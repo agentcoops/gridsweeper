@@ -19,7 +19,7 @@ public class LinearCombinationSweep extends CombinationSweep
 	{
 		int numChildren = children.size();
 		
-		if(numChildren == 0) return new ArrayList<ParameterMap>();
+		if(numChildren == 0) return new ArrayList<ParameterMap>(0);
 		
 		// Assemble childrens' maps
 		int length = -1;
