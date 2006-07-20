@@ -1,4 +1,4 @@
-package com.edbaskerville.gridsweeper;
+package com.edbaskerville.gridsweeper.parameters;
 
 public interface Sweep
 {
