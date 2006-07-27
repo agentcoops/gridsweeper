@@ -2,15 +2,15 @@ package com.edbaskerville.gridsweeper.parameters;
 
 import java.util.*;
 
-public class UniformDoubleSweep extends StochasticSweep
+public class UniformDoubleSweep extends SingleSweep
 {
 	double start;
 	double end;
 	int count;
 	
-	public UniformDoubleSweep(String name, Random rng, double start, double end, int count)
+	public UniformDoubleSweep(String name, double start, double end, int count)
 	{
-		super(name, rng);
+		super(name);
 		
 		if(count < 0) throw new IllegalArgumentException("count cannot be negative");
 		
@@ -20,17 +20,17 @@ public class UniformDoubleSweep extends StochasticSweep
 	}
 
 	@Override
-	public List<ParameterMap> generateMaps()
+	public List<ParameterMap> generateMaps(Random rng)
 	{
 		List<ParameterMap> maps = new ArrayList<ParameterMap>(count);
 		for(int i = 0; i < count; i++)
 		{
-			maps.add(new ParameterMap(name, uniformDouble()));
+			maps.add(new ParameterMap(name, uniformDouble(rng)));
 		}
 		return maps;
 	}
 	
-	private Double uniformDouble()
+	private Double uniformDouble(Random rng)
 	{
 		return new Double(start + rng.nextDouble() * (end - start));
 	}

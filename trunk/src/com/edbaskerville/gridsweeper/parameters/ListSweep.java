@@ -2,11 +2,11 @@ package com.edbaskerville.gridsweeper.parameters;
 
 import java.util.*;
 
-public class ListSweep<T> extends SingleSweep implements List<T>
+public class ListSweep extends SingleSweep implements List<String>
 {
-	private List<T> values;
+	private List<String> values;
 	
-	public ListSweep(String name, List<T> values)
+	public ListSweep(String name, List<String> values)
 	{
 		super(name);
 		this.values = values;
@@ -15,14 +15,14 @@ public class ListSweep<T> extends SingleSweep implements List<T>
 	public ListSweep(String name)
 	{
 		super(name);
-		this.values = new ArrayList<T>();
+		this.values = new ArrayList<String>();
 	}
 	
 	@Override
-	public List<ParameterMap> generateMaps()
+	public List<ParameterMap> generateMaps(Random rng)
 	{
 		List<ParameterMap> maps = new ArrayList<ParameterMap>();
-		for(T value : values)
+		for(String value : values)
 		{
 			maps.add(new ParameterMap(name, value));
 		}
@@ -30,22 +30,22 @@ public class ListSweep<T> extends SingleSweep implements List<T>
 		return maps;
 	}
 
-	public boolean add(T o)
+	public boolean add(String o)
 	{
 		return values.add(o);
 	}
 
-	public void add(int index, T element)
+	public void add(int index, String element)
 	{
 		values.add(index, element);
 	}
 
-	public boolean addAll(Collection<? extends T> c)
+	public boolean addAll(Collection<? extends String> c)
 	{
 		return values.addAll(c);
 	}
 
-	public boolean addAll(int index, Collection<? extends T> c)
+	public boolean addAll(int index, Collection<? extends String> c)
 	{
 		return values.addAll(index, c);
 	}
@@ -65,7 +65,7 @@ public class ListSweep<T> extends SingleSweep implements List<T>
 		return values.containsAll(c);
 	}
 
-	public T get(int index)
+	public String get(int index)
 	{
 		return values.get(index);
 	}
@@ -80,7 +80,7 @@ public class ListSweep<T> extends SingleSweep implements List<T>
 		return values.isEmpty();
 	}
 
-	public Iterator<T> iterator()
+	public Iterator<String> iterator()
 	{
 		return values.iterator();
 	}
@@ -90,12 +90,12 @@ public class ListSweep<T> extends SingleSweep implements List<T>
 		return values.lastIndexOf(o);
 	}
 
-	public ListIterator<T> listIterator()
+	public ListIterator<String> listIterator()
 	{
 		return values.listIterator();
 	}
 
-	public ListIterator<T> listIterator(int index)
+	public ListIterator<String> listIterator(int index)
 	{
 		return values.listIterator(index);
 	}
@@ -105,7 +105,7 @@ public class ListSweep<T> extends SingleSweep implements List<T>
 		return values.remove(o);
 	}
 
-	public T remove(int index)
+	public String remove(int index)
 	{
 		return values.remove(index);
 	}
@@ -120,7 +120,7 @@ public class ListSweep<T> extends SingleSweep implements List<T>
 		return values.retainAll(c);
 	}
 
-	public T set(int index, T element)
+	public String set(int index, String element)
 	{
 		return values.set(index, element);
 	}
@@ -130,7 +130,7 @@ public class ListSweep<T> extends SingleSweep implements List<T>
 		return values.size();
 	}
 
-	public List<T> subList(int fromIndex, int toIndex)
+	public List<String> subList(int fromIndex, int toIndex)
 	{
 		return values.subList(fromIndex, toIndex);
 	}
@@ -140,9 +140,8 @@ public class ListSweep<T> extends SingleSweep implements List<T>
 		return values.toArray();
 	}
 
-	@SuppressWarnings("hiding")
 	public <T> T[] toArray(T[] a)
 	{
-		return values.toArray(a);
+		return null;
 	}
 }

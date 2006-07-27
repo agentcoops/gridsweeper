@@ -19,7 +19,7 @@ public class RangeListSweep extends SingleSweep
 	}
 
 	@Override
-	public List<ParameterMap> generateMaps()
+	public List<ParameterMap> generateMaps(Random rng)
 	{
 		List<ParameterMap> maps = new ArrayList<ParameterMap>();
 		

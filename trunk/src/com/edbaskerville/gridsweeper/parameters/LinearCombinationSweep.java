@@ -15,7 +15,7 @@ public class LinearCombinationSweep extends CombinationSweep
 	}
 
 	@Override
-	public List<ParameterMap> generateMaps() throws SweepLengthException, DuplicateParameterException
+	public List<ParameterMap> generateMaps(Random rng) throws SweepLengthException, DuplicateParameterException
 	{
 		int numChildren = children.size();
 		
@@ -26,7 +26,7 @@ public class LinearCombinationSweep extends CombinationSweep
 		List<List<ParameterMap>> childMapses = new ArrayList<List<ParameterMap>>();
 		for(Sweep child : children)
 		{
-			List<ParameterMap> childMaps = child.generateMaps();
+			List<ParameterMap> childMaps = child.generateMaps(rng);
 			
 			// Verify length
 			if(length == -1) length = childMaps.size();

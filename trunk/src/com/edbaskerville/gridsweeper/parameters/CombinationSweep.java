@@ -16,7 +16,7 @@ public abstract class CombinationSweep implements Sweep, List<Sweep>
 		this.children = new ArrayList<Sweep>();
 	}
 	
-	public abstract List<ParameterMap> generateMaps() throws SweepLengthException, DuplicateParameterException;
+	public abstract List<ParameterMap> generateMaps(Random rng) throws SweepLengthException, DuplicateParameterException;
 
 	public void add(int index, Sweep element)
 	{

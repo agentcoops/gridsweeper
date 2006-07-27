@@ -16,25 +16,25 @@ public class MultiplicativeCombinationSweep extends CombinationSweep
 	}
 
 	@Override
-	public List<ParameterMap> generateMaps() throws SweepLengthException, DuplicateParameterException
+	public List<ParameterMap> generateMaps(Random rng) throws SweepLengthException, DuplicateParameterException
 	{
 		if(children.size() == 0) return new ArrayList<ParameterMap>(0);
 		
-		return generateMaps(children);
+		return generateMaps(children, rng);
 	}
 	
-	private List<ParameterMap> generateMaps(List<Sweep> children) throws SweepLengthException, DuplicateParameterException
+	private List<ParameterMap> generateMaps(List<Sweep> children, Random rng) throws SweepLengthException, DuplicateParameterException
 	{
 		assert children.size() > 0;
 		
-		List<ParameterMap> firstChildMaps = children.get(0).generateMaps();
+		List<ParameterMap> firstChildMaps = children.get(0).generateMaps(rng);
 		
 		// Termination condition: for a single sweep, just return its generated maps
 		if(children.size() == 1) return firstChildMaps;
 		
 		// Recursion: combine the first element of the list with this function
 		// called on the remaining elements
-		return combineMaps(firstChildMaps, generateMaps(children.subList(1, children.size())));
+		return combineMaps(firstChildMaps, generateMaps(children.subList(1, children.size()), rng));
 	}
 	
 	private List<ParameterMap> combineMaps(List<ParameterMap> firstMaps, List<ParameterMap> secondMaps) throws DuplicateParameterException

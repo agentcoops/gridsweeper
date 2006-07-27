@@ -16,13 +16,15 @@ public class ExperimentTest
 	@Before
 	public void setUp() throws Exception
 	{
-		experiment = new Experiment(new Random(), 10, new SingleValueSweep<String>("param", "1"));
+		experiment = new Experiment();
+		experiment.setNumRuns(10);
+		experiment.getRootSweep().add(new SingleValueSweep("param", "1"));
 	}
 	
 	@Test
 	public void generateCases() throws ExperimentException
 	{
-		List<ExperimentCase> cases = experiment.generateCases();
+		List<ExperimentCase> cases = experiment.generateCases(new Random());
 		
 		assertEquals(1, cases.size());
 		

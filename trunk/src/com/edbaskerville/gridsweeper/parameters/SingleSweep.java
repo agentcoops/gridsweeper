@@ -1,6 +1,7 @@
 package com.edbaskerville.gridsweeper.parameters;
 
 import java.util.List;
+import java.util.Random;
 
 public abstract class SingleSweep implements Sweep
 {
@@ -12,7 +13,7 @@ public abstract class SingleSweep implements Sweep
 		this.name = name;
 	}
 
-	public abstract List<ParameterMap> generateMaps();
+	public abstract List<ParameterMap> generateMaps(Random rng);
 
 	public String getName()
 	{

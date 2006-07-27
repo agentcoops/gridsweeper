@@ -5,21 +5,24 @@ import com.edbaskerville.gridsweeper.parameters.*;
 
 public class Experiment
 {
+	private String type;
+	private String name;
+	
 	private Map<String, String> settings;
 	private Map<String, String> abbreviations;
-	private Sweep rootSweep;
+	private MultiplicativeCombinationSweep rootSweep;
 	private int numRuns;
-	private Random rng;
 	private Long rngSeed;
 	
-	public Experiment(Random rng, int numRuns, Sweep rootSweep)
+	public Experiment()
 	{
-		this.rng = rng;
-		this.numRuns = numRuns;
-		this.rootSweep = rootSweep;
+		numRuns = 1;
+		settings = new HashMap<String, String>();
+		abbreviations = new HashMap<String, String>();
+		rootSweep = new MultiplicativeCombinationSweep();
 	}
 	
-	public List<ExperimentCase> generateCases() throws ExperimentException
+	public List<ExperimentCase> generateCases(Random rng) throws ExperimentException
 	{
 		List<ExperimentCase> cases = new ArrayList<ExperimentCase>();
 		
@@ -29,7 +32,7 @@ public class Experiment
 		// Generate the list of parameter values
 		try
 		{
-			List<ParameterMap> maps = rootSweep.generateMaps();
+			List<ParameterMap> maps = rootSweep.generateMaps(rng);
 			
 			for(ParameterMap map : maps)
 			{
@@ -65,11 +68,6 @@ public class Experiment
 		return abbreviations;
 	}
 
-	public void setAbbreviations(Map<String, String> abbreviations)
-	{
-		this.abbreviations = abbreviations;
-	}
-
 	public int getNumRuns()
 	{
 		return numRuns;
@@ -79,16 +77,6 @@ public class Experiment
 	{
 		if(numRuns < 1) throw new IllegalArgumentException("numRuns must be positive");
 		this.numRuns = numRuns;
-	}
-
-	public Random getRng()
-	{
-		return rng;
-	}
-
-	public void setRng(Random rng)
-	{
-		this.rng = rng;
 	}
 
 	public Long getRngSeed()
@@ -101,13 +89,28 @@ public class Experiment
 		this.rngSeed = rngSeed;
 	}
 
-	public Sweep getRootSweep()
+	public MultiplicativeCombinationSweep getRootSweep()
 	{
 		return rootSweep;
 	}
 
-	public void setRootSweep(Sweep rootSweep)
+	public String getName()
 	{
-		this.rootSweep = rootSweep;
+		return name;
+	}
+
+	public void setName(String name)
+	{
+		this.name = name;
+	}
+
+	public String getType()
+	{
+		return type;
+	}
+
+	public void setType(String type)
+	{
+		this.type = type;
 	}
 }
