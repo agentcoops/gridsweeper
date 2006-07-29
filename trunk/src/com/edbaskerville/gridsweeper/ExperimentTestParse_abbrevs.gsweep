@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<experiment>
+	
+	<abbrev param="param1" abbrev="p1" />
+	<abbrev param="param2" abbrev="p2" />
+
+</experiment>

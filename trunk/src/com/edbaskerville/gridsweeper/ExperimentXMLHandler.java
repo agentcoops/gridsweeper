@@ -11,7 +11,7 @@ import com.edbaskerville.gridsweeper.parameters.*;
 
 import static com.edbaskerville.gridsweeper.Logger.*;
 
-public class ExperimentXMLParser extends DefaultHandler
+public class ExperimentXMLHandler extends DefaultHandler
 {
 	private List<Object> stack;
 	private Experiment experiment;
@@ -23,8 +23,9 @@ public class ExperimentXMLParser extends DefaultHandler
 		ITEM
 	}
 	
-	public ExperimentXMLParser()
+	public ExperimentXMLHandler(Experiment experiment)
 	{
+		this.experiment = experiment;
 		stack = new ArrayList<Object>();
 	}
 
@@ -61,8 +62,6 @@ public class ExperimentXMLParser extends DefaultHandler
 				if(top != null)
 					throw new SAXException("experiment tag with non-empty stack");
 				
-				experiment = new Experiment();
-				
 				experiment.setType(attrMap.get("type"));
 				experiment.setName(attrMap.get("name"));
 				
@@ -81,7 +80,18 @@ public class ExperimentXMLParser extends DefaultHandler
 				if(value == null)
 					throw new SAXException("value attribute missing from setting tag");
 				
-				experiment.getSettings().put(key, value);
+				if(key.equals("numRuns"))
+				{
+					experiment.setNumRuns(Integer.parseInt(value));
+				}
+				else if(key.equals("resultsDir"))
+				{
+					experiment.setResultsDir(value);
+				}
+				else
+				{
+					experiment.getSettings().put(key, value);
+				}
 				push(Tag.SETTING);
 			}
 			else if(qName.equals("abbrev"))

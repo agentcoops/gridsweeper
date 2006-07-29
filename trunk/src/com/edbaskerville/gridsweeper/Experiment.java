@@ -1,6 +1,8 @@
 package com.edbaskerville.gridsweeper;
 
 import java.util.*;
+import javax.xml.parsers.*;
+
 import com.edbaskerville.gridsweeper.parameters.*;
 
 public class Experiment
@@ -13,6 +15,7 @@ public class Experiment
 	private MultiplicativeCombinationSweep rootSweep;
 	private int numRuns;
 	private Long rngSeed;
+	private String resultsDir;
 	
 	public Experiment()
 	{
@@ -20,6 +23,22 @@ public class Experiment
 		settings = new HashMap<String, String>();
 		abbreviations = new HashMap<String, String>();
 		rootSweep = new MultiplicativeCombinationSweep();
+	}
+	
+	public Experiment(java.net.URL experimentURL) throws ExperimentException
+	{
+		this();
+		try
+		{
+			SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
+			ExperimentXMLHandler handler = new ExperimentXMLHandler(this);
+			
+			parser.parse(experimentURL.toString(), handler);
+		}
+		catch(Exception e)
+		{
+			throw new ExperimentException("Received exception trying to parse URL.", e);
+		}
 	}
 	
 	public List<ExperimentCase> generateCases(Random rng) throws ExperimentException
@@ -112,5 +131,15 @@ public class Experiment
 	public void setType(String type)
 	{
 		this.type = type;
+	}
+
+	public String getResultsDir()
+	{
+		return resultsDir;
+	}
+
+	public void setResultsDir(String resultsDir)
+	{
+		this.resultsDir = resultsDir;
 	}
 }
