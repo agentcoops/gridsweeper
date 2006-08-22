@@ -8,9 +8,9 @@ public class RunResults
 	private String message;
 	private byte[] stdoutData;
 	private byte[] stderrData;
-	private Map<String, String> outputFiles;
+	private Properties outputFiles;
 	
-	public RunResults(int status, String message, byte[] stdoutData, byte[] stderrData, Map<String, String> outputFiles)
+	public RunResults(int status, String message, byte[] stdoutData, byte[] stderrData, Properties outputFiles)
 	{
 		this.status = status;
 		this.message = message;
@@ -24,7 +24,7 @@ public class RunResults
 		return message;
 	}
 
-	public Map<String, String> getOutputFiles()
+	public Properties getOutputFiles()
 	{
 		return outputFiles;
 	}

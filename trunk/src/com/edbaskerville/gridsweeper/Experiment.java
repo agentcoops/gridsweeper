@@ -10,8 +10,8 @@ public class Experiment
 	private String type;
 	private String name;
 	
-	private Map<String, String> settings;
-	private Map<String, String> abbreviations;
+	private Properties properties;
+	private Properties abbreviations;
 	private MultiplicativeCombinationSweep rootSweep;
 	private int numRuns;
 	private Long rngSeed;
@@ -20,8 +20,8 @@ public class Experiment
 	public Experiment()
 	{
 		numRuns = 1;
-		settings = new HashMap<String, String>();
-		abbreviations = new HashMap<String, String>();
+		properties = new Properties();
+		abbreviations = new Properties();
 		rootSweep = new MultiplicativeCombinationSweep();
 	}
 	
@@ -72,17 +72,17 @@ public class Experiment
 		return cases;
 	}
 
-	public Map<String, String> getSettings()
+	public Properties getProperties()
 	{
-		return settings;
+		return properties;
 	}
 
-	public void setSettings(Map<String, String> settings)
+	public void setProperties(Properties settings)
 	{
-		this.settings = settings;
+		this.properties = settings;
 	}
 
-	public Map<String, String> getAbbreviations()
+	public Properties getAbbreviations()
 	{
 		return abbreviations;
 	}

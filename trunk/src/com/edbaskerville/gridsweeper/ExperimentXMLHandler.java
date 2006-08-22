@@ -90,7 +90,7 @@ public class ExperimentXMLHandler extends DefaultHandler
 				}
 				else
 				{
-					experiment.getSettings().put(key, value);
+					experiment.getProperties().put(key, value);
 				}
 				push(Tag.SETTING);
 			}

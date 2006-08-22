@@ -2,7 +2,7 @@ package com.edbaskerville.gridsweeper;
 
 public interface FileSystem
 {
-	public void connect(java.util.Map<String, String> settings, Progress progress) throws FileSystemException;
+	public void connect(java.util.Properties properties, Progress progress) throws FileSystemException;
 	public void disconnect(Progress progress) throws FileSystemException;
 	
 	public void uploadFile(java.io.InputStream source, String path, Progress progress) throws FileSystemException;
