@@ -61,7 +61,7 @@ public class Experiment
 					rngSeeds.add(rng.nextLong());
 				}
 				
-				cases.add(new ExperimentCase(settings, abbreviations, map, rngSeeds));
+				cases.add(new ExperimentCase(map, rngSeeds));
 			}
 		}
 		catch(Exception e)
