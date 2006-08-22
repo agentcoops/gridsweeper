@@ -38,21 +38,21 @@ public class StringUtils
 			replacements.put(original, escape(original)); 
 		}
 
-		StringBuffer escapedStringBuffer = new StringBuffer();
+		StringBuilder escapedStringBuilder = new StringBuilder();
 		for(int i = 0; i < string.length(); i++)
 		{
 			String original = string.substring(i, i+1);
 			if(replacements.containsKey(original))
 			{
-				escapedStringBuffer.append(replacements.get(original));
+				escapedStringBuilder.append(replacements.get(original));
 			}
 			else
 			{
-				escapedStringBuffer.append(original);
+				escapedStringBuilder.append(original);
 			}
 		}
 		
-		return escapedStringBuffer.toString();
+		return escapedStringBuilder.toString();
 	}
 	
 	static String escape(String string)

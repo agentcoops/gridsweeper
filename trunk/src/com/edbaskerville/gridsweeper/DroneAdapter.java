@@ -71,14 +71,14 @@ public class DroneAdapter implements Adapter
 			arguments.add(setParamOption + name + "=" + parameters.get(name));
 		}
 		
-		StringBuffer messageBuffer = new StringBuffer(command);
+		StringBuilder messageBuilder = new StringBuilder(command);
 		for(String arg : arguments)
 		{
-			messageBuffer.append(" " + StringUtils.escape(arg, " "));
+			messageBuilder.append(" " + StringUtils.escape(arg, " "));
 		}
 		
 		int status = 0;
-		String message = messageBuffer.toString();
+		String message = messageBuilder.toString();
 		
 		byte[] stdoutData = null;
 		byte[] stderrData = null;
