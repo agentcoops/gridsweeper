@@ -4,7 +4,7 @@ import java.io.*;
 import java.util.*;
 import org.apache.commons.net.ftp.*;
 
-public class FTPFileSystem implements FileSystem
+public class FTPFileTransferSystem implements FileTransferSystem
 {
 	String hostname;
 	int port;
@@ -16,10 +16,10 @@ public class FTPFileSystem implements FileSystem
 	
 	FTPClient ftpClient;
 	
-	public FTPFileSystem(Properties properties) throws FileSystemException
+	public FTPFileTransferSystem(Properties properties) throws FileTransferException
 	{
 		hostname = properties.getProperty("hostname");
-		if(hostname == null) throw new FileSystemException("Cannot initialize FTP file system without hostname.");
+		if(hostname == null) throw new FileTransferException("Cannot initialize FTP file system without hostname.");
 		
 		String portStr = properties.getProperty("port");
 		if(portStr != null)
@@ -36,12 +36,12 @@ public class FTPFileSystem implements FileSystem
 		ftpClient = new FTPClient();
 	}
 	
-	public void connect() throws FileSystemException
+	public void connect() throws FileTransferException
 	{
 		connect(null);
 	}
 	
-	public void connect(Progress progress) throws FileSystemException
+	public void connect(Progress progress) throws FileTransferException
 	{
 		if(progress != null) progress.setProgress(0.0);
 		
@@ -53,7 +53,7 @@ public class FTPFileSystem implements FileSystem
 		}
 		catch(Exception e)
 		{
-			throw new FileSystemException("An exception occurred trying to connect to FTP server.", e);
+			throw new FileTransferException("An exception occurred trying to connect to FTP server.", e);
 		}
 		
 		int replyCode = ftpClient.getReplyCode();
@@ -61,7 +61,7 @@ public class FTPFileSystem implements FileSystem
 		if(!FTPReply.isPositiveCompletion(replyCode))
 		{
 			try { ftpClient.disconnect(); } catch (IOException e) { }
-			throw new FileSystemException("FTP server refused connection.");
+			throw new FileTransferException("FTP server refused connection.");
 		}
 		
 		if(progress != null) progress.setProgress(1.0 / 3);
@@ -71,12 +71,12 @@ public class FTPFileSystem implements FileSystem
 		{
 			if(!ftpClient.login(username, password))
 			{
-				throw new FileSystemException("FTP login failed.");
+				throw new FileTransferException("FTP login failed.");
 			}
 		}
 		catch(Exception e)
 		{
-			throw new FileSystemException("An exception occurred trying to login to FTP server.", e);
+			throw new FileTransferException("An exception occurred trying to login to FTP server.", e);
 		}
 		
 		if(progress != null) progress.setProgress(2.0 / 3);
@@ -86,23 +86,23 @@ public class FTPFileSystem implements FileSystem
 		{
 			if(!ftpClient.changeWorkingDirectory(directory))
 			{
-				throw new FileSystemException("Could not change working directory.");
+				throw new FileTransferException("Could not change working directory.");
 			}
 		}
 		catch (IOException e)
 		{
-			throw new FileSystemException("Got exception trying to cd", e);
+			throw new FileTransferException("Got exception trying to cd", e);
 		}
 		
 		if(progress != null) progress.setProgress(1.0);
 	}
 
-	public void disconnect() throws FileSystemException
+	public void disconnect() throws FileTransferException
 	{
 		disconnect(null);
 	}
 	
-	public void disconnect(Progress progress) throws FileSystemException
+	public void disconnect(Progress progress) throws FileTransferException
 	{
 		if(progress != null) progress.setProgress(0.0);
 		
@@ -110,12 +110,12 @@ public class FTPFileSystem implements FileSystem
 		{
 			if(!ftpClient.logout())
 			{
-				throw new FileSystemException("FTP logout failed.");
+				throw new FileTransferException("FTP logout failed.");
 			}
 		}
 		catch (IOException e)
 		{
-			throw new FileSystemException("Caught exception trying to logout.", e);
+			throw new FileTransferException("Caught exception trying to logout.", e);
 		}
 		
 		if(progress != null) progress.setProgress(0.5);
@@ -126,18 +126,18 @@ public class FTPFileSystem implements FileSystem
 		}
 		catch (IOException e)
 		{
-			throw new FileSystemException("Got exception disconnecting from FTP server.", e);
+			throw new FileTransferException("Got exception disconnecting from FTP server.", e);
 		}
 		
 		if(progress != null) progress.setProgress(1.0);
 	}
 	
-	public void downloadFile(String remotePath, String localPath) throws FileSystemException
+	public void downloadFile(String remotePath, String localPath) throws FileTransferException
 	{
 		downloadFile(remotePath, localPath, null);
 	}
 	
-	public void downloadFile(String remotePath, String localPath, Progress progress) throws FileSystemException
+	public void downloadFile(String remotePath, String localPath, Progress progress) throws FileTransferException
 	{
 		if(progress != null) progress.setProgress(0.0);
 		
@@ -149,7 +149,7 @@ public class FTPFileSystem implements FileSystem
 		}
 		catch (IOException e)
 		{
-			throw new FileSystemException("Received exception getting file stream.");
+			throw new FileTransferException("Received exception getting file stream.");
 		}
 		
 		// Get a file output stream
@@ -160,7 +160,7 @@ public class FTPFileSystem implements FileSystem
 		}
 		catch (FileNotFoundException e)
 		{
-			throw new FileSystemException("Could not open local file", e);
+			throw new FileTransferException("Could not open local file", e);
 		}
 		
 		// Get file size
@@ -189,7 +189,7 @@ public class FTPFileSystem implements FileSystem
 		}
 		catch(IOException e)
 		{
-			throw new FileSystemException("Received exception copying file", e);
+			throw new FileTransferException("Received exception copying file", e);
 		}
 		
 		// Close both streams
@@ -200,7 +200,7 @@ public class FTPFileSystem implements FileSystem
 		}
 		catch(IOException e)
 		{
-			throw new FileSystemException("Got exception closing streams", e);
+			throw new FileTransferException("Got exception closing streams", e);
 		}
 		
 		// Complete pending FTP command
@@ -208,21 +208,21 @@ public class FTPFileSystem implements FileSystem
 		{
 			if(!ftpClient.completePendingCommand())
 			{
-				throw new FileSystemException("Could not complete file transfer");
+				throw new FileTransferException("Could not complete file transfer");
 			}
 		}
 		catch (IOException e)
 		{
-			throw new FileSystemException("Received exception completing file transfer", e);
+			throw new FileTransferException("Received exception completing file transfer", e);
 		}
 	}
 
-	public List<String> list(String path) throws FileSystemException
+	public List<String> list(String path) throws FileTransferException
 	{
 		return list(path, null);
 	}
 	
-	public List<String> list(String path, Progress progress) throws FileSystemException
+	public List<String> list(String path, Progress progress) throws FileTransferException
 	{
 		// Get an FTP list parse engine
 		
@@ -234,12 +234,12 @@ public class FTPFileSystem implements FileSystem
 		return null;
 	}
 	
-	public boolean isDirectory(String path) throws FileSystemException
+	public boolean isDirectory(String path) throws FileTransferException
 	{
 		return isDirectory(path, null);
 	}
 	
-	public boolean isDirectory(String path, Progress progress) throws FileSystemException
+	public boolean isDirectory(String path, Progress progress) throws FileTransferException
 	{
 		// Get an FTPFile object for path
 		
@@ -248,12 +248,12 @@ public class FTPFileSystem implements FileSystem
 		return false;
 	}
 	
-	public void deleteFile(String path) throws FileSystemException
+	public void deleteFile(String path) throws FileTransferException
 	{
 		deleteFile(path, null);
 	}
 	
-	public void deleteFile(String path, Progress progress) throws FileSystemException
+	public void deleteFile(String path, Progress progress) throws FileTransferException
 	{
 		if(progress != null) progress.setProgress(0.0);
 		
@@ -261,22 +261,22 @@ public class FTPFileSystem implements FileSystem
 		{
 			if(!ftpClient.deleteFile(path))
 			{
-				throw new FileSystemException("Could not delete file.");
+				throw new FileTransferException("Could not delete file.");
 			}
 		} catch (IOException e)
 		{
-			throw new FileSystemException("Received IOException deleting file", e);
+			throw new FileTransferException("Received IOException deleting file", e);
 		}
 		
 		if(progress != null) progress.setProgress(1.0);
 	}
 	
-	public void uploadFile(String localPath, String remotePath) throws FileSystemException
+	public void uploadFile(String localPath, String remotePath) throws FileTransferException
 	{
 		uploadFile(localPath, remotePath, null);
 	}
 	
-	public void uploadFile(String localPath, String remotePath, Progress progress) throws FileSystemException
+	public void uploadFile(String localPath, String remotePath, Progress progress) throws FileTransferException
 	{
 		if(progress != null) progress.setProgress(0.0);
 		
@@ -290,7 +290,7 @@ public class FTPFileSystem implements FileSystem
 		}
 		catch (FileNotFoundException e)
 		{
-			throw new FileSystemException("Could not find specified file", e);
+			throw new FileTransferException("Could not find specified file", e);
 		}
 		
 		// Get the output stream
@@ -301,7 +301,7 @@ public class FTPFileSystem implements FileSystem
 		}
 		catch(IOException e)
 		{
-			throw new FileSystemException("Received exception retrieving remote stream");
+			throw new FileTransferException("Received exception retrieving remote stream");
 		}
 		
 		// Get size for progress calculations
@@ -320,7 +320,7 @@ public class FTPFileSystem implements FileSystem
 		}
 		catch(IOException e)
 		{
-			throw new FileSystemException("Received exception copying file", e);
+			throw new FileTransferException("Received exception copying file", e);
 		}
 		
 		// Close both files
@@ -331,7 +331,7 @@ public class FTPFileSystem implements FileSystem
 		}
 		catch(IOException e)
 		{
-			throw new FileSystemException("Received exception closing streams", e);
+			throw new FileTransferException("Received exception closing streams", e);
 		}
 		
 		// Complete pending FTP command
@@ -339,18 +339,18 @@ public class FTPFileSystem implements FileSystem
 		{
 			if(!ftpClient.completePendingCommand())
 			{
-				throw new FileSystemException("Could not complete file transfer");
+				throw new FileTransferException("Could not complete file transfer");
 			}
 		}
 		catch (IOException e)
 		{
-			throw new FileSystemException("Received exception completing file transfer", e);
+			throw new FileTransferException("Received exception completing file transfer", e);
 		}
 		
 		if(progress != null) progress.setProgress(1.0);
 	}
 
-	public void makeDirectory(String path, Progress progress) throws FileSystemException
+	public void makeDirectory(String path, Progress progress) throws FileTransferException
 	{
 		if(progress != null) progress.setProgress(0.0);
 		
@@ -359,23 +359,23 @@ public class FTPFileSystem implements FileSystem
 			if(!ftpClient.makeDirectory(path))
 			{
 				
-				throw new FileSystemException("Could not create directory.");
+				throw new FileTransferException("Could not create directory.");
 			}
 		}
 		catch(IOException e)
 		{
-			throw new FileSystemException("Got exception creating directory");
+			throw new FileTransferException("Got exception creating directory");
 		}
 		
 		if(progress != null) progress.setProgress(1.0);
 	}
 
-	public void makeDirectory(String path) throws FileSystemException
+	public void makeDirectory(String path) throws FileTransferException
 	{
 		makeDirectory(path, null);
 	}
 
-	public void removeDirectory(String path, Progress progress) throws FileSystemException
+	public void removeDirectory(String path, Progress progress) throws FileTransferException
 	{
 		if(progress != null) progress.setProgress(0.0);
 		
@@ -383,19 +383,19 @@ public class FTPFileSystem implements FileSystem
 		{
 			if(!ftpClient.removeDirectory(path))
 			{
-				throw new FileSystemException("Could not remove directory.");
+				throw new FileTransferException("Could not remove directory.");
 			}
 		}
 		catch(IOException e)
 		{
-			throw new FileSystemException("Got exception removing directory");
+			throw new FileTransferException("Got exception removing directory");
 		}
 		
 		if(progress != null) progress.setProgress(1.0);
 		
 	}
 
-	public void removeDirectory(String path) throws FileSystemException
+	public void removeDirectory(String path) throws FileTransferException
 	{
 		removeDirectory(path, null);
 	}

@@ -5,9 +5,9 @@ import java.util.*;
 import org.junit.*;
 import static org.junit.Assert.*;
 
-public class FTPFileSystemTest
+public class FTPFileTransferSystemTest
 {
-	FTPFileSystem ftpFS;
+	FTPFileTransferSystem ftpFS;
 	
 	@Before
 	public void setUp() throws Exception
@@ -18,7 +18,7 @@ public class FTPFileSystemTest
 		properties.setProperty("password", "ftp");
 		properties.setProperty("directory", "tmp");
 		
-		ftpFS = new FTPFileSystem(properties);
+		ftpFS = new FTPFileTransferSystem(properties);
 	}
 	
 	@Test
@@ -30,7 +30,7 @@ public class FTPFileSystemTest
 			ftpFS.connect(progress);
 			ftpFS.disconnect(progress);
 		}
-		catch(FileSystemException e)
+		catch(FileTransferException e)
 		{
 			fail();
 		}

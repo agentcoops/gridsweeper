@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="GridSweeper" default="dist" basedir=".">
+	<property name="compile.debug" value="true"/>
+	
+	<property name="src" location="src"/>
+	<property name="bin" location="bin"/>
+	<property name="dist" location="dist"/>
+	
+	<property name="classes" location="${dist}/classes"/>
+	<property name="jarfile" location="${classes}/GridSweeper.jar"/>
+	<property name="distbin" location="${dist}/bin"/>
+	
+	<target name="dist" depends="jar">
+		<copy file="gsweep" tofile="${distbin}/gsweep" />
+		<chmod file="${distbin}/gsweep" perm="755"/>
+		
+		<copy file="gdrone" tofile="${distbin}/gdrone" />
+		<chmod file="${distbin}/gdrone" perm="755"/>
+		
+		<copy file="grunner" tofile="${distbin}/grunner" />
+		<chmod file="${distbin}/grunner" perm="755"/>
+	</target>
+	
+	<target name="compile" description="Compile code">
+		<mkdir dir="${bin}"/>
+		<javac
+			srcdir="${src}"
+			destdir="${bin}"
+			source="1.5"
+			target="1.5"
+			debug="${compile.debug}"
+		/>
+	</target>
+	
+	<target name="jar" depends="compile" description="Build jar">
+		<manifest file="MANIFEST.MF">
+			<attribute name="Main-Class" value="com.edbaskerville.gridsweeper.GridSweeper"/>
+		</manifest>
+
+		<mkdir dir="${classes}"/>
+		<jar 
+			excludes="**/*Test.class **/*.gsweep"
+			jarfile="${jarfile}"
+			basedir="${bin}"
+			manifest="MANIFEST.MF"
+		/>
+	</target>
+	
+	<target name="clean" description="Remove build and dist dirs">
+		<delete dir="${bin}"/>
+		<delete dir="${dist}"/>
+	</target>
+	
+</project>
+
+<!--
+
+GS_ROOT/
+	bin/
+		gsweep
+		gdrone
+		grunner
+	classes/
+		classes.jar
+			(all classes except those with main methods)
+		GridSweeper.jar
+			(app/tool class)
+		GridSweeperRunner.jar
+			(class to actually run simulations on agents)
+	plugins/
+	
+-->

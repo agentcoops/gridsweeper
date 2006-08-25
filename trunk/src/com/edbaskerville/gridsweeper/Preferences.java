@@ -1,6 +1,7 @@
 package com.edbaskerville.gridsweeper;
 
 import java.util.*;
+import java.io.*;
 
 public class Preferences extends Properties
 {
@@ -24,9 +25,22 @@ public class Preferences extends Properties
 		{
 			Preferences defaults = new Preferences();
 			
-			// TODO: set up defaults
+			defaults.setProperty("Root", "/usr/local/gridsweeper");
+			
+			defaults.setProperty("UseSharedFileSystem", "false");
+			defaults.setProperty("FileTransferSystem", "FTP");
+			
+			defaults.setProperty("FTPUsername", "anonymous");
 			
 			sharedPreferences = new Preferences(defaults);
+			try
+			{
+				sharedPreferences.load(new FileInputStream(System.getProperty("user.home") + "/.gridsweeper"));
+				Logger.fine("Loaded user preferences:");
+				Logger.fine(sharedPreferences.toString());
+			}
+			catch(FileNotFoundException e) {}
+			catch(IOException e) {}
 		}
 		
 		return sharedPreferences;

@@ -1,0 +1,5 @@
+#!/bin/sh
+
+CLASSPATH=${GRIDSWEEPER_ROOT}/classes/GridSweeper.jar
+ADAPTER="com.edbaskerville.gridsweeper.DroneAdapter"
+java -cp ${CLASSPATH} com.edbaskerville.gridsweeper.GridSweeper -a ${ADAPTER} $@
