@@ -13,10 +13,10 @@ public class FTPFileTransferSystemTest
 	public void setUp() throws Exception
 	{
 		Properties properties = new Properties();
-		properties.setProperty("hostname", "localhost");
-		properties.setProperty("username", "ftpuser");
-		properties.setProperty("password", "ftp");
-		properties.setProperty("directory", "tmp");
+		properties.setProperty("Hostname", "localhost");
+		properties.setProperty("Username", "ftpuser");
+		properties.setProperty("Password", "ftp");
+		properties.setProperty("Directory", "tmp");
 		
 		ftpFS = new FTPFileTransferSystem(properties);
 	}

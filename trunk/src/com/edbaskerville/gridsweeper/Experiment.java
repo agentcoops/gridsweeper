@@ -12,6 +12,9 @@ public class Experiment
 	
 	private Properties properties;
 	private Properties abbreviations;
+	private Properties inputFiles;
+	private Properties outputFiles;
+	
 	private MultiplicativeCombinationSweep rootSweep;
 	private int numRuns;
 	private Long rngSeed;
@@ -141,5 +144,25 @@ public class Experiment
 	public void setResultsDir(String resultsDir)
 	{
 		this.resultsDir = resultsDir;
+	}
+
+	public Properties getInputFiles() {
+		return inputFiles;
+	}
+
+	public void setInputFiles(Properties inputFiles) {
+		this.inputFiles = inputFiles;
+	}
+
+	public Properties getOutputFiles() {
+		return outputFiles;
+	}
+
+	public void setOutputFiles(Properties outputFiles) {
+		this.outputFiles = outputFiles;
+	}
+
+	public void setAbbreviations(Properties abbreviations) {
+		this.abbreviations = abbreviations;
 	}
 }

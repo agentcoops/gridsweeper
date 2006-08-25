@@ -18,20 +18,20 @@ public class FTPFileTransferSystem implements FileTransferSystem
 	
 	public FTPFileTransferSystem(Properties properties) throws FileTransferException
 	{
-		hostname = properties.getProperty("hostname");
+		hostname = properties.getProperty("Hostname");
 		if(hostname == null) throw new FileTransferException("Cannot initialize FTP file system without hostname.");
 		
-		String portStr = properties.getProperty("port");
+		String portStr = properties.getProperty("Port");
 		if(portStr != null)
 		{
-			port = Integer.parseInt(properties.getProperty("port"));
+			port = Integer.parseInt(properties.getProperty("Port"));
 		}
 		else port = 0;
 		
-		username = properties.getProperty("username");
-		password = properties.getProperty("password");
+		username = properties.getProperty("Username");
+		password = properties.getProperty("Password");
 		
-		directory = properties.getProperty("directory");
+		directory = properties.getProperty("Directory");
 		
 		ftpClient = new FTPClient();
 	}

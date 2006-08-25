@@ -82,4 +82,17 @@ public class StringUtils
 		}
 		return unescapedString;
 	}
+	
+	static String replace(String target, String replacement)
+	{
+		int index = target.indexOf(replacement);
+		if(index != -1)
+		{
+			String beginning = target.substring(0, index);
+			String end = target.substring(index + replacement.length());
+			
+			return beginning + replacement + end; 
+		}
+		return target;
+	}
 }

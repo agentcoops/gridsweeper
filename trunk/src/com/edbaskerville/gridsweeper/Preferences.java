@@ -9,12 +9,12 @@ public class Preferences extends Properties
 	
 	static Preferences sharedPreferences;
 	
-	private Preferences()
+	public Preferences()
 	{
 		super();
 	}
 	
-	private Preferences(Preferences defaults)
+	public Preferences(Preferences defaults)
 	{
 		super(defaults);
 	}
@@ -27,10 +27,10 @@ public class Preferences extends Properties
 			
 			defaults.setProperty("Root", "/usr/local/gridsweeper");
 			
-			defaults.setProperty("UseSharedFileSystem", "false");
-			defaults.setProperty("FileTransferSystem", "FTP");
+			defaults.setProperty("EnableFileTransfer", "true");
+			defaults.setProperty("FileTransferSystemClass", "com.edbaskerville.gridsweeper.FTPFileTransferSystem");
 			
-			defaults.setProperty("FTPUsername", "anonymous");
+			defaults.setProperty("com.edbaskerville.gridsweeper.FTPFileTransferSystem.Username", "anonymous");
 			
 			sharedPreferences = new Preferences(defaults);
 			try
@@ -44,5 +44,28 @@ public class Preferences extends Properties
 		}
 		
 		return sharedPreferences;
+	}
+	
+	public boolean getBooleanProperty(String key)
+	{
+		return Boolean.parseBoolean(getProperty(key));
+	}
+
+	public Properties getPropertiesForClass(String className)
+	{
+		Properties properties = new Properties();
+		String classNamePlusDot = className + ".";
+		
+		for(Object key : properties.keySet())
+		{
+			String propName = (String)key;
+			if(propName.indexOf(classNamePlusDot) == 0)
+			{
+				String shortKey = propName.substring(classNamePlusDot.length());
+				properties.setProperty(shortKey, getProperty(propName));
+			}
+		}
+		
+		return properties;
 	}
 }
