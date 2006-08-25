@@ -25,6 +25,8 @@ public class Experiment
 		numRuns = 1;
 		properties = new Properties();
 		abbreviations = new Properties();
+		inputFiles = new Properties();
+		outputFiles = new Properties();
 		rootSweep = new MultiplicativeCombinationSweep();
 	}
 	

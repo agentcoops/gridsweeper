@@ -1,4 +1,5 @@
 #!/bin/sh
 
 CLASSPATH=${GRIDSWEEPER_ROOT}/classes/GridSweeper.jar
-java -cp ${CLASSPATH} com.edbaskerville.gridsweeper.GridSweeper $@
+CLASS=com.edbaskerville.gridsweeper.GridSweeper
+java -cp ${CLASSPATH} ${CLASS} $@

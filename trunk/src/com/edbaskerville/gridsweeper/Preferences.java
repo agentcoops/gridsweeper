@@ -27,6 +27,8 @@ public class Preferences extends Properties
 			
 			defaults.setProperty("Root", "/usr/local/gridsweeper");
 			
+			defaults.setProperty("AdapterClass", "com.edbaskerville.gridsweeper.DroneAdapter");
+			
 			defaults.setProperty("EnableFileTransfer", "true");
 			defaults.setProperty("FileTransferSystemClass", "com.edbaskerville.gridsweeper.FTPFileTransferSystem");
 			

@@ -43,14 +43,10 @@ public class GridSweeperRunner
 				fts.disconnect();
 			}
 			
-			
-			// Set up adapter object
 			Class adapterClass = setup.getAdapterClass();
-			Class[] parameterTypes = new Class[] { Properties.class, byte[].class };
-			Constructor adapterConstructor = adapterClass.getConstructor(parameterTypes);
-			Object[] initargs = new Object[] { setup.getProperties(), setup.getStdinData() };
-			
-			Adapter adapter = (Adapter)adapterConstructor.newInstance(initargs);
+			Properties properties = setup.getProperties();
+			byte[] stdinData = setup.getStdinData();
+			Adapter adapter = AdapterFactory.createAdapter(adapterClass, properties, stdinData);
 			
 			// Run!
 			ParameterMap parameters = setup.getParameters();

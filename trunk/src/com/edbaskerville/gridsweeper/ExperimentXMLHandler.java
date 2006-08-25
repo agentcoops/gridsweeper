@@ -20,7 +20,9 @@ public class ExperimentXMLHandler extends DefaultHandler
 	{
 		SETTING,
 		ABBREV,
-		ITEM
+		ITEM,
+		INPUT,
+		OUTPUT
 	}
 	
 	public ExperimentXMLHandler(Experiment experiment)
@@ -66,6 +68,40 @@ public class ExperimentXMLHandler extends DefaultHandler
 				experiment.setName(attrMap.get("name"));
 				
 				push(experiment);
+			}
+			else if(qName.equals("input"))
+			{
+				if(top != experiment)
+					throw new SAXException("input tag with non-experiment on top of stack");
+				
+				String source = attrMap.get("source");
+				String destination = attrMap.get("destination");
+				
+				if(source == null)
+					throw new SAXException("source attribute missing from input tag");
+				if(destination == null)
+					throw new SAXException("destination attribute missing from input tag");
+				
+				experiment.getInputFiles().setProperty(source, destination);
+				
+				push(Tag.INPUT);
+			}
+			else if(qName.equals("output"))
+			{
+				if(top != experiment)
+					throw new SAXException("output tag with non-experiment on top of stack");
+				
+				String source = attrMap.get("source");
+				String destination = attrMap.get("destination");
+				
+				if(source == null)
+					throw new SAXException("source attribute missing from output tag");
+				if(destination == null)
+					throw new SAXException("destination attribute missing from output tag");
+				
+				experiment.getOutputFiles().setProperty(source, destination);
+				
+				push(Tag.OUTPUT);
 			}
 			else if(qName.equals("setting"))
 			{
@@ -176,6 +212,16 @@ public class ExperimentXMLHandler extends DefaultHandler
 			{
 				if(top != experiment)
 					throw new SAXException("mismatched experiment end tag");
+			}
+			else if(qName.equals("input"))
+			{
+				if(top != Tag.INPUT)
+					throw new SAXException("mismatched input end tag");
+			}
+			else if(qName.equals("output"))
+			{
+				if(top != Tag.OUTPUT)
+					throw new SAXException("mismatched input end tag");
 			}
 			else if(qName.equals("setting"))
 			{
