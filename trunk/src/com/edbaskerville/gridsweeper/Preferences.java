@@ -29,6 +29,7 @@ public class Preferences extends Properties
 			
 			defaults.setProperty("AdapterClass", "com.edbaskerville.gridsweeper.DroneAdapter");
 			
+			defaults.setProperty("UseSharedFileSystem", "false");
 			defaults.setProperty("EnableFileTransfer", "true");
 			defaults.setProperty("FileTransferSystemClass", "com.edbaskerville.gridsweeper.FTPFileTransferSystem");
 			

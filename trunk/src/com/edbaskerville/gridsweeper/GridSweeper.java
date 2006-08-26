@@ -1,5 +1,7 @@
 package com.edbaskerville.gridsweeper;
 
+import org.ggf.drmaa.DrmaaException;
+
 public class GridSweeper
 {
 	enum ArgState
@@ -7,6 +9,42 @@ public class GridSweeper
 		START,
 		ADAPTER,
 		EXPERIMENT
+	}
+	
+	static Experiment experiment;
+	static GridDelegate gridDelegate;
+	static int numFailedRuns;
+	
+	static
+	{
+		experiment = null;
+		numFailedRuns = 0;
+		gridDelegate = new GridDelegate()
+		{
+			public void batchCompleted()
+			{
+				System.err.println("The experiment has completed.");
+			}
+			
+			public void batchFailed(Exception e)
+			{
+				System.err.println("The experiment failed due to an exception:");
+				e.printStackTrace();
+			}
+
+			public void runCompleted(ExperimentCase experimentCase, int runNumber)
+			{
+				String description = experiment.getCaseDescription(experimentCase);
+				System.err.println("Completed run " + runNumber + " of case " + description);
+			}
+
+			public void runFailed(ExperimentCase experimentCase, int runNumber)
+			{
+				String description = experiment.getCaseDescription(experimentCase);
+				System.err.println("Run " + runNumber + " of case " + description + " failed.");
+			}
+			
+		};
 	}
 	
 	public static void main(String[] args)
@@ -38,7 +76,6 @@ public class GridSweeper
 		
 		// Load experiment
 		if(experimentFile == null) exit("Experiment file must be provided.");
-		Experiment experiment = null;
 		try
 		{
 			experiment = new Experiment(new java.net.URL("file://" + experimentFile));
@@ -49,8 +86,18 @@ public class GridSweeper
 		}
 		
 		// Submit runs and wait for completion.
-		GridController controller = new GridController();
-		controller.submitExperiment(experiment, adapterClassName, true);  
+		GridController controller = new GridController(gridDelegate);
+		try
+		{
+			controller.connect();
+			controller.submitExperiment(experiment, adapterClassName, true);
+			controller.disconnect();
+		}
+		catch(DrmaaException e)
+		{
+			System.out.println("Failed due to a DrmaaException:");
+			e.printStackTrace();
+		}
 	}
 	
 	public static void exit(String message)

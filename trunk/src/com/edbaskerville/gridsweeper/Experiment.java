@@ -167,4 +167,25 @@ public class Experiment
 	public void setAbbreviations(Properties abbreviations) {
 		this.abbreviations = abbreviations;
 	}
+
+	public String getCaseDescription(ExperimentCase experimentCase)
+	{
+		ParameterMap changingParameters = (ParameterMap)experimentCase.getMap().clone();
+		
+		for(Sweep sweep : rootSweep)
+		{
+			if(sweep instanceof SingleValueSweep)
+			{
+				changingParameters.remove(((SingleValueSweep)sweep).getName());
+			}
+		}
+		
+		return changingParameters.toString();
+	}
+
+	public String getDirectoryForCase(ExperimentCase expCase)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
