@@ -95,4 +95,58 @@ public class StringUtils
 		}
 		return target;
 	}
+	
+	static String lastPathComponent(String string)
+	{
+		if(string == null) return null;
+		if(string.equals("/")) return string;
+		
+		int length = string.length();
+		if(length == 0) return string;
+		
+		// Remove trailing slash
+		if(string.charAt(length - 1) == '/') string = string.substring(0, length - 1);
+		
+		// Find final slash
+		int finalSlashLoc = string.lastIndexOf("/");
+		if(finalSlashLoc == -1) return string;
+		else return string.substring(finalSlashLoc + 1);
+	}
+	
+	static String deleteLastPathComponent(String string)
+	{
+		if(string == null) return null;
+		
+		int length = string.length();
+		if(length == 0) return string;
+		if(string.equals("/")) return string;
+		
+		StringBuffer stringBuf = new StringBuffer(string);
+		
+		// Remove trailing slash
+		if(string.charAt(length - 1) == '/') stringBuf.setLength(--length);
+		
+		// Find final slash
+		int finalSlashLoc = stringBuf.lastIndexOf("/");
+		
+		// If no final slash, then we just turn this into the empty string
+		if(finalSlashLoc == -1)
+		{
+			stringBuf.setLength(0);	
+		}
+		
+		// If the final slash is an absolute path indicator, delete everything after that.
+		else if(finalSlashLoc == 0)
+		{
+			stringBuf.setLength(finalSlashLoc + 1);
+		}
+		
+		// If it's an internal path separator, delete it and everything after it.
+		else
+		{
+			stringBuf.setLength(finalSlashLoc);
+		}
+		
+		return stringBuf.toString();
+	}
 }

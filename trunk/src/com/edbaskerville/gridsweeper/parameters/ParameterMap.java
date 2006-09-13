@@ -2,6 +2,7 @@ package com.edbaskerville.gridsweeper.parameters;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 public class ParameterMap extends HashMap<String, Object>
 {
@@ -31,5 +32,11 @@ public class ParameterMap extends HashMap<String, Object>
 	{
 		super(1, 1);
 		put(name, value);
+	}
+
+	public String toDirectoryString(Properties abbreviations)
+	{
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

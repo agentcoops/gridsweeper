@@ -56,9 +56,9 @@ public class Experiment
 		// Generate the list of parameter values
 		try
 		{
-			List<ParameterMap> maps = rootSweep.generateMaps(rng);
+			List<ParameterMap> parameterMaps = rootSweep.generateMaps(rng);
 			
-			for(ParameterMap map : maps)
+			for(ParameterMap parameterMap : parameterMaps)
 			{
 				List<Long> rngSeeds = new ArrayList<Long>(numRuns);
 				for(int i = 0; i < numRuns; i++)
@@ -66,7 +66,7 @@ public class Experiment
 					rngSeeds.add(rng.nextLong());
 				}
 				
-				cases.add(new ExperimentCase(map, rngSeeds));
+				cases.add(new ExperimentCase(parameterMap, rngSeeds));
 			}
 		}
 		catch(Exception e)
@@ -148,29 +148,34 @@ public class Experiment
 		this.resultsDir = resultsDir;
 	}
 
-	public Properties getInputFiles() {
+	public Properties getInputFiles()
+	{
 		return inputFiles;
 	}
 
-	public void setInputFiles(Properties inputFiles) {
+	public void setInputFiles(Properties inputFiles)
+	{
 		this.inputFiles = inputFiles;
 	}
 
-	public Properties getOutputFiles() {
+	public Properties getOutputFiles()
+	{
 		return outputFiles;
 	}
 
-	public void setOutputFiles(Properties outputFiles) {
+	public void setOutputFiles(Properties outputFiles)
+	{
 		this.outputFiles = outputFiles;
 	}
 
-	public void setAbbreviations(Properties abbreviations) {
+	public void setAbbreviations(Properties abbreviations)
+	{
 		this.abbreviations = abbreviations;
 	}
 
 	public String getCaseDescription(ExperimentCase experimentCase)
 	{
-		ParameterMap changingParameters = (ParameterMap)experimentCase.getMap().clone();
+		ParameterMap changingParameters = (ParameterMap)experimentCase.getParameterMap().clone();
 		
 		for(Sweep sweep : rootSweep)
 		{
@@ -183,9 +188,18 @@ public class Experiment
 		return changingParameters.toString();
 	}
 
-	public String getDirectoryForCase(ExperimentCase expCase)
+	public String getDirectoryForCase(ExperimentCase experimentCase)
 	{
-		// TODO Auto-generated method stub
-		return null;
+		ParameterMap changingParameters = (ParameterMap)experimentCase.getParameterMap().clone();
+		
+		for(Sweep sweep : rootSweep)
+		{
+			if(sweep instanceof SingleValueSweep)
+			{
+				changingParameters.remove(((SingleValueSweep)sweep).getName());
+			}
+		}
+		
+		return changingParameters.toDirectoryString(abbreviations);
 	}
 }

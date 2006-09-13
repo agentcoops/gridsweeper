@@ -43,6 +43,8 @@ public class FTPFileTransferSystem implements FileTransferSystem
 	
 	public void connect(Progress progress) throws FileTransferException
 	{
+		int numSteps = 5;
+		
 		if(progress != null) progress.setProgress(0.0);
 		
 		// First establish a socket connection
@@ -64,7 +66,7 @@ public class FTPFileTransferSystem implements FileTransferSystem
 			throw new FileTransferException("FTP server refused connection.");
 		}
 		
-		if(progress != null) progress.setProgress(1.0 / 3);
+		if(progress != null) progress.setProgress(1.0 / numSteps);
 		
 		// Then log in
 		try
@@ -79,9 +81,36 @@ public class FTPFileTransferSystem implements FileTransferSystem
 			throw new FileTransferException("An exception occurred trying to login to FTP server.", e);
 		}
 		
-		if(progress != null) progress.setProgress(2.0 / 3);
+		if(progress != null) progress.setProgress(2.0 / numSteps);
 		
-		// Finally, set working directory
+		// Set passive mode
+		try
+		{
+			ftpClient.enterLocalPassiveMode();
+		}
+		catch(Exception e)
+		{
+			throw new FileTransferException("An exception occurred trying to set passive mode.", e);
+		}
+		
+		if(progress != null) progress.setProgress(3.0 / numSteps);
+		
+		// Set binary mode
+		try
+		{
+			if(!ftpClient.setFileType(FTP.BINARY_FILE_TYPE))
+			{
+				throw new FileTransferException("Setting binary mode failed.");
+			}
+		}
+		catch(Exception e)
+		{
+			throw new FileTransferException("An exception occurred trying to set binary mode.", e);
+		}
+		
+		if(progress != null) progress.setProgress(4.0 / numSteps);
+		
+		// Set working directory
 		try
 		{
 			if(!ftpClient.changeWorkingDirectory(directory))
@@ -241,11 +270,19 @@ public class FTPFileTransferSystem implements FileTransferSystem
 	
 	public boolean isDirectory(String path, Progress progress) throws FileTransferException
 	{
-		// Get an FTPFile object for path
-		
-		// Return whether it's a directory or not
-		
-		return false;
+		if(progress != null) progress.setProgress(0.0);
+		try
+		{
+			FTPFile file = getFTPFile(path);
+			if(progress != null) progress.setProgress(0.5);
+			boolean isDir = file.isDirectory();
+			if(progress != null) progress.setProgress(1.0);
+			return isDir;
+		}
+		catch(Exception e)
+		{
+			throw new FileTransferException("An exception occurred getting FTPFile object", e);
+		}
 	}
 	
 	public void deleteFile(String path) throws FileTransferException
@@ -398,5 +435,29 @@ public class FTPFileTransferSystem implements FileTransferSystem
 	public void removeDirectory(String path) throws FileTransferException
 	{
 		removeDirectory(path, null);
+	}
+	
+	protected FTPFile getFTPFile(String path) throws Exception
+	{
+		String filename = StringUtils.lastPathComponent(path);
+		String dirPath = StringUtils.deleteLastPathComponent(path);
+		
+		FTPFile[] files;
+		if(dirPath.equals(""))
+		{
+			files = ftpClient.listFiles();
+		}
+		else
+		{
+			files = ftpClient.listFiles(dirPath);
+		}
+		for(FTPFile file : files)
+		{
+			if(file.getName().equals(filename))
+			{
+				return file;
+			}
+		}
+		return null;
 	}
 }

@@ -118,4 +118,26 @@ public class FTPFileTransferSystemTest
 		
 		ftpFS.disconnect();
 	}
+	
+	@Test
+	public void isDirectoryFalse() throws Exception
+	{
+		ftpFS.connect();
+		
+		assertFalse(ftpFS.isDirectory("download"));
+		
+		ftpFS.disconnect();
+	}
+	
+	@Test
+	public void isDirectoryTrue() throws Exception
+	{
+		makeDirectory();
+		
+		ftpFS.connect();
+		
+		assertTrue(ftpFS.isDirectory("dir"));
+		
+		ftpFS.disconnect();
+	}
 }

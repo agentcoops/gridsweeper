@@ -49,7 +49,7 @@ public class DroneAdapter implements Adapter
 		this.stdinData = stdinData;
 	}
 
-	public RunResults run(ParameterMap parameters, int runNumber, long rngSeed, boolean dryRun) throws AdapterException
+	public RunResults run(ParameterMap parameterMap, int runNumber, long rngSeed, boolean dryRun) throws AdapterException
 	{
 		List<String> arguments = new ArrayList<String>();
 		
@@ -66,9 +66,9 @@ public class DroneAdapter implements Adapter
 		}
 		
 		// Now add all parameter settings
-		for(String name : parameters.keySet())
+		for(String name : parameterMap.keySet())
 		{
-			arguments.add(setParamOption + name + "=" + parameters.get(name));
+			arguments.add(setParamOption + name + "=" + parameterMap.get(name));
 		}
 		
 		StringBuilder messageBuilder = new StringBuilder(command);

@@ -30,7 +30,7 @@ public class ExperimentTest
 		
 		ExperimentCase expCase = cases.get(0);
 		
-		ParameterMap map = expCase.getMap();
+		ParameterMap map = expCase.getParameterMap();
 		assertEquals(1, map.size());
 		assertEquals("1", map.get("param"));
 		

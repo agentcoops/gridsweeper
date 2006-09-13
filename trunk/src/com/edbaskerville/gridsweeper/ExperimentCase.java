@@ -5,18 +5,18 @@ import com.edbaskerville.gridsweeper.parameters.*;
 
 public class ExperimentCase
 {
-	ParameterMap map;
+	ParameterMap parameterMap;
 	List<Long> rngSeeds;
 	
-	public ExperimentCase(ParameterMap map, List<Long> rngSeeds)
+	public ExperimentCase(ParameterMap parameterMap, List<Long> rngSeeds)
 	{
-		this.map = map;
+		this.parameterMap = parameterMap;
 		this.rngSeeds = rngSeeds;
 	}
 
-	public ParameterMap getMap()
+	public ParameterMap getParameterMap()
 	{
-		return map;
+		return parameterMap;
 	}
 
 	public List<Long> getRngSeeds()
