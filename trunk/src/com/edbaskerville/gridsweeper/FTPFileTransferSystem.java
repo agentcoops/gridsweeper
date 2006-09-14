@@ -38,15 +38,6 @@ public class FTPFileTransferSystem implements FileTransferSystem
 	
 	public void connect() throws FileTransferException
 	{
-		connect(null);
-	}
-	
-	public void connect(Progress progress) throws FileTransferException
-	{
-		int numSteps = 5;
-		
-		if(progress != null) progress.setProgress(0.0);
-		
 		// First establish a socket connection
 		try
 		{
@@ -66,8 +57,6 @@ public class FTPFileTransferSystem implements FileTransferSystem
 			throw new FileTransferException("FTP server refused connection.");
 		}
 		
-		if(progress != null) progress.setProgress(1.0 / numSteps);
-		
 		// Then log in
 		try
 		{
@@ -81,8 +70,6 @@ public class FTPFileTransferSystem implements FileTransferSystem
 			throw new FileTransferException("An exception occurred trying to login to FTP server.", e);
 		}
 		
-		if(progress != null) progress.setProgress(2.0 / numSteps);
-		
 		// Set passive mode
 		try
 		{
@@ -92,8 +79,6 @@ public class FTPFileTransferSystem implements FileTransferSystem
 		{
 			throw new FileTransferException("An exception occurred trying to set passive mode.", e);
 		}
-		
-		if(progress != null) progress.setProgress(3.0 / numSteps);
 		
 		// Set binary mode
 		try
@@ -108,8 +93,6 @@ public class FTPFileTransferSystem implements FileTransferSystem
 			throw new FileTransferException("An exception occurred trying to set binary mode.", e);
 		}
 		
-		if(progress != null) progress.setProgress(4.0 / numSteps);
-		
 		// Set working directory
 		try
 		{
@@ -122,19 +105,10 @@ public class FTPFileTransferSystem implements FileTransferSystem
 		{
 			throw new FileTransferException("Got exception trying to cd", e);
 		}
-		
-		if(progress != null) progress.setProgress(1.0);
 	}
 
 	public void disconnect() throws FileTransferException
 	{
-		disconnect(null);
-	}
-	
-	public void disconnect(Progress progress) throws FileTransferException
-	{
-		if(progress != null) progress.setProgress(0.0);
-		
 		try
 		{
 			if(!ftpClient.logout())
@@ -147,8 +121,6 @@ public class FTPFileTransferSystem implements FileTransferSystem
 			throw new FileTransferException("Caught exception trying to logout.", e);
 		}
 		
-		if(progress != null) progress.setProgress(0.5);
-		
 		try
 		{
 			ftpClient.disconnect();
@@ -157,19 +129,10 @@ public class FTPFileTransferSystem implements FileTransferSystem
 		{
 			throw new FileTransferException("Got exception disconnecting from FTP server.", e);
 		}
-		
-		if(progress != null) progress.setProgress(1.0);
 	}
 	
 	public void downloadFile(String remotePath, String localPath) throws FileTransferException
 	{
-		downloadFile(remotePath, localPath, null);
-	}
-	
-	public void downloadFile(String remotePath, String localPath, Progress progress) throws FileTransferException
-	{
-		if(progress != null) progress.setProgress(0.0);
-		
 		// Get an input stream from FTP server
 		InputStream remoteStream;
 		try
@@ -192,6 +155,7 @@ public class FTPFileTransferSystem implements FileTransferSystem
 			throw new FileTransferException("Could not open local file", e);
 		}
 		
+		/*
 		// Get file size
 		long size;
 		try
@@ -205,6 +169,7 @@ public class FTPFileTransferSystem implements FileTransferSystem
 			size = -1;
 		}
 		long bytesTransferred = 0;
+		*/
 		
 		// Read from input stream and write to output stream
 		try
@@ -213,7 +178,6 @@ public class FTPFileTransferSystem implements FileTransferSystem
 			while((b = remoteStream.read()) != -1)
 			{
 				localStream.write(b);
-				if(progress != null && size != -1) progress.setProgress(++bytesTransferred / (double)size);
 			}
 		}
 		catch(IOException e)
@@ -246,21 +210,26 @@ public class FTPFileTransferSystem implements FileTransferSystem
 		}
 	}
 
-	public List<String> list(String path) throws FileTransferException
+	public String[] list(String path) throws FileTransferException
 	{
-		return list(path, null);
-	}
-	
-	public List<String> list(String path, Progress progress) throws FileTransferException
-	{
-		// Get an FTP list parse engine
-		
-		// Iterate through list while there are more to get,
-		// updating progress accordingly
-		
-		// Return names
-		
-		return null;
+		try
+		{
+			FTPFile[] files;
+			if(path == null || path.equals("")) files = ftpClient.listFiles();
+			else files = ftpClient.listFiles(path);
+			
+			String[] names = new String[files.length];
+			for(int i = 0; i < files.length; i++)
+			{
+				names[i] = files[i].getName();
+			}
+			return names;
+		}
+		catch(Exception e)
+		{
+			if(e instanceof FileTransferException) throw (FileTransferException)e;
+			throw new FileTransferException("An exception occurred listing files", e);
+		}
 	}
 	
 	public boolean isDirectory(String path) throws FileTransferException

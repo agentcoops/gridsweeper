@@ -24,11 +24,10 @@ public class FTPFileTransferSystemTest
 	@Test
 	public void connectAndDisconnect()
 	{
-		Progress progress = new Progress();
 		try
 		{
-			ftpFS.connect(progress);
-			ftpFS.disconnect(progress);
+			ftpFS.connect();
+			ftpFS.disconnect();
 		}
 		catch(FileTransferException e)
 		{
@@ -137,6 +136,23 @@ public class FTPFileTransferSystemTest
 		ftpFS.connect();
 		
 		assertTrue(ftpFS.isDirectory("dir"));
+		
+		ftpFS.disconnect();
+	}
+	
+	@Test
+	public void list() throws Exception
+	{
+		ftpFS.connect();
+		
+		String[] names = ftpFS.list("subdir");
+		assertEquals(3, names.length);
+		if(names.length == 3)
+		{
+			assertEquals("1", names[0]);
+			assertEquals("2", names[1]);
+			assertEquals("3", names[2]);
+		}
 		
 		ftpFS.disconnect();
 	}
