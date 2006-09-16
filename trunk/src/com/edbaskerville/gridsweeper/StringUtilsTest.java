@@ -5,6 +5,12 @@ import static org.junit.Assert.*;
 
 public class StringUtilsTest
 {
+	@Before
+	public void setUp()
+	{
+		StringUtils.setFileSeparator("/");
+	}
+	
 	@Test
 	public void lastWithRoot()
 	{
@@ -73,5 +79,13 @@ public class StringUtilsTest
 	{
 		String path = "dir/sub1/sub2/sub3/file";
 		assertEquals("dir/sub1/sub2/sub3", StringUtils.deleteLastPathComponent(path));
+	}
+	
+	@Test
+	public void expandTilde()
+	{
+		String path = "~/some/sub/path";
+		String homeDir = System.getProperty("home.directory");
+		assertEquals(homeDir + "/some/sub/path", StringUtils.expandTildeInPath(path));
 	}
 }

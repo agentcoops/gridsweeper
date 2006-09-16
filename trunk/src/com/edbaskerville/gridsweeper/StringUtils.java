@@ -5,6 +5,13 @@ import java.util.*;
 
 public class StringUtils
 {
+	private static String fileSep;
+	
+	static
+	{
+		fileSep = System.getProperty("file.separator");
+	}
+	
 	static List<String> tokenize(String string)
 	{
 		return tokenize(string, " ", true);
@@ -99,16 +106,16 @@ public class StringUtils
 	static String lastPathComponent(String string)
 	{
 		if(string == null) return null;
-		if(string.equals("/")) return string;
+		if(string.equals(fileSep)) return string;
 		
 		int length = string.length();
 		if(length == 0) return string;
 		
 		// Remove trailing slash
-		if(string.charAt(length - 1) == '/') string = string.substring(0, length - 1);
+		if(string.substring(length - 1).equals(fileSep)) string = string.substring(0, length - 1);
 		
 		// Find final slash
-		int finalSlashLoc = string.lastIndexOf("/");
+		int finalSlashLoc = string.lastIndexOf(fileSep);
 		if(finalSlashLoc == -1) return string;
 		else return string.substring(finalSlashLoc + 1);
 	}
@@ -119,15 +126,15 @@ public class StringUtils
 		
 		int length = string.length();
 		if(length == 0) return string;
-		if(string.equals("/")) return string;
+		if(string.equals(fileSep)) return string;
 		
 		StringBuffer stringBuf = new StringBuffer(string);
 		
 		// Remove trailing slash
-		if(string.charAt(length - 1) == '/') stringBuf.setLength(--length);
+		if(string.substring(length - 1).equals(fileSep)) stringBuf.setLength(--length);
 		
 		// Find final slash
-		int finalSlashLoc = stringBuf.lastIndexOf("/");
+		int finalSlashLoc = stringBuf.lastIndexOf(fileSep);
 		
 		// If no final slash, then we just turn this into the empty string
 		if(finalSlashLoc == -1)
@@ -148,5 +155,24 @@ public class StringUtils
 		}
 		
 		return stringBuf.toString();
+	}
+	
+	static String expandTildeInPath(String path)
+	{
+		if(path.length() >= 2 && path.substring(0, 2).equals("~" + fileSep))
+		{
+			return System.getProperty("home.directory") + path.substring(1);
+		}
+		return path;
+	}
+
+	public static String getFileSeparator()
+	{
+		return fileSep;
+	}
+
+	public static void setFileSeparator(String fileSeparator)
+	{
+		StringUtils.fileSep = fileSeparator;
 	}
 }
