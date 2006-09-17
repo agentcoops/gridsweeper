@@ -33,8 +33,10 @@ public class UniformDoubleSweepTest
 	@Test
 	public void simpleUniform()
 	{
+		Random rng = new Random();
+		
 		sweep = new UniformDoubleSweep("param", 0, 1, 2);
-		maps = sweep.generateMaps(null);
+		maps = sweep.generateMaps(rng);
 		
 		assertEquals(2, maps.size());
 		
@@ -63,8 +65,10 @@ public class UniformDoubleSweepTest
 	@Test
 	public void reverseUniform()
 	{
+		Random rng = new Random();
+		
 		sweep = new UniformDoubleSweep("param", 20, 10, 2);
-		maps = sweep.generateMaps(null);
+		maps = sweep.generateMaps(rng);
 		
 		assertEquals(2, maps.size());
 		

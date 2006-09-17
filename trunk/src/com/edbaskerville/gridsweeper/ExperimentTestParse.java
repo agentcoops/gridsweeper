@@ -14,8 +14,7 @@ public class ExperimentTestParse
 	public void empty() throws ExperimentException
 	{
 		experiment = new Experiment(getURL("empty"));
-		assertEquals("null", experiment.getType());
-		assertEquals("empty", experiment.getName());
+		assertEquals("test_empty", experiment.getName());
 	}
 	
 	@Test
@@ -23,7 +22,6 @@ public class ExperimentTestParse
 	{
 		experiment = new Experiment(getURL("settings"));
 		assertEquals(10, experiment.getNumRuns());
-		assertEquals("~/Results", experiment.getResultsDir());
 		assertEquals("value", experiment.getProperties().get("anotherSetting"));
 	}
 	

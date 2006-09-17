@@ -43,7 +43,7 @@ public class GridController
 	
 	public void submitExperiment(Experiment experiment, String adapterClassName, boolean waitForCompletion)
 	{
-		try
+		/*try
 		{
 			Properties properties = experiment.getProperties();
 			
@@ -87,18 +87,7 @@ public class GridController
 		catch(Exception e)
 		{
 			if(delegate != null) delegate.batchFailed(e);
-		}
-	}
-	
-	private void downloadData(Experiment experiment, ExperimentCase expCase, int runNumber, Properties properties) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	private void setupFileSystem(Experiment experiment, List<ExperimentCase> expCases, Properties properties)
-	{
-		// TODO Auto-generated method stub
-		
+		}*/
 	}
 
 	private List<String> submitCases(Experiment exp, List<ExperimentCase> cases, Properties properties, String adapterClassName, byte[] stdinData) throws DrmaaException

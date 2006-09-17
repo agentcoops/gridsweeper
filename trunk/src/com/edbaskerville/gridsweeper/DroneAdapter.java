@@ -95,6 +95,7 @@ public class DroneAdapter implements Adapter
 			
 			try
 			{
+				// Actually run the damn thing, getting a process object with which to interact with it
 				Process process = Runtime.getRuntime().exec(cmdArray);
 				
 				// Write to stdin stream

@@ -7,7 +7,6 @@ import com.edbaskerville.gridsweeper.parameters.*;
 
 public class Experiment
 {
-	private String type;
 	private String name;
 	
 	private Properties properties;
@@ -18,7 +17,6 @@ public class Experiment
 	private MultiplicativeCombinationSweep rootSweep;
 	private int numRuns;
 	private Long rngSeed;
-	private String resultsDir;
 	
 	public Experiment()
 	{
@@ -126,26 +124,6 @@ public class Experiment
 	public void setName(String name)
 	{
 		this.name = name;
-	}
-
-	public String getType()
-	{
-		return type;
-	}
-
-	public void setType(String type)
-	{
-		this.type = type;
-	}
-
-	public String getResultsDir()
-	{
-		return resultsDir;
-	}
-
-	public void setResultsDir(String resultsDir)
-	{
-		this.resultsDir = resultsDir;
 	}
 
 	public Properties getInputFiles()

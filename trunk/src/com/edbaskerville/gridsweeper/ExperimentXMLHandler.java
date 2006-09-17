@@ -64,8 +64,13 @@ public class ExperimentXMLHandler extends DefaultHandler
 				if(top != null)
 					throw new SAXException("experiment tag with non-empty stack");
 				
-				experiment.setType(attrMap.get("type"));
 				experiment.setName(attrMap.get("name"));
+				
+				String numRunsStr = attrMap.get("numRuns");
+				if(numRunsStr != null)
+				{
+					experiment.setNumRuns(Integer.parseInt(numRunsStr));
+				}
 				
 				push(experiment);
 			}
@@ -116,18 +121,8 @@ public class ExperimentXMLHandler extends DefaultHandler
 				if(value == null)
 					throw new SAXException("value attribute missing from setting tag");
 				
-				if(key.equals("numRuns"))
-				{
-					experiment.setNumRuns(Integer.parseInt(value));
-				}
-				else if(key.equals("resultsDir"))
-				{
-					experiment.setResultsDir(value);
-				}
-				else
-				{
-					experiment.getProperties().put(key, value);
-				}
+				experiment.getProperties().put(key, value);
+				
 				push(Tag.SETTING);
 			}
 			else if(qName.equals("abbrev"))
