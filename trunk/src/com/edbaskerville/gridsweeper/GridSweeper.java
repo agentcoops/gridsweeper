@@ -47,9 +47,11 @@ public class GridSweeper
 		};
 	}
 	
-	public static void main(String[] args)
+	public static void main(String[] args) throws GridSweeperException
 	{
-		String adapterClassName = null;
+		Logger.entering("GridSweeper", "main");
+		
+		String adapterClassName = Preferences.sharedPreferences().getProperty("AdapterClass");
 		String experimentFile = null;
 		
 		ArgState state = ArgState.START;
@@ -78,15 +80,15 @@ public class GridSweeper
 		if(experimentFile == null) exit("Experiment file must be provided.");
 		try
 		{
-			experiment = new Experiment(new java.net.URL("file://" + experimentFile));
+			experiment = new Experiment(new java.net.URL("file", "", experimentFile));
 		}
 		catch(Exception e)
 		{
-			exit("Could not load experiment file.");
+			throw new GridSweeperException("Could not load experiment file.", e);
 		}
 		
 		// Submit runs and wait for completion.
-		GridController controller = new GridController(gridDelegate);
+		/*GridController controller = new GridController(gridDelegate);
 		try
 		{
 			controller.connect();
@@ -95,9 +97,10 @@ public class GridSweeper
 		}
 		catch(DrmaaException e)
 		{
-			System.out.println("Failed due to a DrmaaException:");
-			e.printStackTrace();
-		}
+			throw new GridSweeperException("Could not submit experiment", e);
+		}*/
+		
+		Logger.exiting("GridSweeper", "main");
 	}
 	
 	public static void exit(String message)

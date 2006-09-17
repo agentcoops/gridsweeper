@@ -394,8 +394,10 @@ public class ExperimentXMLHandler extends DefaultHandler
 		
 		try
 		{
-			parent.add(new RangeListSweep(param, new BigDecimal(start),
-					new BigDecimal(end), new BigDecimal(increment)));
+			RangeListSweep sweep = new RangeListSweep(param, new BigDecimal(start),
+					new BigDecimal(end), new BigDecimal(increment)); 
+			parent.add(sweep);
+			push(sweep);
 		}
 		catch(NumberFormatException e)
 		{
