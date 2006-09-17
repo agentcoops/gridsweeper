@@ -10,6 +10,13 @@ public class GridController
 	private GridDelegate delegate;
 	private Session session;
 	
+	private static String className;
+	
+	static
+	{
+		className = GridController.class.toString();
+	}
+	
 	public GridController()
 	{
 		super();
@@ -32,17 +39,27 @@ public class GridController
 	
 	public void connect() throws DrmaaException
 	{
-		session = SessionFactory.getFactory().getSession();
-		session.init(null);
+		Logger.entering(className, "connect");
+		
+		/*session = SessionFactory.getFactory().getSession();
+		session.init(null);*/
+
+		Logger.exiting(className, "connect");
 	}
 	
 	public void disconnect() throws DrmaaException
 	{
-		session.exit();
+		Logger.entering(className, "disconnect");
+		
+		//session.exit();
+		
+		Logger.exiting(className, "disconnect");
 	}
 	
 	public void submitExperiment(Experiment experiment, String adapterClassName, boolean waitForCompletion)
 	{
+		Logger.entering(className, "submitExperiment");
+		
 		/*try
 		{
 			Properties properties = experiment.getProperties();
@@ -88,10 +105,14 @@ public class GridController
 		{
 			if(delegate != null) delegate.batchFailed(e);
 		}*/
+		
+		Logger.exiting(className, "submitExperiment"); 
 	}
 
 	private List<String> submitCases(Experiment exp, List<ExperimentCase> cases, Properties properties, String adapterClassName, byte[] stdinData) throws DrmaaException
 	{
+		Logger.entering(className, "submitCases");
+		
 		List<String> jobIds = new ArrayList<String>();
 		
 		for(ExperimentCase expCase : cases)
@@ -105,11 +126,15 @@ public class GridController
 			}
 		}
 		
+		Logger.exiting(className, "submitCases");
+		
 		return jobIds;
 	}
 	
 	private JobTemplate getJobTemplate(Experiment exp, ExperimentCase expCase, int runNumber, Properties properties, String adapterClassName, byte[] stdinData) throws DrmaaException
 	{
+		Logger.entering(className, "getJobTemplate");
+		
 		Preferences preferences = Preferences.sharedPreferences();
 		
 		JobTemplate jt = session.createJobTemplate();
@@ -136,6 +161,8 @@ public class GridController
 		jt.setInputPath(caseDir + "/.gridsweeper.in." + runNumber);
 		jt.setOutputPath(exp.getDirectoryForCase(expCase) + "/.gridsweeper.out." + runNumber);
 		jt.setTransferFiles(new FileTransferMode(true, true, false));
+
+		Logger.exiting(className, "getJobTemplate");
 		
 		return jt;
 	}
@@ -143,6 +170,10 @@ public class GridController
 	private byte[] getStdinData(String stdinPath)
 	{
 		if(stdinPath == null) return null;
+		
+		Logger.entering(className, "getStdinData");
+		
+		byte[] stdinData;
 		
 		try
 		{
@@ -158,11 +189,15 @@ public class GridController
 			inputStream.close();
 			outputStream.close();
 			
-			return outputStream.toByteArray();
+			stdinData = outputStream.toByteArray();
 		}
 		catch(Exception e)
 		{
-			return null;
+			stdinData = null;
 		}
+		
+		Logger.exiting(className, "getStdinData");
+		
+		return stdinData;
 	}
 }

@@ -1,6 +1,9 @@
 package com.edbaskerville.gridsweeper;
 
 import org.ggf.drmaa.DrmaaException;
+import java.util.*;
+import static com.edbaskerville.gridsweeper.StringUtils.*;
+import static com.edbaskerville.gridsweeper.DateUtils.*;
 
 public class GridSweeper
 {
@@ -11,9 +14,17 @@ public class GridSweeper
 		EXPERIMENT
 	}
 	
+	static String adapterClassName;
+	static String experimentPath;
+	
 	static Experiment experiment;
 	static GridDelegate gridDelegate;
 	static int numFailedRuns;
+	
+	static Preferences preferences;
+	
+	static String className;
+	static Calendar cal;
 	
 	static
 	{
@@ -45,18 +56,56 @@ public class GridSweeper
 			}
 			
 		};
+		
+		preferences = Preferences.sharedPreferences();
+		className = GridSweeper.class.toString();
+		cal = new GregorianCalendar();
 	}
 	
 	public static void main(String[] args) throws GridSweeperException
 	{
-		Logger.entering("GridSweeper", "main");
+		Logger.entering(className, "main");
 		
-		String adapterClassName = Preferences.sharedPreferences().getProperty("AdapterClass");
-		String experimentFile = null;
+		adapterClassName = Preferences.sharedPreferences().getProperty("AdapterClass");
+		experimentPath = null;
+		
+		// Parse args
+		parseArgs(args);
+		
+		// Load experiment file
+		loadExperiment();
+		
+		// Prepare local filesystem
+		prepareLocalFileSystem();
+		
+		// If file sharing is on, prepare remote filesystem
+		if(preferences.getBooleanProperty("EnableFileTransfer"))
+		{
+			transferFiles();
+		}
+		
+		// Connect, submit, wait for completion, and disconnect
+		GridController controller = new GridController(gridDelegate);
+		try
+		{
+			controller.connect();
+			controller.submitExperiment(experiment, adapterClassName, true);
+			controller.disconnect();
+		}
+		catch(DrmaaException e)
+		{
+			throw new GridSweeperException("Could not submit experiment", e);
+		}
+
+		Logger.exiting(className, "main");
+	}
+	
+	private static void parseArgs(String[] args)
+	{
+		Logger.entering(className, "parseArgs");
 		
 		ArgState state = ArgState.START;
 		
-		// Parse args
 		for(String arg : args)
 		{
 			switch(state)
@@ -70,42 +119,57 @@ public class GridSweeper
 					state = ArgState.START;
 					break;
 				case EXPERIMENT:
-					experimentFile = arg;
+					experimentPath = arg;
 					state = ArgState.START;
 					break;
 			}
 		}
 		
-		// Load experiment
-		if(experimentFile == null) exit("Experiment file must be provided.");
+		Logger.exiting(className, "parseArgs");
+	}
+	
+	private static void loadExperiment() throws GridSweeperException
+	{
+		Logger.entering(className, "loadExperiment");
+		
+		if(experimentPath == null)
+		{
+			throw new GridSweeperException("No experiment file provided.");
+		}
+		
 		try
 		{
-			experiment = new Experiment(new java.net.URL("file", "", experimentFile));
+			experiment = new Experiment(new java.net.URL("file", "", experimentPath));
 		}
 		catch(Exception e)
 		{
 			throw new GridSweeperException("Could not load experiment file.", e);
 		}
 		
-		// Submit runs and wait for completion.
-		/*GridController controller = new GridController(gridDelegate);
-		try
-		{
-			controller.connect();
-			controller.submitExperiment(experiment, adapterClassName, true);
-			controller.disconnect();
-		}
-		catch(DrmaaException e)
-		{
-			throw new GridSweeperException("Could not submit experiment", e);
-		}*/
-		
-		Logger.exiting("GridSweeper", "main");
+		Logger.exiting(className, "loadExperiment");
 	}
 	
-	public static void exit(String message)
+	private static void prepareLocalFileSystem() throws GridSweeperException
 	{
-		System.err.println(message);
-		System.exit(1);
+		Logger.entering(className, "prepareLocalFileSystem");
+		
+		String expsDir = expandTildeInPath(preferences.getProperty("ExperimentsDirectory"));
+		
+		String expName = experiment.getName();
+		String dateStr = getDateString(cal);
+		String timeStr = getTimeString(cal);
+		String expSubDir = String.format("%s%s%s-%s", dateStr, getFileSeparator(), expName, timeStr);
+		
+		String expDir = appendPathComponent(expsDir, expSubDir);
+		Logger.finer("Experiment subdirectory: " + expDir);
+		
+		Logger.exiting(className, "prepareLocalFileSystem");
+	}
+	
+	private static void transferFiles() throws GridSweeperException
+	{
+		Logger.entering(className, "transferFiles");
+		
+		Logger.exiting(className, "transferFiles");
 	}
 }

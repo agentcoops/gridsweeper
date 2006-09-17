@@ -161,7 +161,7 @@ public class StringUtils
 	{
 		if(path.length() >= 2 && path.substring(0, 2).equals("~" + fileSep))
 		{
-			return System.getProperty("home.directory") + path.substring(1);
+			return System.getProperty("user.home") + path.substring(1);
 		}
 		return path;
 	}
@@ -174,5 +174,29 @@ public class StringUtils
 	public static void setFileSeparator(String fileSeparator)
 	{
 		StringUtils.fileSep = fileSeparator;
+	}
+	
+	public static String appendPathComponent(String path, String component)
+	{
+		int pathLength = path.length();
+		boolean pathHasFinalSlash = (pathLength > 0)
+			&& (path.substring(pathLength - 1).equals(fileSep));
+		
+		int componentLength = component.length();
+		boolean componentHasStartingSlash = (componentLength > 0)
+			&& (component.substring(0, 1).equals(fileSep));
+		
+		if(!(pathHasFinalSlash || componentHasStartingSlash))
+		{
+			return path + fileSep + component;
+		}
+		else if(pathHasFinalSlash && componentHasStartingSlash)
+		{
+			return path + component.substring(1);
+		}
+		else
+		{
+			return path + component;
+		}
 	}
 }

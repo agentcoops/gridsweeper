@@ -1,7 +1,5 @@
 package com.edbaskerville.gridsweeper;
 
-import java.net.URL;
-
 import org.junit.*;
 import static org.junit.Assert.*;
 
