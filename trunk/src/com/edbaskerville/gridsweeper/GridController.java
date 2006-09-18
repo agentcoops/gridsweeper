@@ -135,7 +135,7 @@ public class GridController
 	{
 		Logger.entering(className, "getJobTemplate");
 		
-		Preferences preferences = Preferences.sharedPreferences();
+		/*Preferences preferences = Preferences.sharedPreferences();
 		
 		JobTemplate jt = session.createJobTemplate();
 		
@@ -165,6 +165,8 @@ public class GridController
 		Logger.exiting(className, "getJobTemplate");
 		
 		return jt;
+		*/
+		return null;
 	}
 
 	private byte[] getStdinData(String stdinPath)

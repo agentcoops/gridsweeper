@@ -1,6 +1,8 @@
 package com.edbaskerville.gridsweeper;
 
 import org.ggf.drmaa.DrmaaException;
+
+import java.io.File;
 import java.util.*;
 import static com.edbaskerville.gridsweeper.StringUtils.*;
 import static com.edbaskerville.gridsweeper.DateUtils.*;
@@ -18,6 +20,7 @@ public class GridSweeper
 	static String experimentPath;
 	
 	static Experiment experiment;
+	static List<ExperimentCase> cases;
 	static GridDelegate gridDelegate;
 	static int numFailedRuns;
 	
@@ -74,6 +77,9 @@ public class GridSweeper
 		
 		// Load experiment file
 		loadExperiment();
+		
+		// Generate experiment cases, etc.
+		setUpExperiment();
 		
 		// Prepare local filesystem
 		prepareLocalFileSystem();
@@ -149,19 +155,54 @@ public class GridSweeper
 		Logger.exiting(className, "loadExperiment");
 	}
 	
+	private static void setUpExperiment() throws GridSweeperException
+	{
+		try
+		{
+			// Assemble cases
+			cases = experiment.generateCases(new Random());
+		}
+		catch (ExperimentException e)
+		{
+			throw new GridSweeperException("Could not generate experiment cases", e);
+		}
+	}
+	
 	private static void prepareLocalFileSystem() throws GridSweeperException
 	{
 		Logger.entering(className, "prepareLocalFileSystem");
 		
-		String expsDir = expandTildeInPath(preferences.getProperty("ExperimentsDirectory"));
-		
-		String expName = experiment.getName();
-		String dateStr = getDateString(cal);
-		String timeStr = getTimeString(cal);
-		String expSubDir = String.format("%s%s%s-%s", dateStr, getFileSeparator(), expName, timeStr);
-		
-		String expDir = appendPathComponent(expsDir, expSubDir);
-		Logger.finer("Experiment subdirectory: " + expDir);
+		try
+		{
+			String expsDir = expandTildeInPath(preferences.getProperty("ExperimentsDirectory"));
+			
+			// First set up big directory for the whole experiment
+			String expName = experiment.getName();
+			String dateStr = getDateString(cal);
+			String timeStr = getTimeString(cal);
+			String expSubDir = String.format("%s%s%s-%s", dateStr, getFileSeparator(), expName, timeStr);
+			
+			String expDir = appendPathComponent(expsDir, expSubDir);
+			Logger.finer("Experiment subdirectory: " + expDir);
+			
+			File expDirFile = new File(expDir);
+			expDirFile.mkdirs();
+			
+			// Now set up subdirectories for each case
+			for(ExperimentCase expCase : cases)
+			{
+				String caseSubDir = experiment.getDirectoryNameForCase(expCase);
+				String caseDir = appendPathComponent(expDir, caseSubDir);
+				Logger.finer("Case subdirectory: " + caseDir);
+
+				File caseDirFile = new File(caseDir);
+				caseDirFile.mkdirs();
+			}
+		}
+		catch(Exception e)
+		{
+			throw new GridSweeperException("Could not set up local dirs", e);
+		}
 		
 		Logger.exiting(className, "prepareLocalFileSystem");
 	}

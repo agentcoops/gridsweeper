@@ -18,6 +18,30 @@ public abstract class CombinationSweep implements Sweep, List<Sweep>
 	
 	public abstract List<ParameterMap> generateMaps(Random rng) throws SweepLengthException, DuplicateParameterException;
 
+	public List<String> getParameterOrder()
+	{
+		List<String> parameterOrder = new ArrayList<String>();
+		
+		for(Sweep sweep : children)
+		{
+			if(sweep instanceof SingleValueSweep)
+			{
+				// Don't include it
+			}
+			else if(sweep instanceof SingleSweep)
+			{
+				parameterOrder.add(((SingleSweep)sweep).getName());
+			}
+			else
+			{
+				assert(sweep instanceof CombinationSweep);
+				parameterOrder.addAll(((CombinationSweep)sweep).getParameterOrder());
+			}
+		}
+		
+		return parameterOrder;
+	}
+	
 	public void add(int index, Sweep element)
 	{
 		children.add(index, element);

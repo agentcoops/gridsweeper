@@ -15,6 +15,8 @@ public class Experiment
 	private Properties outputFiles;
 	
 	private MultiplicativeCombinationSweep rootSweep;
+	private List<String> parameterOrder;
+	
 	private int numRuns;
 	private Long rngSeed;
 	
@@ -166,18 +168,57 @@ public class Experiment
 		return changingParameters.toString();
 	}
 
-	public String getDirectoryForCase(ExperimentCase experimentCase)
+	public String getDirectoryNameForCase(ExperimentCase expCase)
 	{
-		ParameterMap changingParameters = (ParameterMap)experimentCase.getParameterMap().clone();
+		List<String> parameterOrder = getParameterOrderUsed();
+		StringBuffer dirName = new StringBuffer();
 		
-		for(Sweep sweep : rootSweep)
+		boolean first = true;
+		for(String param : parameterOrder)
 		{
-			if(sweep instanceof SingleValueSweep)
+			if(!first) dirName.append("-");
+			
+			if(abbreviations.containsKey(param))
 			{
-				changingParameters.remove(((SingleValueSweep)sweep).getName());
+				dirName.append(abbreviations.get(param));
 			}
+			else
+			{
+				dirName.append(param);
+			}
+			
+			Object value = expCase.getParameterMap().get(param);
+			String valueStr;
+			if(value instanceof Double)
+			{
+				valueStr = String.format("%5g", value);
+			}
+			else valueStr = value.toString();
+			dirName.append("=" + valueStr);
+			
+			first = false;
 		}
 		
-		return changingParameters.toDirectoryString(abbreviations);
+		return dirName.toString();
+	}
+	
+	private List<String> getParameterOrderUsed()
+	{
+		if(parameterOrder != null)
+		{
+			return parameterOrder;
+		}
+		
+		return rootSweep.getParameterOrder();
+	}
+	
+	public List<String> getParameterOrder()
+	{
+		return parameterOrder;
+	}
+
+	public void setParameterOrder(List<String> parameterOrder)
+	{
+		this.parameterOrder = parameterOrder;
 	}
 }
