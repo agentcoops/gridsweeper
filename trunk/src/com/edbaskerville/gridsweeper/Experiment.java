@@ -58,15 +58,31 @@ public class Experiment
 		{
 			List<ParameterMap> parameterMaps = rootSweep.generateMaps(rng);
 			
-			for(ParameterMap parameterMap : parameterMaps)
+			// If there's an rng seed provided,
+			// and only one parameter combo,
+			// and only one run,
+			// we're going to use that rng seed for the one run.
+			// This givs proper behavior for reproducing cases.
+			if(rngSeed != null && parameterMaps.size() == 1 && numRuns == 1)
 			{
-				List<Long> rngSeeds = new ArrayList<Long>(numRuns);
-				for(int i = 0; i < numRuns; i++)
+				List<Long> rngSeeds = new ArrayList<Long>(1);
+				rngSeeds.add(rngSeed);
+				cases.add(new ExperimentCase(parameterMaps.get(0), rngSeeds));
+			}
+			
+			// Otherwise generate a big pile of cases.
+			else
+			{
+				for(ParameterMap parameterMap : parameterMaps)
 				{
-					rngSeeds.add(rng.nextLong());
+					List<Long> rngSeeds = new ArrayList<Long>(numRuns);
+					for(int i = 0; i < numRuns; i++)
+					{
+						rngSeeds.add(rng.nextLong());
+					}
+					
+					cases.add(new ExperimentCase(parameterMap, rngSeeds));
 				}
-				
-				cases.add(new ExperimentCase(parameterMap, rngSeeds));
 			}
 		}
 		catch(Exception e)

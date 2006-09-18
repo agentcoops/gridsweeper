@@ -3,6 +3,7 @@ package com.edbaskerville.gridsweeper;
 import java.io.*;
 import java.util.*;
 import org.apache.commons.net.ftp.*;
+import static com.edbaskerville.gridsweeper.StringUtils.*;
 
 public class FTPFileTransferSystem implements FileTransferSystem
 {
@@ -148,7 +149,7 @@ public class FTPFileTransferSystem implements FileTransferSystem
 		FileOutputStream localStream;
 		try
 		{
-			localStream = new FileOutputStream(localPath);
+			localStream = new FileOutputStream(expandTildeInPath(localPath));
 		}
 		catch (FileNotFoundException e)
 		{
@@ -262,7 +263,7 @@ public class FTPFileTransferSystem implements FileTransferSystem
 	
 	public void uploadFile(String localPath, String remotePath) throws FileTransferException
 	{
-		File localFile = new File(localPath);
+		File localFile = new File(expandTildeInPath(localPath));
 		
 		// Get a file input stream
 		FileInputStream localStream;
@@ -346,14 +347,14 @@ public class FTPFileTransferSystem implements FileTransferSystem
 	
 	public void makeDirectory(String path) throws FileTransferException
 	{
-		List<String> components = StringUtils.pathComponents(path);
+		List<String> components = pathComponents(path);
 		
 		try
 		{
 			String pathSoFar = "";
 			for(String component : components)
 			{
-				pathSoFar = StringUtils.appendPathComponent(pathSoFar, component);
+				pathSoFar = appendPathComponent(pathSoFar, component);
 				if(fileExists(pathSoFar))
 				{
 					if(!isDirectory(pathSoFar))
@@ -386,7 +387,7 @@ public class FTPFileTransferSystem implements FileTransferSystem
 			{
 				for(String component : listing)
 				{
-					String subpath = StringUtils.appendPathComponent(path, component);
+					String subpath = appendPathComponent(path, component);
 					if(isDirectory(subpath)) removeDirectory(subpath);
 					else deleteFile(subpath);
 				}
@@ -405,8 +406,8 @@ public class FTPFileTransferSystem implements FileTransferSystem
 	
 	protected FTPFile getFTPFile(String path) throws Exception
 	{
-		String filename = StringUtils.lastPathComponent(path);
-		String dirPath = StringUtils.deleteLastPathComponent(path);
+		String filename = lastPathComponent(path);
+		String dirPath = deleteLastPathComponent(path);
 		
 		FTPFile[] files;
 		if(dirPath.equals(""))

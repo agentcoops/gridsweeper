@@ -72,6 +72,12 @@ public class ExperimentXMLHandler extends DefaultHandler
 					experiment.setNumRuns(Integer.parseInt(numRunsStr));
 				}
 				
+				String rngSeedStr = attrMap.get("rngSeed");
+				if(rngSeedStr != null)
+				{
+					experiment.setRngSeed(Long.parseLong(rngSeedStr));
+				}
+				
 				push(experiment);
 			}
 			else if(qName.equals("input"))

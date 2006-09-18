@@ -20,6 +20,7 @@ public class GridSweeper
 	static String experimentPath;
 	
 	static Experiment experiment;
+	static boolean dryRun;
 	static List<ExperimentCase> cases;
 	static GridDelegate gridDelegate;
 	static int numFailedRuns;
@@ -32,6 +33,7 @@ public class GridSweeper
 	static
 	{
 		experiment = null;
+		dryRun = false;
 		numFailedRuns = 0;
 		gridDelegate = new GridDelegate()
 		{
@@ -112,7 +114,8 @@ public class GridSweeper
 			{
 				case START:
 					if(arg.equals("-a")) state = ArgState.ADAPTER;
-					else if(arg.equals("-e")) state = ArgState.EXPERIMENT; 
+					else if(arg.equals("-e")) state = ArgState.EXPERIMENT;
+					else if(arg.equals("-d")) dryRun = true;
 					break;
 				case ADAPTER:
 					adapterClassName = arg;
@@ -172,8 +175,9 @@ public class GridSweeper
 		{
 			Logger.finer("preferences: " + preferences);
 			
+			// Set up file transfer system if asked for
 			FileTransferSystem fts = null;
-			if(useFileTransfer)
+			if(!dryRun && useFileTransfer)
 			{
 				fts = FileTransferSystemFactory.getFactory().getFileTransferSystem(preferences);
 				fts.connect();
@@ -193,7 +197,22 @@ public class GridSweeper
 			File expDirFile = new File(expDir);
 			expDirFile.mkdirs();
 			
-			if(useFileTransfer) fts.makeDirectory(expSubDir);
+			// If file transfer is on, make the directory
+			// and upload input files
+			if(!dryRun && useFileTransfer)
+			{
+				String inputDir = appendPathComponent(expSubDir, "input");
+				fts.makeDirectory(inputDir);
+				
+				Properties inputFiles = experiment.getInputFiles();
+				for(Object localPathObj : inputFiles.keySet())
+				{
+					String localPath = (String)localPathObj;
+					String remotePath = appendPathComponent(inputDir, inputFiles.getProperty(localPath));
+					
+					fts.uploadFile(localPath, remotePath);
+				}
+			}
 			
 			// Now set up subdirectories for each case
 			for(ExperimentCase expCase : cases)
@@ -205,19 +224,27 @@ public class GridSweeper
 				File caseDirFile = new File(caseLocalDir);
 				caseDirFile.mkdirs();
 				
-				// If file transfer is on, set things up there
+				// Output XML for each
+				List<Long> rngSeeds = expCase.getRngSeeds();
+				for(int i = 0; i < rngSeeds.size(); i++)
+				{
+					String xmlPath = appendPathComponent(caseLocalDir, "case." + i + ".gsweep");
+					String caseName = dateStr + "-" + timeStr + "-" + caseSubDir + "-" + i;
+					
+					ExperimentCaseXMLWriter xmlWriter = new ExperimentCaseXMLWriter(
+							xmlPath, experiment, expCase, caseName, rngSeeds.get(i));
+					xmlWriter.writeXML();
+				}
+				
+				/*// Set up an output directory for the case
 				if(useFileTransfer)
 				{
-					// First set up the directories
 					String caseRemoteDir = appendPathComponent(expSubDir, caseSubDir);
 					String caseRemoteDirInput = appendPathComponent(caseRemoteDir, "input");
 					String caseRemoteDirOutput = appendPathComponent(caseRemoteDir, "output");
-					fts.makeDirectory(caseRemoteDirInput);
+					fts.makeDirectory(caseRemoteDir);
 					fts.makeDirectory(caseRemoteDirOutput);
-					
-					// Now upload the input files
-					
-				}
+				}*/
 			}
 			if(useFileTransfer) fts.disconnect();
 		}

@@ -2,21 +2,25 @@
 
 <experiment name="sample" numRuns="10">
 	
-	<abbrev param="param1" abbrev="p1" />
-	<abbrev param="param2" abbrev="p2" />
-	<abbrev param="param3" abbrev="p3" />
-	<abbrev param="param4" abbrev="p4" />
+	<setting key="command" value="/bin/echo" />
 	
-	<value param="param1" value="0.5" />
+	<input source="~/Experiments/input/test.in" destination="test.in" />
 	
-	<list param="param2">
+	<abbrev param="alpha" abbrev="a" />
+	<abbrev param="beta" abbrev="b" />
+	<abbrev param="gamma" abbrev="g" />
+	<abbrev param="nu" abbrev="n" />
+	
+	<value param="alpha" value="0.5" />
+	
+	<list param="beta">
 		<item value="0.1" />
 		<item value="0.3" />
 		<item value="0.9" />
 	</list>
 	
-	<range param="param3" start="0.1" end="0.5" increment="0.1" />
+	<range param="gamma" start="0.1" end="0.5" increment="0.1" />
 	
-	<uniform param="param4" type="double" start="0" end="1" count="3" />
+	<range param="nu" start="0.3" end="0.6" increment="0.1" />
 
 </experiment>
