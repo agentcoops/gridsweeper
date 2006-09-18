@@ -234,18 +234,10 @@ public class FTPFileTransferSystem implements FileTransferSystem
 	
 	public boolean isDirectory(String path) throws FileTransferException
 	{
-		return isDirectory(path, null);
-	}
-	
-	public boolean isDirectory(String path, Progress progress) throws FileTransferException
-	{
-		if(progress != null) progress.setProgress(0.0);
 		try
 		{
 			FTPFile file = getFTPFile(path);
-			if(progress != null) progress.setProgress(0.5);
 			boolean isDir = file.isDirectory();
-			if(progress != null) progress.setProgress(1.0);
 			return isDir;
 		}
 		catch(Exception e)
@@ -256,13 +248,6 @@ public class FTPFileTransferSystem implements FileTransferSystem
 	
 	public void deleteFile(String path) throws FileTransferException
 	{
-		deleteFile(path, null);
-	}
-	
-	public void deleteFile(String path, Progress progress) throws FileTransferException
-	{
-		if(progress != null) progress.setProgress(0.0);
-		
 		try
 		{
 			if(!ftpClient.deleteFile(path))
@@ -273,19 +258,10 @@ public class FTPFileTransferSystem implements FileTransferSystem
 		{
 			throw new FileTransferException("Received IOException deleting file", e);
 		}
-		
-		if(progress != null) progress.setProgress(1.0);
 	}
 	
 	public void uploadFile(String localPath, String remotePath) throws FileTransferException
 	{
-		uploadFile(localPath, remotePath, null);
-	}
-	
-	public void uploadFile(String localPath, String remotePath, Progress progress) throws FileTransferException
-	{
-		if(progress != null) progress.setProgress(0.0);
-		
 		File localFile = new File(localPath);
 		
 		// Get a file input stream
@@ -310,9 +286,9 @@ public class FTPFileTransferSystem implements FileTransferSystem
 			throw new FileTransferException("Received exception retrieving remote stream");
 		}
 		
-		// Get size for progress calculations
+		/*// Get size for progress calculations
 		long size = localFile.length();
-		long bytesTransferred = 0;
+		long bytesTransferred = 0;*/
 		
 		// Read from file input stream and write to output stream
 		try
@@ -321,7 +297,7 @@ public class FTPFileTransferSystem implements FileTransferSystem
 			while((b = localStream.read()) != -1)
 			{
 				remoteStream.write(b);
-				if(progress != null) progress.setProgress(++bytesTransferred / (double)size);
+				//if(progress != null) progress.setProgress(++bytesTransferred / (double)size);
 			}
 		}
 		catch(IOException e)
@@ -352,58 +328,79 @@ public class FTPFileTransferSystem implements FileTransferSystem
 		{
 			throw new FileTransferException("Received exception completing file transfer", e);
 		}
-		
-		if(progress != null) progress.setProgress(1.0);
 	}
-
-	public void makeDirectory(String path, Progress progress) throws FileTransferException
+	
+	public boolean fileExists(String path) throws FileTransferException
 	{
-		if(progress != null) progress.setProgress(0.0);
+		FTPFile file;
+		try
+		{
+			file = getFTPFile(path);
+		}
+		catch (Exception e)
+		{
+			throw new FileTransferException("Got exception getting FTPFIle object.");
+		}
+		return file != null;
+	}
+	
+	public void makeDirectory(String path) throws FileTransferException
+	{
+		List<String> components = StringUtils.pathComponents(path);
 		
 		try
 		{
-			if(!ftpClient.makeDirectory(path))
+			String pathSoFar = "";
+			for(String component : components)
 			{
-				
-				throw new FileTransferException("Could not create directory.");
+				pathSoFar = StringUtils.appendPathComponent(pathSoFar, component);
+				if(fileExists(path))
+				{
+					if(!isDirectory(pathSoFar))
+					{
+						throw new FileTransferException("Non-directory file already exists in desired directory path.");
+					}
+				}
+				else
+				{
+					if(!ftpClient.makeDirectory(pathSoFar))
+					{
+						throw new FileTransferException("Could not create directory: " + pathSoFar);
+					}
+				}
 			}
 		}
 		catch(IOException e)
 		{
 			throw new FileTransferException("Got exception creating directory");
 		}
-		
-		if(progress != null) progress.setProgress(1.0);
 	}
 
-	public void makeDirectory(String path) throws FileTransferException
+	public void removeDirectory(String path) throws FileTransferException
 	{
-		makeDirectory(path, null);
-	}
-
-	public void removeDirectory(String path, Progress progress) throws FileTransferException
-	{
-		if(progress != null) progress.setProgress(0.0);
-		
 		try
 		{
+			String[] listing = list(path);
+			
+			if(listing.length != 0)
+			{
+				for(String component : listing)
+				{
+					String subpath = StringUtils.appendPathComponent(path, component);
+					if(isDirectory(subpath)) removeDirectory(subpath);
+					else deleteFile(subpath);
+				}
+			}
+			
 			if(!ftpClient.removeDirectory(path))
 			{
-				throw new FileTransferException("Could not remove directory.");
+				throw new FileTransferException("Could not remove directory " + path);					
 			}
 		}
 		catch(IOException e)
 		{
 			throw new FileTransferException("Got exception removing directory");
 		}
-		
-		if(progress != null) progress.setProgress(1.0);
-		
-	}
-
-	public void removeDirectory(String path) throws FileTransferException
-	{
-		removeDirectory(path, null);
 	}
 	
 	protected FTPFile getFTPFile(String path) throws Exception

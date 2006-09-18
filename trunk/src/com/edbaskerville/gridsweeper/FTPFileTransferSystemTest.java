@@ -102,6 +102,23 @@ public class FTPFileTransferSystemTest
 	}
 	
 	@Test
+	public void makeDirectories() throws Exception
+	{
+		ftpFS.connect();
+		
+		try { ftpFS.removeDirectory("dir2"); } catch(Exception e) {}
+		
+		// Make directory
+		ftpFS.makeDirectory("dir2/with/subdir");
+		
+		// Verify directory exists
+		File dir = new File("/Users/ftpuser/tmp/dir2/with/subdir");
+		assertTrue(dir.exists());
+		
+		ftpFS.disconnect();		
+	}
+	
+	@Test
 	public void removeDirectory() throws Exception
 	{
 		makeDirectory();
@@ -113,6 +130,23 @@ public class FTPFileTransferSystemTest
 		
 		// Verify directory doesn't exist
 		File dir = new File("/Users/ftpuser/tmp/dir");
+		assertFalse(dir.exists());
+		
+		ftpFS.disconnect();
+	}
+	
+	@Test
+	public void removeDirectoryRecursive() throws Exception
+	{
+		makeDirectories();
+		
+		ftpFS.connect();
+		
+		// Remove directory
+		ftpFS.removeDirectory("dir2");
+		
+		// Verify directory doesn't exist
+		File dir = new File("/Users/ftpuser/tmp/dir2");
 		assertFalse(dir.exists());
 		
 		ftpFS.disconnect();

@@ -178,6 +178,11 @@ public class StringUtils
 	
 	public static String appendPathComponent(String path, String component)
 	{
+		if(path.equals(""))
+		{
+			return component;
+		}
+		
 		int pathLength = path.length();
 		boolean pathHasFinalSlash = (pathLength > 0)
 			&& (path.substring(pathLength - 1).equals(fileSep));
@@ -198,5 +203,26 @@ public class StringUtils
 		{
 			return path + component;
 		}
+	}
+
+	public static List<String> pathComponents(String path)
+	{
+		List<String> tokens = tokenize(path, "/", false);
+		
+		int size = tokens.size();
+		
+		// Remove empty string caused by trailing slash if present
+		if(size > 0 && tokens.get(size - 1).equals(""))
+		{
+			tokens.remove(--size);
+		}
+		
+		// Replace empty string caused by initial slash with actual slash
+		if(size > 0 && tokens.get(0).equals(""))
+		{
+			tokens.set(0, "/");
+		}
+		
+		return tokens;
 	}
 }
