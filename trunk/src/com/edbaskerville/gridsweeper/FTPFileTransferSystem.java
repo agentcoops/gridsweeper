@@ -339,7 +339,7 @@ public class FTPFileTransferSystem implements FileTransferSystem
 		}
 		catch (Exception e)
 		{
-			throw new FileTransferException("Got exception getting FTPFIle object.");
+			throw new FileTransferException("Got exception getting FTPFile object.");
 		}
 		return file != null;
 	}
@@ -354,7 +354,7 @@ public class FTPFileTransferSystem implements FileTransferSystem
 			for(String component : components)
 			{
 				pathSoFar = StringUtils.appendPathComponent(pathSoFar, component);
-				if(fileExists(path))
+				if(fileExists(pathSoFar))
 				{
 					if(!isDirectory(pathSoFar))
 					{

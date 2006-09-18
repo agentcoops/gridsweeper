@@ -81,14 +81,8 @@ public class GridSweeper
 		// Generate experiment cases, etc.
 		setUpExperiment();
 		
-		// Prepare local filesystem
-		prepareLocalFileSystem();
-		
-		// If file sharing is on, prepare remote filesystem
-		if(preferences.getBooleanProperty("EnableFileTransfer"))
-		{
-			transferFiles();
-		}
+		// Prepare filesystems: local always, and remote if shared filesystem is off
+		prepareFileSystems();
 		
 		// Connect, submit, wait for completion, and disconnect
 		GridController controller = new GridController(gridDelegate);
@@ -168,12 +162,23 @@ public class GridSweeper
 		}
 	}
 	
-	private static void prepareLocalFileSystem() throws GridSweeperException
+	private static void prepareFileSystems() throws GridSweeperException
 	{
-		Logger.entering(className, "prepareLocalFileSystem");
+		Logger.entering(className, "prepareFileSystems");
+		
+		boolean useFileTransfer = !preferences.getBooleanProperty("UseSharedFileSystem");
 		
 		try
 		{
+			Logger.finer("preferences: " + preferences);
+			
+			FileTransferSystem fts = null;
+			if(useFileTransfer)
+			{
+				fts = FileTransferSystemFactory.getFactory().getFileTransferSystem(preferences);
+				fts.connect();
+			}
+			
 			String expsDir = expandTildeInPath(preferences.getProperty("ExperimentsDirectory"));
 			
 			// First set up big directory for the whole experiment
@@ -188,29 +193,39 @@ public class GridSweeper
 			File expDirFile = new File(expDir);
 			expDirFile.mkdirs();
 			
+			if(useFileTransfer) fts.makeDirectory(expSubDir);
+			
 			// Now set up subdirectories for each case
 			for(ExperimentCase expCase : cases)
 			{
 				String caseSubDir = experiment.getDirectoryNameForCase(expCase);
-				String caseDir = appendPathComponent(expDir, caseSubDir);
-				Logger.finer("Case subdirectory: " + caseDir);
+				String caseLocalDir = appendPathComponent(expDir, caseSubDir);
+				Logger.finer("Case subdirectory: " + caseLocalDir);
 
-				File caseDirFile = new File(caseDir);
+				File caseDirFile = new File(caseLocalDir);
 				caseDirFile.mkdirs();
+				
+				// If file transfer is on, set things up there
+				if(useFileTransfer)
+				{
+					// First set up the directories
+					String caseRemoteDir = appendPathComponent(expSubDir, caseSubDir);
+					String caseRemoteDirInput = appendPathComponent(caseRemoteDir, "input");
+					String caseRemoteDirOutput = appendPathComponent(caseRemoteDir, "output");
+					fts.makeDirectory(caseRemoteDirInput);
+					fts.makeDirectory(caseRemoteDirOutput);
+					
+					// Now upload the input files
+					
+				}
 			}
+			if(useFileTransfer) fts.disconnect();
 		}
 		catch(Exception e)
 		{
 			throw new GridSweeperException("Could not set up local dirs", e);
 		}
 		
-		Logger.exiting(className, "prepareLocalFileSystem");
-	}
-	
-	private static void transferFiles() throws GridSweeperException
-	{
-		Logger.entering(className, "transferFiles");
-		
-		Logger.exiting(className, "transferFiles");
+		Logger.exiting(className, "prepareFileSystems");
 	}
 }

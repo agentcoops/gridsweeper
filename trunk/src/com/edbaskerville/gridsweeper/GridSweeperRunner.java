@@ -21,10 +21,10 @@ public class GridSweeperRunner
 			Preferences preferences = setup.getPreferences();
 			
 			// Download input files
-			boolean enableFileTransfer = preferences.getBooleanProperty("EnableFileTransfer");
-			if(enableFileTransfer)
+			boolean useFileTransfer = !preferences.getBooleanProperty("UseSharedFileSystem");
+			FileTransferSystem fts = FileTransferSystemFactory.getFactory().getFileTransferSystem(preferences);
+			if(useFileTransfer)
 			{
-				FileTransferSystem fts = getFileTransferSystem(preferences);
 				fts.connect();
 				
 				Properties inputFiles = setup.getInputFiles();
@@ -56,9 +56,8 @@ public class GridSweeperRunner
 			results = adapter.run(parameters, runNumber, rngSeed, dryRun);
 			
 			// Stage files listed in run properties back to server (if asked for)
-			if(enableFileTransfer)
+			if(useFileTransfer)
 			{
-				FileTransferSystem fts = getFileTransferSystem(preferences);
 				fts.connect();
 				
 				Properties outputFiles = setup.getOutputFiles();
@@ -89,26 +88,5 @@ public class GridSweeperRunner
 			stdoutStream.writeObject(results);
 		}
 		catch(Exception e) {}
-	}
-
-	private static FileTransferSystem getFileTransferSystem(Preferences preferences)
-	{
-		String className = preferences.getProperty("FileTransferSystemClass");
-		Properties ftpProperties = preferences.getPropertiesForClass(className);
-		
-		try
-		{
-			Class ftsClass = Class.forName(preferences.getProperty("FileTransferSystemClass"));
-			Class[] parameterTypes = new Class[] { Properties.class };
-			Constructor constructor = ftsClass.getConstructor(parameterTypes);
-			Object[] initargs = new Object[] { ftpProperties };
-			FileTransferSystem fts = (FileTransferSystem)constructor.newInstance(initargs);
-			
-			return fts;
-		}
-		catch(Exception e)
-		{
-			return null;
-		}
 	}
 }

@@ -31,7 +31,6 @@ public class Preferences extends Properties
 			defaults.setProperty("AdapterClass", "com.edbaskerville.gridsweeper.DroneAdapter");
 			
 			defaults.setProperty("UseSharedFileSystem", "false");
-			defaults.setProperty("EnableFileTransfer", "true");
 			defaults.setProperty("FileTransferSystemClass", "com.edbaskerville.gridsweeper.FTPFileTransferSystem");
 			
 			defaults.setProperty("com.edbaskerville.gridsweeper.FTPFileTransferSystem.Username", "anonymous");
@@ -60,7 +59,7 @@ public class Preferences extends Properties
 		Properties properties = new Properties();
 		String classNamePlusDot = className + ".";
 		
-		for(Object key : properties.keySet())
+		for(Object key : keySet())
 		{
 			String propName = (String)key;
 			if(propName.indexOf(classNamePlusDot) == 0)
