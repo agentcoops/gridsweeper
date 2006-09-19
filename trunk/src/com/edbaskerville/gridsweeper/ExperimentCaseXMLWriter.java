@@ -48,8 +48,7 @@ public class ExperimentCaseXMLWriter
 	
 	private void printExperimentStart()
 	{
-		String name = experiment.getName()
-			+ "-" + caseName;
+		String name = caseName;
 		String numRuns = "1";
 		
 		StringMap attrs = new StringMap();

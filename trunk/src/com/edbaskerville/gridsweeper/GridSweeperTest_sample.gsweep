@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<experiment name="sample" numRuns="10">
+<experiment name="sample" numRuns="2">
 	
 	<setting key="command" value="/bin/echo" />
 	
@@ -13,14 +13,10 @@
 	
 	<value param="alpha" value="0.5" />
 	
-	<list param="beta">
-		<item value="0.1" />
-		<item value="0.3" />
-		<item value="0.9" />
-	</list>
+	<value param="beta" value="0.3"/>
 	
-	<range param="gamma" start="0.1" end="0.5" increment="0.1" />
+	<range param="gamma" start="0.1" end="0.3" increment="0.1" />
 	
-	<range param="nu" start="0.3" end="0.6" increment="0.1" />
+	<range param="nu" start="0.3" end="0.5" increment="0.1" />
 
 </experiment>

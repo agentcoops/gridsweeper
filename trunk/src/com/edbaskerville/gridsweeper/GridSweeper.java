@@ -1,8 +1,9 @@
 package com.edbaskerville.gridsweeper;
 
-import org.ggf.drmaa.DrmaaException;
+import org.ggf.drmaa.*;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.*;
 import static com.edbaskerville.gridsweeper.StringUtils.*;
 import static com.edbaskerville.gridsweeper.DateUtils.*;
@@ -27,8 +28,16 @@ public class GridSweeper
 	
 	static Preferences preferences;
 	
+	static boolean useFileTransfer;
+	
 	static String className;
 	static Calendar cal;
+	
+	static String dateStr;
+	static String timeStr;
+	static String expDir;
+	
+	static Session drmaaSession;
 	
 	static
 	{
@@ -83,22 +92,12 @@ public class GridSweeper
 		// Generate experiment cases, etc.
 		setUpExperiment();
 		
-		// Prepare filesystems: local always, and remote if shared filesystem is off
-		prepareFileSystems();
-		
-		// Connect, submit, wait for completion, and disconnect
-		GridController controller = new GridController(gridDelegate);
-		try
-		{
-			controller.connect();
-			controller.submitExperiment(experiment, adapterClassName, true);
-			controller.disconnect();
-		}
-		catch(DrmaaException e)
-		{
-			throw new GridSweeperException("Could not submit experiment", e);
-		}
+		// Run jobs
+		run();
 
+		// Wait for job completion
+		finish();
+		
 		Logger.exiting(className, "main");
 	}
 	
@@ -165,11 +164,11 @@ public class GridSweeper
 		}
 	}
 	
-	private static void prepareFileSystems() throws GridSweeperException
+	private static void run() throws GridSweeperException
 	{
-		Logger.entering(className, "prepareFileSystems");
+		Logger.entering(className, "prepare");
 		
-		boolean useFileTransfer = !preferences.getBooleanProperty("UseSharedFileSystem");
+		useFileTransfer = !preferences.getBooleanProperty("UseSharedFileSystem");
 		
 		try
 		{
@@ -187,11 +186,11 @@ public class GridSweeper
 			
 			// First set up big directory for the whole experiment
 			String expName = experiment.getName();
-			String dateStr = getDateString(cal);
-			String timeStr = getTimeString(cal);
+			dateStr = getDateString(cal);
+			timeStr = getTimeString(cal);
 			String expSubDir = String.format("%s%s%s-%s", dateStr, getFileSeparator(), expName, timeStr);
 			
-			String expDir = appendPathComponent(expsDir, expSubDir);
+			expDir = appendPathComponent(expsDir, expSubDir);
 			Logger.finer("Experiment subdirectory: " + expDir);
 			
 			File expDirFile = new File(expDir);
@@ -214,37 +213,14 @@ public class GridSweeper
 				}
 			}
 			
-			// Now set up subdirectories for each case
+			// Establish DRMAA session
+			drmaaSession = SessionFactory.getFactory().getSession();
+			drmaaSession.init(null);
+			
+			// Set up and run each case
 			for(ExperimentCase expCase : cases)
 			{
-				String caseSubDir = experiment.getDirectoryNameForCase(expCase);
-				String caseLocalDir = appendPathComponent(expDir, caseSubDir);
-				Logger.finer("Case subdirectory: " + caseLocalDir);
-
-				File caseDirFile = new File(caseLocalDir);
-				caseDirFile.mkdirs();
-				
-				// Output XML for each
-				List<Long> rngSeeds = expCase.getRngSeeds();
-				for(int i = 0; i < rngSeeds.size(); i++)
-				{
-					String xmlPath = appendPathComponent(caseLocalDir, "case." + i + ".gsweep");
-					String caseName = dateStr + "-" + timeStr + "-" + caseSubDir + "-" + i;
-					
-					ExperimentCaseXMLWriter xmlWriter = new ExperimentCaseXMLWriter(
-							xmlPath, experiment, expCase, caseName, rngSeeds.get(i));
-					xmlWriter.writeXML();
-				}
-				
-				/*// Set up an output directory for the case
-				if(useFileTransfer)
-				{
-					String caseRemoteDir = appendPathComponent(expSubDir, caseSubDir);
-					String caseRemoteDirInput = appendPathComponent(caseRemoteDir, "input");
-					String caseRemoteDirOutput = appendPathComponent(caseRemoteDir, "output");
-					fts.makeDirectory(caseRemoteDir);
-					fts.makeDirectory(caseRemoteDirOutput);
-				}*/
+				runCase(expCase);
 			}
 			if(useFileTransfer) fts.disconnect();
 		}
@@ -253,6 +229,73 @@ public class GridSweeper
 			throw new GridSweeperException("Could not set up local dirs", e);
 		}
 		
-		Logger.exiting(className, "prepareFileSystems");
+		Logger.exiting(className, "prepare");
+	}
+	
+	private static void runCase(ExperimentCase expCase) throws FileNotFoundException, DrmaaException
+	{		
+		String caseSubDir = experiment.getDirectoryNameForCase(expCase);
+		String caseDir = appendPathComponent(expDir, caseSubDir);
+		Logger.finer("Case subdirectory: " + caseDir);
+		
+		File caseDirFile = new File(caseDir);
+		caseDirFile.mkdirs();
+		
+		// For each run, output XML and run the damn thing
+		List<Long> rngSeeds = expCase.getRngSeeds();
+		for(int i = 0; i < rngSeeds.size(); i++)
+		{
+			runCaseRun(expCase, caseDir, caseSubDir, i, rngSeeds.get(i));
+		}
+		
+		/*// Set up an output directory for the case
+		if(useFileTransfer)
+		{
+			String caseRemoteDir = appendPathComponent(expSubDir, caseSubDir);
+			String caseRemoteDirInput = appendPathComponent(caseRemoteDir, "input");
+			String caseRemoteDirOutput = appendPathComponent(caseRemoteDir, "output");
+			fts.makeDirectory(caseRemoteDir);
+			fts.makeDirectory(caseRemoteDirOutput);
+		}*/
+	}
+	
+	private static void runCaseRun(ExperimentCase expCase, String caseDir, String caseSubDir, int i, Long rngSeed) throws FileNotFoundException, DrmaaException
+	{
+		String caseRunName = experiment.getName() + "-" + dateStr + "-" + timeStr + "-" + caseSubDir + "-" + i;
+
+		// Write XML
+		String xmlPath = appendPathComponent(caseDir, "case." + i + ".gsweep");
+		ExperimentCaseXMLWriter xmlWriter = new ExperimentCaseXMLWriter(
+				xmlPath, experiment, expCase, caseRunName, rngSeed);
+		xmlWriter.writeXML();
+		
+		// Generate job template
+		JobTemplate jt = drmaaSession.createJobTemplate();
+		
+		jt.setJobName(caseRunName);
+		
+		jt.setRemoteCommand("/bin/echo");
+		jt.setArgs(new String[] {caseSubDir } );
+		
+		if(!useFileTransfer) jt.setWorkingDirectory(caseDir);
+		jt.setOutputPath(appendPathComponent(caseDir, ".gridsweeper_out." + i));
+		jt.setTransferFiles(new FileTransferMode(false, true, false));
+		
+		String jobId = drmaaSession.runJob(jt);
+		drmaaSession.deleteJobTemplate(jt);
+		
+		// TODO: Record job id so it can be reported back as tied to this case run.
+	}
+	
+	private static void finish() throws GridSweeperException
+	{
+		try
+		{
+			drmaaSession.exit();
+		}
+		catch(DrmaaException e)
+		{
+			throw new GridSweeperException("Received exception ending DRMAA session", e);
+		}
 	}
 }
