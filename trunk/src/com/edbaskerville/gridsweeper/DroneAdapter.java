@@ -23,9 +23,7 @@ public class DroneAdapter implements Adapter
 	
 	private String miscOptions;
 	
-	byte[] stdinData;
-	
-	public DroneAdapter(Properties settings, byte[] stdinData) throws AdapterException
+	public DroneAdapter(Properties settings) throws AdapterException
 	{
 		command = settings.getProperty("command");
 		if(command == null)
@@ -45,11 +43,9 @@ public class DroneAdapter implements Adapter
 		inputFilePath = settings.getProperty("inputFilePath");
 		
 		miscOptions = settings.getProperty("miscOptions");
-		
-		this.stdinData = stdinData;
 	}
 
-	public RunResults run(ParameterMap parameterMap, int runNumber, long rngSeed, boolean dryRun) throws AdapterException
+	public RunResults run(ParameterMap parameterMap, int runNumber, long rngSeed) throws AdapterException
 	{
 		List<String> arguments = new ArrayList<String>();
 		
@@ -83,48 +79,45 @@ public class DroneAdapter implements Adapter
 		byte[] stdoutData = null;
 		byte[] stderrData = null;
 		
-		if(!dryRun)
+		// Create command array
+		String[] cmdArray = new String[arguments.size() + 1];
+		cmdArray[0] = command;
+		for(int i = 0; i < arguments.size(); i++)
 		{
-			// Create command array
-			String[] cmdArray = new String[arguments.size() + 1];
-			cmdArray[0] = command;
-			for(int i = 0; i < arguments.size(); i++)
-			{
-				cmdArray[i+1] = arguments.get(i);
-			}
+			cmdArray[i+1] = arguments.get(i);
+		}
+		
+		try
+		{
+			// Actually run the damn thing, getting a process object with which to interact with it
+			Process process = Runtime.getRuntime().exec(cmdArray);
 			
-			try
+			/*// Write to stdin stream
+			OutputStream stdinStream = process.getOutputStream();
+			if(stdinData != null)
 			{
-				// Actually run the damn thing, getting a process object with which to interact with it
-				Process process = Runtime.getRuntime().exec(cmdArray);
-				
-				// Write to stdin stream
-				OutputStream stdinStream = process.getOutputStream();
-				if(stdinData != null)
-				{
-					stdinStream.write(stdinData);
-				}
-				stdinStream.close();
-				
-				// Read to end of stdout and stderr streams
-				int b;
-				
-				InputStream stdoutStream = process.getInputStream();
-				ByteArrayOutputStream stdoutByteStream = new ByteArrayOutputStream();
-				while((b = stdoutStream.read()) != -1)
-					stdoutByteStream.write(b);
-				stdoutData = stdoutByteStream.toByteArray();
-				
-				InputStream stderrStream = process.getErrorStream();
-				ByteArrayOutputStream stderrByteStream = new ByteArrayOutputStream();
-				while((b = stderrStream.read()) != -1)
-					stderrByteStream.write(b);
-				stderrData = stderrByteStream.toByteArray();
+				stdinStream.write(stdinData);
 			}
-			catch (IOException e)
-			{
-				throw new AdapterException("Received IOException running process", e);
-			}
+			stdinStream.close();*/
+			
+			// Read to end of stdout and stderr streams
+			int b;
+			
+			InputStream stdoutStream = process.getInputStream();
+			ByteArrayOutputStream stdoutByteStream = new ByteArrayOutputStream();
+			while((b = stdoutStream.read()) != -1)
+				stdoutByteStream.write(b);
+			stdoutData = stdoutByteStream.toByteArray();
+			
+			InputStream stderrStream = process.getErrorStream();
+			ByteArrayOutputStream stderrByteStream = new ByteArrayOutputStream();
+			while((b = stderrStream.read()) != -1)
+				stderrByteStream.write(b);
+			stderrData = stderrByteStream.toByteArray();
+		}
+		catch (IOException e)
+		{
+			throw new AdapterException("Received IOException running process", e);
 		}
 		
 		return new RunResults(status, message, stdoutData, stderrData);

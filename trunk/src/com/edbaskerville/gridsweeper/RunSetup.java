@@ -12,37 +12,28 @@ public class RunSetup implements Serializable
 	private Properties properties;
 	private Properties inputFiles;
 	private String fileTransferSubpath;
-	private byte[] stdinData;
 	private ParameterMap parameters;
 	private int runNumber;
 	private long rngSeed;
-	private boolean dryRun;
 	private Properties outputFiles;
-	private Class adapterClass;
+	private String adapterClassName;
 	
-	public RunSetup(Preferences preferences, Properties properties, Properties inputFiles, String fileTransferSubpath, byte[] stdinData, ParameterMap parameters, int runNumber, long rngSeed, boolean dryRun, Properties outputFiles, Class adapterClass)
+	public RunSetup(Preferences preferences, Properties properties, Properties inputFiles, String fileTransferSubpath, ParameterMap parameters, int runNumber, long rngSeed, Properties outputFiles, String adapterClassName)
 	{
 		this.preferences = preferences;
 		this.properties = properties;
 		this.inputFiles = inputFiles;
 		this.fileTransferSubpath = fileTransferSubpath;
-		this.stdinData = stdinData;
 		this.parameters = parameters;
 		this.runNumber = runNumber;
 		this.rngSeed = rngSeed;
-		this.dryRun = dryRun;
 		this.outputFiles = outputFiles;
-		this.adapterClass = adapterClass;
+		this.adapterClassName = adapterClassName;
 	}
 
-	public Class getAdapterClass()
+	public String getAdapterClassName()
 	{
-		return adapterClass;
-	}
-	
-	public boolean isDryRun()
-	{
-		return dryRun;
+		return adapterClassName;
 	}
 	
 	public Preferences getPreferences()
@@ -63,11 +54,6 @@ public class RunSetup implements Serializable
 	public int getRunNumber()
 	{
 		return runNumber;
-	}
-	
-	public byte[] getStdinData()
-	{
-		return stdinData;
 	}
 	
 	public ParameterMap getParameters()

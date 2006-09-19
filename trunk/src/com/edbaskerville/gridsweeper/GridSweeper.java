@@ -4,6 +4,9 @@ import org.ggf.drmaa.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.*;
 import static com.edbaskerville.gridsweeper.StringUtils.*;
 import static com.edbaskerville.gridsweeper.DateUtils.*;
@@ -20,11 +23,11 @@ public class GridSweeper
 	static String adapterClassName;
 	static String experimentPath;
 	
+	static String root;
+	
 	static Experiment experiment;
 	static boolean dryRun;
 	static List<ExperimentCase> cases;
-	static GridDelegate gridDelegate;
-	static int numFailedRuns;
 	
 	static Preferences preferences;
 	
@@ -43,33 +46,6 @@ public class GridSweeper
 	{
 		experiment = null;
 		dryRun = false;
-		numFailedRuns = 0;
-		gridDelegate = new GridDelegate()
-		{
-			public void batchCompleted()
-			{
-				System.err.println("The experiment has completed.");
-			}
-			
-			public void batchFailed(Exception e)
-			{
-				System.err.println("The experiment failed due to an exception:");
-				e.printStackTrace();
-			}
-
-			public void runCompleted(ExperimentCase experimentCase, int runNumber)
-			{
-				String description = experiment.getCaseDescription(experimentCase);
-				System.err.println("Completed run " + runNumber + " of case " + description);
-			}
-
-			public void runFailed(ExperimentCase experimentCase, int runNumber)
-			{
-				String description = experiment.getCaseDescription(experimentCase);
-				System.err.println("Run " + runNumber + " of case " + description + " failed.");
-			}
-			
-		};
 		
 		preferences = Preferences.sharedPreferences();
 		className = GridSweeper.class.toString();
@@ -82,6 +58,12 @@ public class GridSweeper
 		
 		adapterClassName = Preferences.sharedPreferences().getProperty("AdapterClass");
 		experimentPath = null;
+		
+		root = System.getenv("GRIDSWEEPER_ROOT");
+		if(root == null)
+		{
+			throw new GridSweeperException("GRIDSWEEPER_ROOT environment variable not set.");
+		}
 		
 		// Parse args
 		parseArgs(args);
@@ -213,16 +195,19 @@ public class GridSweeper
 				}
 			}
 			
-			// Establish DRMAA session
-			drmaaSession = SessionFactory.getFactory().getSession();
-			drmaaSession.init(null);
+			if(!dryRun)
+			{
+				// Establish DRMAA session
+				drmaaSession = SessionFactory.getFactory().getSession();
+				drmaaSession.init(null);
+			}
 			
 			// Set up and run each case
 			for(ExperimentCase expCase : cases)
 			{
 				runCase(expCase);
 			}
-			if(useFileTransfer) fts.disconnect();
+			if(!dryRun && useFileTransfer) fts.disconnect();
 		}
 		catch(Exception e)
 		{
@@ -232,7 +217,7 @@ public class GridSweeper
 		Logger.exiting(className, "prepare");
 	}
 	
-	private static void runCase(ExperimentCase expCase) throws FileNotFoundException, DrmaaException
+	private static void runCase(ExperimentCase expCase) throws FileNotFoundException, DrmaaException, IOException
 	{		
 		String caseSubDir = experiment.getDirectoryNameForCase(expCase);
 		String caseDir = appendPathComponent(expDir, caseSubDir);
@@ -247,19 +232,9 @@ public class GridSweeper
 		{
 			runCaseRun(expCase, caseDir, caseSubDir, i, rngSeeds.get(i));
 		}
-		
-		/*// Set up an output directory for the case
-		if(useFileTransfer)
-		{
-			String caseRemoteDir = appendPathComponent(expSubDir, caseSubDir);
-			String caseRemoteDirInput = appendPathComponent(caseRemoteDir, "input");
-			String caseRemoteDirOutput = appendPathComponent(caseRemoteDir, "output");
-			fts.makeDirectory(caseRemoteDir);
-			fts.makeDirectory(caseRemoteDirOutput);
-		}*/
 	}
 	
-	private static void runCaseRun(ExperimentCase expCase, String caseDir, String caseSubDir, int i, Long rngSeed) throws FileNotFoundException, DrmaaException
+	private static void runCaseRun(ExperimentCase expCase, String caseDir, String caseSubDir, int i, Long rngSeed) throws DrmaaException, IOException
 	{
 		String caseRunName = experiment.getName() + "-" + dateStr + "-" + timeStr + "-" + caseSubDir + "-" + i;
 
@@ -269,17 +244,25 @@ public class GridSweeper
 				xmlPath, experiment, expCase, caseRunName, rngSeed);
 		xmlWriter.writeXML();
 		
+		// Write setup file
+		String stdinPath = appendPathComponent(caseDir, ".gridsweeper_in." + i);
+		RunSetup setup = new RunSetup(preferences, experiment.getProperties(),
+				experiment.getInputFiles(), caseSubDir, expCase.getParameterMap(),
+				i, rngSeed, experiment.getOutputFiles(), adapterClassName);
+		ObjectOutputStream stdinStream = new ObjectOutputStream(new FileOutputStream(stdinPath));
+		stdinStream.writeObject(setup);
+		
 		// Generate job template
 		JobTemplate jt = drmaaSession.createJobTemplate();
-		
 		jt.setJobName(caseRunName);
-		
-		jt.setRemoteCommand("/bin/echo");
-		jt.setArgs(new String[] {caseSubDir } );
-		
+		jt.setRemoteCommand(appendPathComponent(root, "grunner"));
 		if(!useFileTransfer) jt.setWorkingDirectory(caseDir);
+		jt.setInputPath(stdinPath);
 		jt.setOutputPath(appendPathComponent(caseDir, ".gridsweeper_out." + i));
-		jt.setTransferFiles(new FileTransferMode(false, true, false));
+		jt.setTransferFiles(new FileTransferMode(true, true, false));
+		Properties environment = new Properties();
+		environment.setProperty("GRIDSWEEPER_ROOT", root);
+		jt.setJobEnvironment(environment);
 		
 		String jobId = drmaaSession.runJob(jt);
 		drmaaSession.deleteJobTemplate(jt);

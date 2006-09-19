@@ -5,11 +5,11 @@ import java.util.Properties;
 
 public class AdapterFactory
 {
-	public static Adapter createAdapter(String adapterClassName, Properties properties, byte[] stdinData)
+	public static Adapter createAdapter(String adapterClassName, Properties properties)
 	{
 		try
 		{
-			return createAdapter(Class.forName(adapterClassName), properties, stdinData);
+			return createAdapter(Class.forName(adapterClassName), properties);
 		}
 		catch(Exception e)
 		{
@@ -17,13 +17,13 @@ public class AdapterFactory
 		}
 	}
 	
-	public static Adapter createAdapter(Class adapterClass, Properties properties, byte[] stdinData)
+	public static Adapter createAdapter(Class adapterClass, Properties properties)
 	{
 		try
 		{
 			Class[] parameterTypes = new Class[] { Properties.class, byte[].class };
 			Constructor adapterConstructor = adapterClass.getConstructor(parameterTypes);
-			Object[] initargs = new Object[] { properties, stdinData };
+			Object[] initargs = new Object[] { properties };
 			
 			return (Adapter)adapterConstructor.newInstance(initargs);
 		}

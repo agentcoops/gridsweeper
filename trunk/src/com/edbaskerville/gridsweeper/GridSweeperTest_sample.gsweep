@@ -3,6 +3,7 @@
 <experiment name="sample" numRuns="2">
 	
 	<setting key="command" value="/bin/echo" />
+	<setting key="miscOptions" value="-n" />
 	
 	<input source="~/Experiments/input/test.in" destination="test.in" />
 	

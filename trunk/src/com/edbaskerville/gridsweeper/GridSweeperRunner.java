@@ -2,7 +2,7 @@ package com.edbaskerville.gridsweeper;
 
 import java.util.*;
 import java.io.*;
-import java.lang.reflect.*;
+import static com.edbaskerville.gridsweeper.StringUtils.*;
 
 import com.edbaskerville.gridsweeper.parameters.ParameterMap;
 
@@ -34,8 +34,8 @@ public class GridSweeperRunner
 					String path = inputFiles.getProperty((String)key);
 					String fileTransferSubpath = setup.getFileTransferSubpath();
 					
-					String remotePath = fileTransferSubpath + "/" + path;
-					String localPath = StringUtils.replace(path, Constants.RunNumberPlaceholder);
+					String remotePath = appendPathComponent(fileTransferSubpath, path);
+					String localPath = path;
 					
 					fts.downloadFile(remotePath, localPath);
 				}
@@ -43,17 +43,15 @@ public class GridSweeperRunner
 				fts.disconnect();
 			}
 			
-			Class adapterClass = setup.getAdapterClass();
+			String adapterClassName = setup.getAdapterClassName();
 			Properties properties = setup.getProperties();
-			byte[] stdinData = setup.getStdinData();
-			Adapter adapter = AdapterFactory.createAdapter(adapterClass, properties, stdinData);
+			Adapter adapter = AdapterFactory.createAdapter(adapterClassName, properties);
 			
 			// Run!
 			ParameterMap parameters = setup.getParameters();
 			int runNumber = setup.getRunNumber();
 			long rngSeed = setup.getRngSeed();
-			boolean dryRun = setup.isDryRun();
-			results = adapter.run(parameters, runNumber, rngSeed, dryRun);
+			results = adapter.run(parameters, runNumber, rngSeed);
 			
 			// Stage files listed in run properties back to server (if asked for)
 			if(useFileTransfer)
@@ -64,10 +62,9 @@ public class GridSweeperRunner
 				
 				for(Object key : outputFiles.keySet())
 				{
-					String localPath = StringUtils.replace((String)key, Constants.RunNumberPlaceholder);
-					String finalPath = outputFiles.getProperty((String)key);
+					String localPath = (String)key;
 					String fileTransferSubpath = setup.getFileTransferSubpath();
-					String remotePath = fileTransferSubpath + "/" + finalPath;
+					String remotePath = appendPathComponent(fileTransferSubpath, localPath);
 					
 					fts.uploadFile(localPath, remotePath);
 				}

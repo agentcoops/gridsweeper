@@ -25,7 +25,6 @@ public class Preferences extends Properties
 		{
 			Preferences defaults = new Preferences();
 			
-			defaults.setProperty("RootDirectory", "/usr/local/gridsweeper");
 			defaults.setProperty("ExperimentsDirectory", "~/Experiments");
 			
 			defaults.setProperty("AdapterClass", "com.edbaskerville.gridsweeper.DroneAdapter");
