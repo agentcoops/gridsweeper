@@ -22,9 +22,10 @@ public class GridSweeperRunner
 			
 			// Download input files
 			boolean useFileTransfer = !preferences.getBooleanProperty("UseSharedFileSystem");
-			FileTransferSystem fts = FileTransferSystemFactory.getFactory().getFileTransferSystem(preferences);
+			FileTransferSystem fts = null;
 			if(useFileTransfer)
 			{
+				fts = FileTransferSystemFactory.getFactory().getFileTransferSystem(preferences);
 				fts.connect();
 				
 				Properties inputFiles = setup.getInputFiles();
@@ -74,6 +75,7 @@ public class GridSweeperRunner
 		}
 		catch(Exception e)
 		{
+			e.printStackTrace();
 			results = new RunResults(e); 
 		}
 		

@@ -257,9 +257,10 @@ public class GridSweeper
 		jt.setJobName(caseRunName);
 		jt.setRemoteCommand(appendPathComponent(root, "grunner"));
 		if(!useFileTransfer) jt.setWorkingDirectory(caseDir);
-		jt.setInputPath(stdinPath);
-		jt.setOutputPath(appendPathComponent(caseDir, ".gridsweeper_out." + i));
-		jt.setTransferFiles(new FileTransferMode(true, true, false));
+		jt.setInputPath(":" + stdinPath);
+		jt.setOutputPath(":" + appendPathComponent(caseDir, ".gridsweeper_out." + i));
+		jt.setErrorPath(":" + appendPathComponent(caseDir, ".gridsweeper_err." + i));
+		//jt.setTransferFiles(new FileTransferMode(true, true, false));
 		Properties environment = new Properties();
 		environment.setProperty("GRIDSWEEPER_ROOT", root);
 		jt.setJobEnvironment(environment);

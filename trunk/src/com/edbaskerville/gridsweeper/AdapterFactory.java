@@ -21,7 +21,7 @@ public class AdapterFactory
 	{
 		try
 		{
-			Class[] parameterTypes = new Class[] { Properties.class, byte[].class };
+			Class[] parameterTypes = new Class[] { Properties.class };
 			Constructor adapterConstructor = adapterClass.getConstructor(parameterTypes);
 			Object[] initargs = new Object[] { properties };
 			

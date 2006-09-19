@@ -5,8 +5,6 @@
 	<setting key="command" value="/bin/echo" />
 	<setting key="miscOptions" value="-n" />
 	
-	<input source="~/Experiments/input/test.in" destination="test.in" />
-	
 	<abbrev param="alpha" abbrev="a" />
 	<abbrev param="beta" abbrev="b" />
 	<abbrev param="gamma" abbrev="g" />
