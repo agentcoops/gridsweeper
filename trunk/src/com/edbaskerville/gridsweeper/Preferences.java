@@ -25,6 +25,8 @@ public class Preferences extends Properties
 		{
 			Preferences defaults = new Preferences();
 			
+			defaults.setProperty("RootDirectory", "/usr/local/gridsweeper");
+			defaults.setProperty("ExperimentsDirectory", "~/experiments");
 			defaults.setProperty("ExperimentsDirectory", "~/Experiments");
 			
 			defaults.setProperty("AdapterClass", "com.edbaskerville.gridsweeper.DroneAdapter");
@@ -58,7 +60,7 @@ public class Preferences extends Properties
 		Properties properties = new Properties();
 		String classNamePlusDot = className + ".";
 		
-		for(Object key : keySet())
+		for(Object key : properties.keySet())
 		{
 			String propName = (String)key;
 			if(propName.indexOf(classNamePlusDot) == 0)
