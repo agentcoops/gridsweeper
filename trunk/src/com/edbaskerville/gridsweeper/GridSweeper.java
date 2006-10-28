@@ -255,12 +255,22 @@ public class GridSweeper
 		// Generate job template
 		JobTemplate jt = drmaaSession.createJobTemplate();
 		jt.setJobName(caseRunName);
-		jt.setRemoteCommand(appendPathComponent(root, "grunner"));
+		jt.setRemoteCommand(appendPathComponent(root, "bin/grunner"));
 		if(!useFileTransfer) jt.setWorkingDirectory(caseDir);
 		jt.setInputPath(":" + stdinPath);
 		jt.setOutputPath(":" + appendPathComponent(caseDir, ".gridsweeper_out." + i));
 		jt.setErrorPath(":" + appendPathComponent(caseDir, ".gridsweeper_err." + i));
-		//jt.setTransferFiles(new FileTransferMode(true, true, false));
+		
+		try
+		{
+			jt.setTransferFiles(new FileTransferMode(true, true, true));
+		}
+		catch(DrmaaException e)
+		{
+			// If setTransferFiles isn't supported, we'll hope that the system defaults to
+			// transfering them. This works for SGE.
+		}
+		
 		Properties environment = new Properties();
 		environment.setProperty("GRIDSWEEPER_ROOT", root);
 		jt.setJobEnvironment(environment);

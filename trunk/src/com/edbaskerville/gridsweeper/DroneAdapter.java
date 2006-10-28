@@ -74,6 +74,7 @@ public class DroneAdapter implements Adapter
 		}
 		
 		int status = 0;
+		// String message = messageBuilder.toString();
 		String message = messageBuilder.toString();
 		
 		byte[] stdoutData = null;

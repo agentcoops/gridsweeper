@@ -14,8 +14,8 @@
 	
 	<value param="beta" value="0.3"/>
 	
-	<range param="gamma" start="0.1" end="0.3" increment="0.1" />
+	<range param="gamma" start="0.1" end="0.1" increment="0.1" />
 	
-	<range param="nu" start="0.3" end="0.5" increment="0.1" />
+	<range param="nu" start="0.3" end="0.3" increment="0.1" />
 
 </experiment>
