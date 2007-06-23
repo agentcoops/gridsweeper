@@ -4,6 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+/**
+ * A subclass of {@code HashMap<String, Object>} created to avoid typing {@code HashMap<String, Object>}.
+ * @author Ed Baskerville
+ *
+ */
 public class ParameterMap extends HashMap<String, Object>
 {
 	private static final long serialVersionUID = 1L;
@@ -32,11 +37,5 @@ public class ParameterMap extends HashMap<String, Object>
 	{
 		super(1, 1);
 		put(name, value);
-	}
-
-	public String toDirectoryString(Properties abbreviations)
-	{
-		// TODO Auto-generated method stub
-		return null;
 	}
 }

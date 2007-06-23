@@ -2,22 +2,48 @@ package com.edbaskerville.gridsweeper.parameters;
 
 import java.util.*;
 
+/**
+ * An abstract class representing parameter sweeps that combine multiple sub-sweeps.
+ * @author Ed Baskerville
+ *
+ */
 public abstract class CombinationSweep implements Sweep, List<Sweep>
 {
+	/**
+	 * A list containing sub-sweeps to be combined.
+	 */
 	protected List<Sweep> children;
 	
+	/**
+	 * Constructor to initialize {@code children}, for use by subclasses.
+	 * @param children
+	 */
 	public CombinationSweep(List<Sweep> children)
 	{
 		this.children = children;
 	}
 	
+	/**
+	 * Default constructor, initializes {@code children} with an empty list.
+	 *
+	 */
 	public CombinationSweep()
 	{
 		this.children = new ArrayList<Sweep>();
 	}
 	
 	public abstract List<ParameterMap> generateMaps(Random rng) throws SweepLengthException, DuplicateParameterException;
-
+	
+	/**
+	 * Generates the standard order in which parameters should be presented to the user
+	 * in sweep enumerations, for example to name output directories. The order is
+	 * given by the order of the {@code children} field, with sub-sweeps of class
+	 * {@code CombinationSweep} given recursively, and with instances of class
+	 * {@code SingleValueSweep} omitted.
+	 * The {@link com.edbaskerville.gridsweeper.Experiment#setParameterOrder} method can
+	 * be used to provide a user override for the default order.
+	 * @return A list of parameter names providing the human-readable order.
+	 */
 	public List<String> getParameterOrder()
 	{
 		List<String> parameterOrder = new ArrayList<String>();

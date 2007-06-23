@@ -2,6 +2,11 @@ package com.edbaskerville.gridsweeper.parameters;
 
 import java.util.*;
 
+/**
+ * Represents a 
+ * @author ebaskerv
+ *
+ */
 public class ListSweep extends SingleSweep implements List<String>
 {
 	private List<String> values;
