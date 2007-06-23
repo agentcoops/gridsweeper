@@ -11,16 +11,12 @@
 			</arguments>
 		</buildCommand>
 		<buildCommand>
-			<name>net.sourceforge.metrics.builder</name>
-			<arguments>
-			</arguments>
-		</buildCommand>
-		<buildCommand>
 			<name>org.eclipse.ui.externaltools.ExternalToolBuilder</name>
+			<triggers>full,incremental,</triggers>
 			<arguments>
 				<dictionary>
 					<key>LaunchConfigHandle</key>
-					<value>&lt;project&gt;/.externalToolBuilders/Ant.launch</value>
+					<value>&lt;project&gt;/.externalToolBuilders/Ant Builder.launch</value>
 				</dictionary>
 			</arguments>
 		</buildCommand>
@@ -29,4 +25,11 @@
 		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>net.sourceforge.metrics.nature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>bin</name>
+			<type>2</type>
+			<location>/Users/ebaskerv/Software/gridsweeper/bin</location>
+		</link>
+	</linkedResources>
 </projectDescription>

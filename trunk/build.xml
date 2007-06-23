@@ -22,17 +22,6 @@
 		<chmod file="${distbin}/grunner" perm="755"/>
 	</target>
 	
-	<target name="compile" description="Compile code">
-		<mkdir dir="${bin}"/>
-		<javac
-			srcdir="${src}"
-			destdir="${bin}"
-			source="1.5"
-			target="1.5"
-			debug="${compile.debug}"
-		/>
-	</target>
-	
 	<target name="jar" depends="compile" description="Build jar">
 		<manifest file="MANIFEST.MF">
 			<attribute name="Main-Class" value="com.edbaskerville.gridsweeper.GridSweeper"/>
@@ -44,6 +33,17 @@
 			jarfile="${jarfile}"
 			basedir="${bin}"
 			manifest="MANIFEST.MF"
+		/>
+	</target>
+	
+	<target name="compile" description="Compile code">
+		<mkdir dir="${bin}"/>
+		<javac
+			srcdir="${src}"
+			destdir="${bin}"
+			source="1.5"
+			target="1.5"
+			debug="${compile.debug}"
 		/>
 	</target>
 	
