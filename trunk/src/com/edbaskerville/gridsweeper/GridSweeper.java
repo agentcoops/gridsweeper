@@ -11,8 +11,20 @@ import java.util.*;
 import static com.edbaskerville.gridsweeper.StringUtils.*;
 import static com.edbaskerville.gridsweeper.DateUtils.*;
 
+/**
+ * The GridSweeper command-line tool for job submission. Takes a .gsweep
+ * XML experiment file and submits it to the grid for execution via DRMAA.
+ * Warning: Written on a houseboat in Paris. May still contain strange French bugs.
+ * @author Ed Baskerville
+ *
+ */
 public class GridSweeper
 {
+	/**
+	 * A state enum for the argument-parsing state machine.
+	 * @author Ed Baskerville
+	 *
+	 */
 	enum ArgState
 	{
 		START,
@@ -52,6 +64,14 @@ public class GridSweeper
 		cal = new GregorianCalendar();
 	}
 	
+	/**
+	 * Does everything: loads the experiment, runs the experiment, and (soon)
+	 * monitors the experiment.
+	 * @param args Command-line arguments.
+	 * @throws GridSweeperException If the GRIDSWEEPER_ROOT environment variable
+	 * is not set, or if parsing, loading, setup, running, or monitoring jobs
+	 * generate any other uncaught exceptions.
+	 */
 	public static void main(String[] args) throws GridSweeperException
 	{
 		Logger.entering(className, "main");
@@ -83,6 +103,11 @@ public class GridSweeper
 		Logger.exiting(className, "main");
 	}
 	
+	/**
+	 * Parses command-line arguments. Currently only handles -a (adapter class),
+	 * -e (experiment file path), and -d (whether to perform a dry run).
+	 * @param args Command-line arguments.
+	 */
 	private static void parseArgs(String[] args)
 	{
 		Logger.entering(className, "parseArgs");
@@ -112,6 +137,11 @@ public class GridSweeper
 		Logger.exiting(className, "parseArgs");
 	}
 	
+	/**
+	 * Loads the experiment from the provided XML file.
+	 * @throws GridSweeperException If the experiment path is not provided,
+	 * or if the file cannot be loaded or parsed.
+	 */
 	private static void loadExperiment() throws GridSweeperException
 	{
 		Logger.entering(className, "loadExperiment");
@@ -133,6 +163,10 @@ public class GridSweeper
 		Logger.exiting(className, "loadExperiment");
 	}
 	
+	/**
+	 * Generates experiment cases in preparation for running the experiment.
+	 * @throws GridSweeperException If case generation fails.
+	 */
 	private static void setUpExperiment() throws GridSweeperException
 	{
 		try
@@ -146,6 +180,15 @@ public class GridSweeper
 		}
 	}
 	
+	/**
+	 * Runs the experiment. Experiment results are collated in a master experiment directory,
+	 * specified in the user preferences, in a subdirectory tagged with the experiment name
+	 * and date/time ({@code <name>/YYYY-MM-DD-hh-mm-ss}). If a shared filesystem is not
+	 * available, files are first staged to the experiment results directory on the
+	 * file transfer system. Then a DRMAA session is established, and each case is submitted.
+	 * 
+	 * @throws GridSweeperException
+	 */
 	private static void run() throws GridSweeperException
 	{
 		Logger.entering(className, "prepare");
@@ -217,6 +260,14 @@ public class GridSweeper
 		Logger.exiting(className, "prepare");
 	}
 	
+	/**
+	 * Submits a single experiment case. This means running one job for each
+	 * run of the case (one for each random seed).
+	 * @param expCase The experiment case to run.
+	 * @throws FileNotFoundException If the case directory cannot be found/created.
+	 * @throws DrmaaException If a DRMAA error occurs (in {@link #runCaseRun}).
+	 * @throws IOException If the case XML cannot be written out (in {@link #runCaseRun}).
+	 */
 	private static void runCase(ExperimentCase expCase) throws FileNotFoundException, DrmaaException, IOException
 	{		
 		String caseSubDir = experiment.getDirectoryNameForCase(expCase);
@@ -234,6 +285,16 @@ public class GridSweeper
 		}
 	}
 	
+	/**
+	 * Submits a single run of an experiment case.
+	 * @param expCase The case to run.
+	 * @param caseDir The full path to where files are stored for this case.
+	 * @param caseSubDir The case directory relative to the experiment results directory.
+	 * @param i The run number for this run.
+	 * @param rngSeed The random seed for this run.
+	 * @throws DrmaaException If a DRMAA error occurs during job submission.
+	 * @throws IOException If the case XML cannot be written out.
+	 */
 	private static void runCaseRun(ExperimentCase expCase, String caseDir, String caseSubDir, int i, Long rngSeed) throws DrmaaException, IOException
 	{
 		String caseRunName = experiment.getName() + "-" + dateStr + "-" + timeStr + "-" + caseSubDir + "-" + i;
@@ -245,8 +306,8 @@ public class GridSweeper
 		xmlWriter.writeXML();
 		
 		// Write setup file
-		String stdinPath = appendPathComponent(caseDir, ".gridsweeper_in." + i);
-		RunSetup setup = new RunSetup(preferences, experiment.getProperties(),
+		String stdinPath = appendPathComponent(caseDir, ".gsweep_in." + i);
+		RunSetup setup = new RunSetup(preferences, experiment.getSettings(),
 				experiment.getInputFiles(), caseSubDir, expCase.getParameterMap(),
 				i, rngSeed, experiment.getOutputFiles(), adapterClassName);
 		ObjectOutputStream stdinStream = new ObjectOutputStream(new FileOutputStream(stdinPath));
@@ -258,8 +319,8 @@ public class GridSweeper
 		jt.setRemoteCommand(appendPathComponent(root, "bin/grunner"));
 		if(!useFileTransfer) jt.setWorkingDirectory(caseDir);
 		jt.setInputPath(":" + stdinPath);
-		jt.setOutputPath(":" + appendPathComponent(caseDir, ".gridsweeper_out." + i));
-		jt.setErrorPath(":" + appendPathComponent(caseDir, ".gridsweeper_err." + i));
+		jt.setOutputPath(":" + appendPathComponent(caseDir, ".gsweep_out." + i));
+		jt.setErrorPath(":" + appendPathComponent(caseDir, ".gsweep_err." + i));
 		
 		try
 		{
@@ -281,6 +342,10 @@ public class GridSweeper
 		// TODO: Record job id so it can be reported back as tied to this case run.
 	}
 	
+	/**
+	 * Cleans up: for now, just closes the DRMAA session.
+	 * @throws GridSweeperException If the DRMAA {@code exit()} call fails.
+	 */
 	private static void finish() throws GridSweeperException
 	{
 		try

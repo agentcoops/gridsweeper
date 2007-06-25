@@ -3,6 +3,13 @@ package com.edbaskerville.gridsweeper;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 
+/**
+ * A collection of useful methods for manipulating strings.
+ * TODO: Ensure that this code, and other code, is path separator-agnostic.
+ * Somebody may want to run this on Windows someday (ugh).
+ * @author Ed Baskerville
+ *
+ */
 public class StringUtils
 {
 	private static String fileSep;

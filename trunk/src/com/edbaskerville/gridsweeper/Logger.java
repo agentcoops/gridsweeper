@@ -2,6 +2,11 @@ package com.edbaskerville.gridsweeper;
 
 import java.util.logging.*;
 
+/**
+ * A utility class wrapping the standard Java logging system with static methods.
+ * @author Ed Baskerville
+ *
+ */
 public class Logger
 {
 	private static java.util.logging.Logger logger;

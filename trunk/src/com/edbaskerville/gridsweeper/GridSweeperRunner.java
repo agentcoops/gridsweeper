@@ -6,8 +6,32 @@ import static com.edbaskerville.gridsweeper.StringUtils.*;
 
 import com.edbaskerville.gridsweeper.parameters.ParameterMap;
 
+/**
+ * The GridSweeperRunner command-line tool to actually run the model
+ * on the execution host.
+ * @author Ed Baskerville
+ *
+ */
 public class GridSweeperRunner
 {
+	/*
+	 * TODO: fix how file transfer works. Input files should be segregated
+	 * in their own directory so that upon run completion the entire model output
+	 * directory can be retrieved from the file transer system without needlessly
+	 * transferring back input files.
+	 * Furthermore, there's no reason for output files to be a Properties object:
+	 * the path within the working directory should be the same as the path
+	 * in the output directory on the server. 
+	 */
+	
+	/**
+	 * Runs the model. First, reads the {@link RunSetup} object from standard input,
+	 * and extracts settings for the run. If file transfer is on, input files
+	 * are then downloaded from the file transfer system. Then an adapter object
+	 * is created as specified in the run setup and used to actually run the model.
+	 * Finally, if necessary, files are staged back to the file transfer system
+	 * to be retrieved at the submission host. 
+	 */
 	public static void main(String[] args)
 	{
 		RunResults results;
@@ -45,7 +69,7 @@ public class GridSweeperRunner
 			}
 			
 			String adapterClassName = setup.getAdapterClassName();
-			Properties properties = setup.getProperties();
+			Properties properties = setup.getSettings();
 			Adapter adapter = AdapterFactory.createAdapter(adapterClassName, properties);
 			
 			// Run!

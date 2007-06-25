@@ -3,6 +3,12 @@ package com.edbaskerville.gridsweeper;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * A trivial subclass of {@code java.util.HashMap} supporting only
+ * string keys and string values.
+ * @author Ed Baskerville
+ *
+ */
 public class StringMap extends HashMap<String, String>
 {
 	private static final long serialVersionUID = 1L;

@@ -11,11 +11,22 @@ import com.edbaskerville.gridsweeper.parameters.*;
 
 import static com.edbaskerville.gridsweeper.Logger.*;
 
+/**
+ * The SAX-based XML parser for experiment XML (.gsweep) files.
+ * TODO: Write a complete specification for the file format. For now, see the example files. 
+ * @author Ed Baskerville
+ *
+ */
 public class ExperimentXMLHandler extends DefaultHandler
 {
 	private List<Object> stack;
 	private Experiment experiment;
 
+	/**
+	 * An enum representing the supported XML tags.
+	 * @author Ed Baskerville
+	 *
+	 */
 	private enum Tag
 	{
 		SETTING,
@@ -25,18 +36,28 @@ public class ExperimentXMLHandler extends DefaultHandler
 		OUTPUT
 	}
 	
+	/**
+	 * Default constructor.
+	 * @param experiment The experiment to write values into.
+	 */
 	public ExperimentXMLHandler(Experiment experiment)
 	{
 		this.experiment = experiment;
 		stack = new ArrayList<Object>();
 	}
 
+	/**
+	 * @see org.xml.sax.helpers.DefaultHandler#startDocument()
+	 */
 	@Override
 	public void startDocument()
 	{
 		fine("beginning parsing");
 	}
-
+	
+	/**
+	 * @see org.xml.sax.helpers.DefaultHandler#endDocument()
+	 */
 	@Override
 	public void endDocument() throws SAXException
 	{
@@ -49,6 +70,11 @@ public class ExperimentXMLHandler extends DefaultHandler
 		}
 	}
 
+	/**
+	 * Parses the start tag of an XML element. Performs error checking
+	 * and updates the parse stack and the Experiment object as appropriate.
+	 * @see org.xml.sax.helpers.DefaultHandler#startElement(java.lang.String, java.lang.String, java.lang.String, org.xml.sax.Attributes)
+	 */
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException
 	{
@@ -127,7 +153,7 @@ public class ExperimentXMLHandler extends DefaultHandler
 				if(value == null)
 					throw new SAXException("value attribute missing from setting tag");
 				
-				experiment.getProperties().put(key, value);
+				experiment.getSettings().put(key, value);
 				
 				push(Tag.SETTING);
 			}
@@ -198,6 +224,11 @@ public class ExperimentXMLHandler extends DefaultHandler
 		}
 	}
 
+	/**
+	 * Parses the end tag of an XML element. Performs error checking and updates
+	 * the state of the stack and Experiment object as appropriate.
+	 * @see org.xml.sax.helpers.DefaultHandler#endElement(java.lang.String, java.lang.String, java.lang.String)
+	 */
 	@Override
 	public void endElement(String uri, String localName, String qName) throws SAXException
 	{
@@ -283,6 +314,12 @@ public class ExperimentXMLHandler extends DefaultHandler
 		}
 	}
     
+	/**
+	 * Converts an XML attributes object to a simple string map.
+	 * TODO: Can {@code Map<String, String>} just be {@code StringMap}?
+	 * @param attributes The XML attributes object.
+	 * @return A string map representing the attributes.
+	 */
     private Map<String, String> getMapFromAttributes(Attributes attributes)
     {
         Map<String, String> expressionMap = new HashMap<String, String>();
@@ -296,22 +333,40 @@ public class ExperimentXMLHandler extends DefaultHandler
         return expressionMap;
     }
     
+    /**
+     * Peeks at the top of the parse stack without removing the top object.
+     * @return The top object on the stack, or {@code null} if the stack is empty.
+     */
     private Object peek()
     {
     	if(stack.size() > 0) return stack.get(stack.size() - 1);
     	return null;
     }
 
+    /**
+     * Pushes an object to the top of the parse stack.
+     * @param obj The object to push.
+     */
 	private void push(Object obj)
 	{
 		stack.add(obj);
 	}
 	
+	/**
+	 * Pops the top object off of the stack.
+	 */
 	private void pop()
 	{
 		if(stack.size() > 0) stack.remove(stack.size() - 1);
 	}
 	
+	/**
+	 * Parses a sweep element, passing the parent on the appropriate method for the
+	 * appropriate type of sweep.
+	 * @param qName The tag name.
+	 * @param attrMap The attributes of the sweep.
+	 * @throws SAXException
+	 */
 	private void startSweepElement(String qName, Map<String, String> attrMap) throws SAXException
 	{
 		Object top = peek();
@@ -369,6 +424,12 @@ public class ExperimentXMLHandler extends DefaultHandler
 		push(sweep);
 	}
 	
+	/**
+	 * Parses the start tag of a list sweep.
+	 * @param parent The sweep's parent.
+	 * @param attrMap The sweep's attributes.
+	 * @throws SAXException If the parameter name attribute is missing.
+	 */
 	private void startListElement(CombinationSweep parent, Map<String, String> attrMap) throws SAXException
 	{
 		String param = attrMap.get("param");
@@ -382,6 +443,12 @@ public class ExperimentXMLHandler extends DefaultHandler
 		push(listSweep);		
 	}
 	
+	/**
+	 * Parses the start tag of a range sweep.
+	 * @param parent The sweep's parent.
+	 * @param attrMap The sweep's attributes.
+	 * @throws SAXException If any required attributes are missing.
+	 */
 	private void startRangeElement(CombinationSweep parent, Map<String, String> attrMap) throws SAXException
 	{
 		String param = attrMap.get("param");
@@ -411,6 +478,12 @@ public class ExperimentXMLHandler extends DefaultHandler
 		}
 	}
 	
+	/**
+	 * Parses the start tag of a uniform distribution sweep.
+	 * @param parent The sweep's parent.
+	 * @param attrMap The sweep's attributes.
+	 * @throws SAXException If any of the required attributes is missing.
+	 */
 	private void startUniformElement(CombinationSweep parent, Map<String, String> attrMap) throws SAXException
 	{
 		String param = attrMap.get("param");
@@ -448,6 +521,12 @@ public class ExperimentXMLHandler extends DefaultHandler
 		}
 	}
 	
+	/**
+	 * Parses the start of a multiplicative combination sweep element.
+	 * @param parent The sweep's parent.
+	 * @param attrMap The sweep's attributes.
+	 * @throws SAXException Currently, never.
+	 */
 	private void startMultiplicativeElement(CombinationSweep parent, Map<String, String> attrMap) throws SAXException
 	{
 		MultiplicativeCombinationSweep sweep = new MultiplicativeCombinationSweep();
@@ -455,6 +534,12 @@ public class ExperimentXMLHandler extends DefaultHandler
 		push(sweep);
 	}
 	
+	/**
+	 * Parses the start of a linear/parallel sweep.
+	 * @param parent The sweep's parent.
+	 * @param attrMap The sweep's attributes
+	 * @throws SAXException Currently, never.
+	 */
 	private void startLinearElement(CombinationSweep parent, Map<String, String> attrMap) throws SAXException
 	{
 		LinearCombinationSweep sweep = new LinearCombinationSweep();

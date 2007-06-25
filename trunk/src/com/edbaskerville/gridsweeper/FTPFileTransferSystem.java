@@ -5,6 +5,40 @@ import java.util.*;
 import org.apache.commons.net.ftp.*;
 import static com.edbaskerville.gridsweeper.StringUtils.*;
 
+/**
+ * <p>An file transfer system for accessing FTP servers. This class is implemented
+ * on top of <a target="_top"
+ * href="http://jakarta.apache.org/commons/net/">Jakarta Commons Net</a>'s
+ * FTP client. Supported settings
+ * (all prefixed by umich.cscs.lsa.gridsweeper.FTPFileTransferSystem):</p>
+ * 
+ * <table>
+ * 
+ * <tr>
+ * <td>Hostname</td>        <td>The DNS hostname or IP address of the server. Required.</td>
+ * </tr>
+ * 
+ * <tr>
+ * <td>Port</td>            <td>The server listening port. Optional.</td>
+ * </tr>
+ * 
+ * <tr>
+ * <td>Username</td>        <td>The FTP account username. Optional.</td>
+ * </tr>
+ * 
+ * <tr>
+ * <td>Password</td>        <td>The FTP account password. Optional.</td>
+ * </tr>
+ * 
+ * <tr>
+ * <td>Directory</td>       <td>The directory that will act as the root of
+ *                              the file transfer system. Optional.</td>
+ * </tr>
+ * 
+ * </table>
+ * @author Ed Baskerville
+ *
+ */
 public class FTPFileTransferSystem implements FileTransferSystem
 {
 	String hostname;
@@ -17,6 +51,11 @@ public class FTPFileTransferSystem implements FileTransferSystem
 	
 	FTPClient ftpClient;
 	
+	/**
+	 * Initializes an FTP file transfer system.
+	 * @param properties The settings for the file transfer system.
+	 * @throws FileTransferException If the hostname is not specified.
+	 */
 	public FTPFileTransferSystem(Properties properties) throws FileTransferException
 	{
 		hostname = properties.getProperty("Hostname");
@@ -404,6 +443,13 @@ public class FTPFileTransferSystem implements FileTransferSystem
 		}
 	}
 	
+	/**
+	 * Gets a Jakarta Commons {@code FTPFile} object for a provided path.
+	 * Needed because the default behavior of file listing is a bit complex.
+	 * @param path 
+	 * @return The FTP file object.
+	 * @throws Exception
+	 */
 	protected FTPFile getFTPFile(String path) throws Exception
 	{
 		String filename = lastPathComponent(path);

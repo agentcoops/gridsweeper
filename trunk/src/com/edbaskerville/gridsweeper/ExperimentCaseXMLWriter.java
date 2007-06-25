@@ -5,6 +5,12 @@ import java.util.*;
 
 import com.edbaskerville.gridsweeper.parameters.ParameterMap;
 
+/**
+ * Generates XML for a specific experiment case, so it can be
+ * reproduced exactly at a later time.
+ * @author Ed Baskerville
+ *
+ */
 public class ExperimentCaseXMLWriter
 {
 	private static String xmlDeclaration = "<?xml version=\"1.0\"?>";
@@ -15,6 +21,15 @@ public class ExperimentCaseXMLWriter
 	private String caseName;
 	private long rngSeed;
 	
+	/**
+	 * Constructor for {@code ExperimentCaseXMLWriter}.
+	 * @param path The output path for the XML.
+	 * @param experiment The experiment object.
+	 * @param expCase The experiment case with parameter settings.
+	 * @param caseName A name to write out into the XML.
+	 * @param rngSeed The random seed.
+	 * @throws FileNotFoundException If the output file cannot be opened.
+	 */
 	public ExperimentCaseXMLWriter(String path, Experiment experiment, ExperimentCase expCase, String caseName, long rngSeed) throws FileNotFoundException
 	{
 		this.xmlStream = new PrintStream(new BufferedOutputStream(new FileOutputStream(path)));
@@ -24,6 +39,9 @@ public class ExperimentCaseXMLWriter
 		this.rngSeed = rngSeed;
 	}
 	
+	/**
+	 * Outputs the experiment case XML.
+	 */
 	public void writeXML()
 	{
 		printDeclaration();
@@ -41,11 +59,18 @@ public class ExperimentCaseXMLWriter
 		xmlStream.close();
 	}
 	
+	/**
+	 * Prints the XML declaration line.
+	 *
+	 */
 	private void printDeclaration()
 	{
 		xmlStream.println(xmlDeclaration);
 	}
 	
+	/*
+	 * Prints the start of the experiment tag, with attributes.
+	 */
 	private void printExperimentStart()
 	{
 		String name = caseName;
@@ -58,14 +83,22 @@ public class ExperimentCaseXMLWriter
 		printTagStart(0, "experiment", attrs, false);
 	}
 	
+	/**
+	 * Prints the end experiment tag.
+	 *
+	 */
 	private void printExperimentEnd()
 	{
 		printTagEnd(0, "experiment");
 	}
 	
+	/**
+	 * Prints XML tags for all the experiment settings. 
+	 *
+	 */
 	private void printSettings()
 	{
-		Properties settings = experiment.getProperties();
+		Properties settings = experiment.getSettings();
 		
 		for(Object settingObj : settings.keySet())
 		{
@@ -79,6 +112,10 @@ public class ExperimentCaseXMLWriter
 		}
 	}
 	
+	/**
+	 * Prints XML tags for all the input files. 
+	 *
+	 */
 	private void printInputFiles()
 	{
 		Properties inputFiles = experiment.getInputFiles();
@@ -95,6 +132,10 @@ public class ExperimentCaseXMLWriter
 		}
 	}
 	
+	/**
+	 * Prints XML tags for all the output files.
+	 *
+	 */
 	private void printOutputFiles()
 	{
 		Properties outputFiles = experiment.getOutputFiles();
@@ -111,6 +152,10 @@ public class ExperimentCaseXMLWriter
 		}
 	}
 	
+	/**
+	 * Prints XML tags for all the parameter abbreviations.
+	 *
+	 */
 	private void printAbbrevs()
 	{
 		Properties abbrevs = experiment.getAbbreviations();
@@ -127,6 +172,10 @@ public class ExperimentCaseXMLWriter
 		}
 	}
 	
+	/**
+	 * Prints XML tags for all parameter assignments.
+	 *
+	 */
 	private void printParamValues()
 	{
 		ParameterMap paramMap = expCase.getParameterMap();
@@ -142,6 +191,13 @@ public class ExperimentCaseXMLWriter
 		}
 	}
 	
+	/**
+	 * Prints a starting XML tag, with optional termination.
+	 * @param level The indentation level for this tag.
+	 * @param name The tag name.
+	 * @param attrs A map of atributes.
+	 * @param terminate Whether or not to terminate the tag.
+	 */
 	private void printTagStart(int level, String name, StringMap attrs, boolean terminate)
 	{
 		for(int i = 0; i < level; i++) xmlStream.print("\t");
@@ -156,6 +212,11 @@ public class ExperimentCaseXMLWriter
 		xmlStream.println(">");
 	}
 	
+	/**
+	 * Prints an ending XML tag
+	 * @param level The indentation level for this tag.
+	 * @param name The tag name.
+	 */
 	private void printTagEnd(int level, String name)
 	{
 		for(int i = 0; i < level; i++) xmlStream.print("\t");

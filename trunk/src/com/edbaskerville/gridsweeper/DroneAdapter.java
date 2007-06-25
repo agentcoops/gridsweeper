@@ -6,6 +6,74 @@ import java.util.*;
 
 import com.edbaskerville.gridsweeper.parameters.ParameterMap;
 
+/**
+ * <p>An adapter that runs models designed for Ted Belding's Drone.
+ * The Drone model specification leaves quite a bit of room for
+ * customization, so {@code DroneAdapter} supports quite a few settings:</p>
+ * 
+ * <table>
+ * 
+ * <tr>
+ * <td>Command</td>                 <td>Description</td>
+ * <td>Default</td>
+ * </tr>
+ * 
+ * <tr>
+ * <td>{@code command}</td>         <td>The path to the model executable. Required.</td>
+ * <td>(none)</td>
+ * </tr>
+ * 
+ * <tr>
+ * <td>{@code setParamOption}</td>  <td>The command-line option for parameter assignments
+ *                                  <em>param</em>=<em>value</em>.</td>
+ * <td>{@code -D}</td>
+ * </tr>
+ * 
+ * <tr>
+ * <td>{@code runNumOption}</td>    <td>The command-line option for specifying the run number.</td>
+ * <td>{@code -N}</td>
+ * </tr>
+ * 
+ * <tr>
+ * <td>{@code runNumPrefix}</td>    <td>A prefix to add before the run number.</td>
+ * <td>(none)</td>
+ * </tr>
+ * 
+ * <tr>
+ * <td>{@code rngSeedOption}</td>   <td>The command-line option for specifying specify the random seed.</td>
+ * <td>{@code -S}</td>
+ * </tr>
+ * 
+ * <tr>
+ * <td>{@code useInputFile}</td>    <td>Whether or not to provide an input file.
+ *                                  Interpreted as true if and only if the value is equal,
+ *                                  ignoring case, to the string {@code "true"}.</td>
+ * <td>{@code true}</td>
+ * </tr>
+ * 
+ * <tr>
+ * <td>{@code inputFileOption}</td> <td>The command-line option for specifying the input file.</td>
+ * <td>{@code -I}</td>
+ * </tr>
+ * 
+ * <tr>
+ * <td>{@code inputFilePath}</td>   <td>The path to the input file.</td>
+ * <td>(none)</td>
+ * </tr>
+ * 
+ * <tr>
+ * <td>{@code miscOptions}</td>     <td>Additional command-line options to supply.</td>
+ * <td>(none)</td>
+ * </tr>
+ * 
+ * </table>
+ * 
+ * <p>For more information, see the
+ * <a target="_top" href="http://www.cscs.umich.edu/Software/Drone/">Drone website</a>.</p>
+ * 
+ * @author Ed Baskerville
+ *
+ */
 public class DroneAdapter implements Adapter
 {
 	private String command;
@@ -23,6 +91,13 @@ public class DroneAdapter implements Adapter
 	
 	private String miscOptions;
 	
+	/**
+	 * Standard {@link Adapter} constructor for {@code DroneAdapter}. Assigns settings
+	 * to fields.
+	 * @param settings Settings for the adapter. See the class description
+	 * for supported settings.
+	 * @throws AdapterException When no command is specified.
+	 */
 	public DroneAdapter(Properties settings) throws AdapterException
 	{
 		command = settings.getProperty("command");
@@ -45,6 +120,11 @@ public class DroneAdapter implements Adapter
 		miscOptions = settings.getProperty("miscOptions");
 	}
 
+	/**
+	 * Runs the Drone model as specified by the settings and the arguments to this method.  
+	 * 
+	 * @throws AdapterException If an I/O error occurs. TODO: more robust error checking needed.
+	 */
 	public RunResults run(ParameterMap parameterMap, int runNumber, long rngSeed) throws AdapterException
 	{
 		List<String> arguments = new ArrayList<String>();

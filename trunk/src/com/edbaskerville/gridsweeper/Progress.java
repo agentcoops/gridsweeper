@@ -1,5 +1,10 @@
 package com.edbaskerville.gridsweeper;
 
+/**
+ * A simple class to represent the progress of a process, e.g., job submission.
+ * @author Ed Baskerville
+ *
+ */
 public class Progress
 {
 	private double progress;

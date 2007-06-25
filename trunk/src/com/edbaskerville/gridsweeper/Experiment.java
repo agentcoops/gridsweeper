@@ -5,11 +5,22 @@ import javax.xml.parsers.*;
 
 import com.edbaskerville.gridsweeper.parameters.*;
 
+/**
+ * Represents an experiment. An experiment is specified by a root
+ * parameter sweep of class
+ * {@link MultiplicativeCombinationSweep},
+ * a set of abbreviations for parameter names so that directories can be named
+ * more efficiently, and sets of input and output files to transfer (if
+ * a shared filesystem is not available). The experiment object is the one
+ * most directly represented in the user interface.
+ * @author Ed Baskerville
+ *
+ */
 public class Experiment
 {
 	private String name;
 	
-	private Properties properties;
+	private Properties settings;
 	private Properties abbreviations;
 	private Properties inputFiles;
 	private Properties outputFiles;
@@ -20,16 +31,28 @@ public class Experiment
 	private int numRuns;
 	private Long rngSeed;
 	
+	/**
+	 * The default constructor. Initializes {@code numRuns} to 1, and 
+	 * creates empty objects for settings, abbreviations, input/output files,
+	 * and the root parameter sweep. 
+	 *
+	 */
 	public Experiment()
 	{
 		numRuns = 1;
-		properties = new Properties();
+		settings = new Properties();
 		abbreviations = new Properties();
 		inputFiles = new Properties();
 		outputFiles = new Properties();
 		rootSweep = new MultiplicativeCombinationSweep();
 	}
 	
+	/**
+	 * Loads an experiment from XML. See {@link ExperimentXMLHandler} for
+	 * a description of the XML format.
+	 * @param experimentURL The URL containing the XML. 
+	 * @throws ExperimentException If the XML cannot be parsed.
+	 */
 	public Experiment(java.net.URL experimentURL) throws ExperimentException
 	{
 		this();
@@ -46,6 +69,13 @@ public class Experiment
 		}
 	}
 	
+	/**
+	 * Generates experiment cases (parameter assignments and random seeds) from
+	 * the experiment specification.
+	 * @param rng The random number generator to use.
+	 * @return A list of experiment cases
+	 * @throws ExperimentException
+	 */
 	public List<ExperimentCase> generateCases(Random rng) throws ExperimentException
 	{
 		List<ExperimentCase> cases = new ArrayList<ExperimentCase>();
@@ -62,7 +92,7 @@ public class Experiment
 			// and only one parameter combo,
 			// and only one run,
 			// we're going to use that rng seed for the one run.
-			// This givs proper behavior for reproducing cases.
+			// This gives proper behavior for reproducing cases.
 			if(rngSeed != null && parameterMaps.size() == 1 && numRuns == 1)
 			{
 				List<Long> rngSeeds = new ArrayList<Long>(1);
@@ -93,86 +123,170 @@ public class Experiment
 		return cases;
 	}
 
-	public Properties getProperties()
+	/** 
+	 * Getter for experiment settings.
+	 * @return The settings object.
+	 */
+	public Properties getSettings()
 	{
-		return properties;
+		return settings;
 	}
 
-	public void setProperties(Properties settings)
+	/**
+	 * Setter for experiment settings.
+	 * @param settings The settings object to use.
+	 */
+	public void setSettings(Properties settings)
 	{
-		this.properties = settings;
+		this.settings = settings;
 	}
 
+	/**
+	 * Getter for abbrevations.
+	 * @return The abbreviations object.
+	 */
 	public Properties getAbbreviations()
 	{
 		return abbreviations;
 	}
 
+	/**
+	 * Setter for parameter name abbreviations. 
+	 * @param abbreviations The abbreviations object to use.
+	 */
+	public void setAbbreviations(Properties abbreviations)
+	{
+		this.abbreviations = abbreviations;
+	}
+
+	/**
+	 * Getter for the number of runs.
+	 * @return The number of runs.
+	 */
 	public int getNumRuns()
 	{
 		return numRuns;
 	}
 
+	/**
+	 * Setter for the number of runs.
+	 * @param numRuns The number of times to run each set of parameter assignments.
+	 */
 	public void setNumRuns(int numRuns)
 	{
 		if(numRuns < 1) throw new IllegalArgumentException("numRuns must be positive");
 		this.numRuns = numRuns;
 	}
 
+	/**
+	 * Getter for the random seed. This seed is used as a starting point for calculating
+	 * the random seeds for runs as well as for stochastic sweeps. 
+	 * @return The seed for the random number generator.
+	 */
 	public Long getRngSeed()
 	{
 		return rngSeed;
 	}
 
+	/**
+	 * Setter for the random seed. This seed is used as a starting point for calculating
+	 * the random seeds for runs as well as for stochastic sweeps.
+	 * @param rngSeed The random seed to use. 
+	 */
 	public void setRngSeed(Long rngSeed)
 	{
 		this.rngSeed = rngSeed;
 	}
 
+	/**
+	 * Getter for the root parameter sweep.
+	 * @return The root {@code MultiplicativeCombinationSweep} object.
+	 */
 	public MultiplicativeCombinationSweep getRootSweep()
 	{
 		return rootSweep;
 	}
 
+	/**
+	 * Getter for the experiment name. The name is used in the user interface
+	 * as well as to name experiment results directories.
+	 * @return The experiment name.
+	 */
 	public String getName()
 	{
 		return name;
 	}
 
+	/**
+	 * Setter for the experiment name.
+	 * @param name The experiment name to use.
+	 */
 	public void setName(String name)
 	{
 		this.name = name;
 	}
 
+	/**
+	 * Getter for the input files object. Keys are source file paths in the
+	 * submission host's filesystem, and values are desintation paths relative
+	 * to the running model executable's working directory.
+	 * This object is only used when file transfer is on.
+	 * @return The input files object.
+	 */
 	public Properties getInputFiles()
 	{
 		return inputFiles;
 	}
 
+	/**
+	 * Setter for the input files object. Keys are source file paths in the
+	 * submission host's filesystem, and values are destination paths relative
+	 * to the running model executable's working directory.
+	 * This object is only used when file transfer is on.
+	 * @param inputFiles
+	 */
 	public void setInputFiles(Properties inputFiles)
 	{
 		this.inputFiles = inputFiles;
 	}
 
+	/**
+	 * Getter for the output files object. TODO: this will be changed from a Properties
+	 * object to a simple list of strings, so that the source path within the
+	 * executable working directory will be the same as the destination path
+	 * in the output directory on the submission host.
+	 * @return The output files object.
+	 */
 	public Properties getOutputFiles()
 	{
 		return outputFiles;
 	}
 
+	/**
+	 * Setter for the output files object. TODO: this will be changed from a Properties
+	 * object to a simple list of strings, so that the source path within the
+	 * executable working directory will be the same as the destination path
+	 * in the output directory on the submission host.
+	 * @param outputFiles The output files object to use.
+	 */
 	public void setOutputFiles(Properties outputFiles)
 	{
 		this.outputFiles = outputFiles;
 	}
 
-	public void setAbbreviations(Properties abbreviations)
-	{
-		this.abbreviations = abbreviations;
-	}
-
+	/**
+	 * Returns a string description of an experiment case for debugging purposes.
+	 * Includes all parameters except SingleValueSweep-set parameters (since
+	 * their values don't change).
+	 * @param experimentCase The experiment case to get a description for.
+	 * @return The string description.
+	 */
 	public String getCaseDescription(ExperimentCase experimentCase)
 	{
 		ParameterMap changingParameters = (ParameterMap)experimentCase.getParameterMap().clone();
 		
+		// TODO: I see a bug. Only SingleValueSweep 
+		// objects at the root level will be detected, since there's no recursion.
 		for(Sweep sweep : rootSweep)
 		{
 			if(sweep instanceof SingleValueSweep)
@@ -184,6 +298,21 @@ public class Experiment
 		return changingParameters.toString();
 	}
 
+	/**
+	 * Generates a directory name for an experiment case. The name
+	 * is in the format <em>p1</em>=<em>v1</em>-<em>p2</em>=<em>v2</em>...,
+	 * where <em>p1</em>, etc. is the parameter name or, if available,
+	 * the abbreviation, and <em>v1</em>, etc. is the parameter value.
+	 * {@link SingleValueSweep}-set parameters are left out of the name.
+	 * Parameter values of type {@code Double} are formatted using the
+	 * {@code %5g} format (scientific notation or float, whichever is shorter).
+	 * The order is determined by the {@code parameterOrder} field of the
+	 * experiment, if available, or by the {@link CombinationSweep#getParameterOrder}
+	 * method.
+	 *  
+	 * @param expCase
+	 * @return The directory name.
+	 */
 	public String getDirectoryNameForCase(ExperimentCase expCase)
 	{
 		List<String> parameterOrder = getParameterOrderUsed();
@@ -218,6 +347,11 @@ public class Experiment
 		return dirName.toString();
 	}
 	
+	/**
+	 * Returns the user-visble parameter order set, or the root sweep's
+	 * parameter order if none has been explicitly set.
+	 * @return The parameter order.
+	 */
 	private List<String> getParameterOrderUsed()
 	{
 		if(parameterOrder != null)
@@ -228,11 +362,19 @@ public class Experiment
 		return rootSweep.getParameterOrder();
 	}
 	
+	/**
+	 * Returns the user-visible parameter order set. May be {@code null}.
+	 * @return The parameter order.
+	 */
 	public List<String> getParameterOrder()
 	{
 		return parameterOrder;
 	}
 
+	/**
+	 * Sets the parameter order to use for directory names, etc.
+	 * @param parameterOrder The parameter order to use.
+	 */
 	public void setParameterOrder(List<String> parameterOrder)
 	{
 		this.parameterOrder = parameterOrder;
