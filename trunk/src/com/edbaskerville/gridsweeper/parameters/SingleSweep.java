@@ -24,7 +24,7 @@ public abstract class SingleSweep implements Sweep
 		this.name = name;
 	}
 
-	public abstract List<ParameterMap> generateMaps(Random rng);
+	public abstract List<ParameterMap> generateMaps(Random rng, int numRuns);
 
 	/**
 	 * Returns the parameter name used by this sweep.

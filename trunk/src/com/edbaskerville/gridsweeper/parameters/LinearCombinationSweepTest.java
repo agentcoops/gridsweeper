@@ -18,7 +18,7 @@ public class LinearCombinationSweepTest
 	@Test
 	public void emptySweep() throws SweepLengthException, DuplicateParameterException
 	{
-		List<ParameterMap> maps = sweep.generateMaps(null);
+		List<ParameterMap> maps = sweep.generateMaps(null, 1);
 		assertEquals(maps.size(), 0);
 	}
 	
@@ -27,7 +27,7 @@ public class LinearCombinationSweepTest
 	{
 		ListSweep listSweep = new ListSweep("param");
 		sweep.add(listSweep);
-		List<ParameterMap> maps = sweep.generateMaps(null);
+		List<ParameterMap> maps = sweep.generateMaps(null, 1);
 		assertEquals(maps.size(), 0);
 	}
 	
@@ -39,7 +39,7 @@ public class LinearCombinationSweepTest
 		listSweep.add("there");
 		sweep.add(listSweep);
 		
-		List<ParameterMap> maps = sweep.generateMaps(null);
+		List<ParameterMap> maps = sweep.generateMaps(null, 1);
 		assertEquals(maps.size(), 2);
 		assertEquals(maps.get(0).get("param"), "hello");
 		assertEquals(maps.get(1).get("param"), "there");
@@ -58,7 +58,7 @@ public class LinearCombinationSweepTest
 		listSweep2.add("0.4");
 		sweep.add(listSweep2);
 		
-		List<ParameterMap> maps = sweep.generateMaps(null);
+		List<ParameterMap> maps = sweep.generateMaps(null, 1);
 		assertEquals(2, maps.size());
 		assertEquals(maps.get(0).get("beta"), "0.1");
 		assertEquals(maps.get(1).get("beta"), "0.2");
@@ -77,7 +77,7 @@ public class LinearCombinationSweepTest
 		try
 		{
 			@SuppressWarnings("unused")
-			List<ParameterMap> maps = sweep.generateMaps(null);
+			List<ParameterMap> maps = sweep.generateMaps(null, 1);
 			fail();
 		}
 		catch(DuplicateParameterException e) {}
@@ -98,7 +98,7 @@ public class LinearCombinationSweepTest
 		try
 		{
 			@SuppressWarnings("unused")
-			List<ParameterMap> maps = sweep.generateMaps(null);
+			List<ParameterMap> maps = sweep.generateMaps(null, 1);
 			fail();
 		}
 		catch(SweepLengthException e) {}

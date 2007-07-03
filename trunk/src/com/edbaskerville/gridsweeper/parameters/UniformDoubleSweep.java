@@ -47,12 +47,17 @@ public class UniformDoubleSweep extends SingleSweep
 	 * Generates {@code count} value assignments from the specified uniform distribution.
 	 */
 	@Override
-	public List<ParameterMap> generateMaps(Random rng)
+	public List<ParameterMap> generateMaps(Random rng, int numRuns)
 	{
 		List<ParameterMap> maps = new ArrayList<ParameterMap>(count);
 		for(int i = 0; i < count; i++)
 		{
-			maps.add(new ParameterMap(name, uniformDouble(rng)));
+			ArrayList<Double> valueList = new ArrayList<Double>(numRuns);
+			for(int j = 0; j < numRuns; j++)
+			{
+				valueList.add(uniformDouble(rng));
+			}
+			maps.add(new ParameterMap(name, valueList));
 		}
 		return maps;
 	}

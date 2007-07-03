@@ -44,7 +44,7 @@ public class LinearCombinationSweep extends CombinationSweep
 	 * @see com.edbaskerville.gridsweeper.parameters.CombinationSweep#generateMaps(java.util.Random)
 	 */
 	@Override
-	public List<ParameterMap> generateMaps(Random rng) throws SweepLengthException, DuplicateParameterException
+	public List<ParameterMap> generateMaps(Random rng, int numRuns) throws SweepLengthException, DuplicateParameterException
 	{
 		int numChildren = children.size();
 		
@@ -55,7 +55,7 @@ public class LinearCombinationSweep extends CombinationSweep
 		List<List<ParameterMap>> childMapses = new ArrayList<List<ParameterMap>>();
 		for(Sweep child : children)
 		{
-			List<ParameterMap> childMaps = child.generateMaps(rng);
+			List<ParameterMap> childMaps = child.generateMaps(rng, numRuns);
 			
 			// Verify length
 			if(length == -1) length = childMaps.size();

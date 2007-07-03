@@ -42,13 +42,14 @@ public class MultiplicativeCombinationSweep extends CombinationSweep
 	 * @see com.edbaskerville.gridsweeper.parameters.CombinationSweep#generateMaps(java.util.Random)
 	 */
 	@Override
-	public List<ParameterMap> generateMaps(Random rng) throws SweepLengthException, DuplicateParameterException
+	public List<ParameterMap> generateMaps(Random rng, int numRuns) throws SweepLengthException, DuplicateParameterException
 	{
 		if(children.size() == 0) return new ArrayList<ParameterMap>(0);
 		
-		return generateMaps(children, rng);
+		return generateMaps(children, rng, numRuns);
 	}
 	
+	private List<ParameterMap> generateMaps(List<Sweep> children, Random rng, int numRuns) throws SweepLengthException, DuplicateParameterException
 	/**
 	 * Recursively generates maps from the children that have not yet been combined.
 	 * It should be possible (?) to implement this method without recursion as an optimization.
@@ -58,18 +59,17 @@ public class MultiplicativeCombinationSweep extends CombinationSweep
 	 * @throws SweepLengthException
 	 * @throws DuplicateParameterException
 	 */
-	private List<ParameterMap> generateMaps(List<Sweep> children, Random rng) throws SweepLengthException, DuplicateParameterException
 	{
 		assert children.size() > 0;
 		
-		List<ParameterMap> firstChildMaps = children.get(0).generateMaps(rng);
+		List<ParameterMap> firstChildMaps = children.get(0).generateMaps(rng, numRuns);
 		
 		// Termination condition: for a single sweep, just return its generated maps
 		if(children.size() == 1) return firstChildMaps;
 		
 		// Recursion: combine the first element of the list with this function
 		// called on the remaining elements
-		return combineMaps(firstChildMaps, generateMaps(children.subList(1, children.size()), rng));
+		return combineMaps(firstChildMaps, generateMaps(children.subList(1, children.size()), rng, numRuns));
 	}
 	
 	/**

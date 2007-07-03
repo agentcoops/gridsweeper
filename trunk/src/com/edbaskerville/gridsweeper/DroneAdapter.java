@@ -144,6 +144,12 @@ public class DroneAdapter implements Adapter
 		// Now add all parameter settings
 		for(String name : parameterMap.keySet())
 		{
+			Object value = parameterMap.get(name);
+			if(value instanceof List)
+			{
+				value = (((List)value).get(runNumber));
+			}
+			
 			arguments.add(setParamOption + name + "=" + parameterMap.get(name));
 		}
 		

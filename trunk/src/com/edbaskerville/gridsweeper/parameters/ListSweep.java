@@ -24,7 +24,7 @@ public class ListSweep extends SingleSweep implements List<String>
 	}
 	
 	@Override
-	public List<ParameterMap> generateMaps(Random rng)
+	public List<ParameterMap> generateMaps(Random rng, int numRuns)
 	{
 		List<ParameterMap> maps = new ArrayList<ParameterMap>();
 		for(String value : values)

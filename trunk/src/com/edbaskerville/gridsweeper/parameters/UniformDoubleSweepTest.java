@@ -36,14 +36,14 @@ public class UniformDoubleSweepTest
 		Random rng = new Random();
 		
 		sweep = new UniformDoubleSweep("param", 0, 1, 2);
-		maps = sweep.generateMaps(rng);
+		maps = sweep.generateMaps(rng, 1);
 		
 		assertEquals(2, maps.size());
 		
-		double firstValue = ((Double)maps.get(0).get("param")).doubleValue();
+		double firstValue = ((Double) ((ArrayList)maps.get(0).get("param")).get(0)).doubleValue();
 		assertTrue(firstValue >= 0 && firstValue < 1);
 		
-		double secondValue = ((Double)maps.get(1).get("param")).doubleValue();
+		double secondValue = ((Double) ((ArrayList)maps.get(1).get("param")).get(0)).doubleValue();
 		assertTrue(secondValue >= 0 && secondValue < 1);
 	}
 	
@@ -51,14 +51,14 @@ public class UniformDoubleSweepTest
 	public void offsetUniform()
 	{
 		sweep = new UniformDoubleSweep("param", 10, 20, 2);
-		maps = sweep.generateMaps(rng);
+		maps = sweep.generateMaps(rng, 1);
 		
 		assertEquals(2, maps.size());
 		
-		double firstValue = ((Double)maps.get(0).get("param")).doubleValue();
+		double firstValue = ((Double) ((ArrayList)maps.get(0).get("param")).get(0)).doubleValue();
 		assertTrue(firstValue >= 10 && firstValue < 20);
 		
-		double secondValue = ((Double)maps.get(1).get("param")).doubleValue();
+		double secondValue = ((Double) ((ArrayList)maps.get(1).get("param")).get(0)).doubleValue();
 		assertTrue(secondValue >= 10 && secondValue < 20);
 	}
 	
@@ -68,14 +68,14 @@ public class UniformDoubleSweepTest
 		Random rng = new Random();
 		
 		sweep = new UniformDoubleSweep("param", 20, 10, 2);
-		maps = sweep.generateMaps(rng);
+		maps = sweep.generateMaps(rng, 1);
 		
 		assertEquals(2, maps.size());
 		
-		double firstValue = ((Double)maps.get(0).get("param")).doubleValue();
+		double firstValue = ((Double) ((ArrayList)maps.get(0).get("param")).get(0)).doubleValue();
 		assertTrue(firstValue >= 10 && firstValue < 20);
 		
-		double secondValue = ((Double)maps.get(1).get("param")).doubleValue();
+		double secondValue = ((Double) ((ArrayList)maps.get(1).get("param")).get(0)).doubleValue();
 		assertTrue(secondValue >= 10 && secondValue < 20);
 	}
 	
@@ -87,7 +87,7 @@ public class UniformDoubleSweepTest
 		double end = 20;
 		
 		sweep = new UniformDoubleSweep("param", start, end, numDraws);
-		maps = sweep.generateMaps(rng);
+		maps = sweep.generateMaps(rng, 1);
 		
 		assertEquals(numDraws, maps.size());
 		
@@ -95,7 +95,7 @@ public class UniformDoubleSweepTest
 		double total = 0;
 		for(int i = 0; i < numDraws; i++)
 		{
-			double value = ((Double)maps.get(i).get("param")).doubleValue();
+			double value = ((Double) ((ArrayList)maps.get(i).get("param")).get(0)).doubleValue();
 			assertTrue(value >= start && value < end);
 			total += value;
 		}
