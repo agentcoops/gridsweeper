@@ -1,5 +1,6 @@
 package com.edbaskerville.gridsweeper.parameters;
 
+import com.edbaskerville.gridsweeper.*;
 import java.util.*;
 
 /**
@@ -9,9 +10,10 @@ import java.util.*;
  */
 public class ListSweep extends SingleSweep implements List<String>
 {
-	private List<String> values;
+	// TODO: remove this weird "implements List<String>".
+	private StringList values;
 	
-	public ListSweep(String name, List<String> values)
+	public ListSweep(String name, StringList values)
 	{
 		super(name);
 		this.values = values;
@@ -20,7 +22,7 @@ public class ListSweep extends SingleSweep implements List<String>
 	public ListSweep(String name)
 	{
 		super(name);
-		this.values = new ArrayList<String>();
+		this.values = new StringList();
 	}
 	
 	@Override

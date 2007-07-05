@@ -26,7 +26,7 @@ public class Experiment
 	private Properties outputFiles;
 	
 	private MultiplicativeCombinationSweep rootSweep;
-	private List<String> parameterOrder;
+	private StringList parameterOrder;
 	
 	private int numRuns;
 	private Long rngSeed;
@@ -315,7 +315,7 @@ public class Experiment
 	 */
 	public String getDirectoryNameForCase(ExperimentCase expCase)
 	{
-		List<String> parameterOrder = getParameterOrderUsed();
+		StringList parameterOrder = getParameterOrderUsed();
 		StringBuffer dirName = new StringBuffer();
 		
 		boolean first = true;
@@ -352,7 +352,7 @@ public class Experiment
 	 * parameter order if none has been explicitly set.
 	 * @return The parameter order.
 	 */
-	private List<String> getParameterOrderUsed()
+	private StringList getParameterOrderUsed()
 	{
 		if(parameterOrder != null)
 		{
@@ -366,7 +366,7 @@ public class Experiment
 	 * Returns the user-visible parameter order set. May be {@code null}.
 	 * @return The parameter order.
 	 */
-	public List<String> getParameterOrder()
+	public StringList getParameterOrder()
 	{
 		return parameterOrder;
 	}
@@ -375,7 +375,7 @@ public class Experiment
 	 * Sets the parameter order to use for directory names, etc.
 	 * @param parameterOrder The parameter order to use.
 	 */
-	public void setParameterOrder(List<String> parameterOrder)
+	public void setParameterOrder(StringList parameterOrder)
 	{
 		this.parameterOrder = parameterOrder;
 	}

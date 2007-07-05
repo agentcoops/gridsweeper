@@ -127,7 +127,7 @@ public class DroneAdapter implements Adapter
 	 */
 	public RunResults run(ParameterMap parameterMap, int runNumber, long rngSeed) throws AdapterException
 	{
-		List<String> arguments = new ArrayList<String>();
+		StringList arguments = new StringList();
 		
 		// First, add non-parameter options
 		if(miscOptions != null)

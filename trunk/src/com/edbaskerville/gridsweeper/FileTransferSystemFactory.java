@@ -39,13 +39,6 @@ public class FileTransferSystemFactory
 	{
 		String className = preferences.getProperty("FileTransferSystemClass");
 		
-		// TODO: Generally fix nomenclature confusion between properties,
-		// preferences, and settings. Pick one, or two if there's a real distinction.
-		// Thoughts 7/5/07:
-		// "properties": general term, convenient to match Java class Properties that's used
-		// "settings": stop using
-		// "preferences": application-wide user preferences, handled by Preferences class.
-		// some "preferences" may be used as object "settings" at runtime.
 		Properties ftsProperties = preferences.getPropertiesForClass(className);
 		
 		try

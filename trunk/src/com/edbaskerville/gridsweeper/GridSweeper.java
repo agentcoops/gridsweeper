@@ -210,10 +210,11 @@ public class GridSweeper
 			String expsDir = expandTildeInPath(preferences.getProperty("ExperimentsDirectory"));
 			
 			// First set up big directory for the whole experiment
+			// Located in <experimentDir>/<experimentName>/<experimentDate>/<experimentTime>
 			String expName = experiment.getName();
 			dateStr = getDateString(cal);
 			timeStr = getTimeString(cal);
-			String expSubDir = String.format("%s%s%s-%s", dateStr, getFileSeparator(), expName, timeStr);
+			String expSubDir = String.format("%s%s%s-%s", expName, getFileSeparator(), dateStr, getFileSeparator(), timeStr);
 			
 			expDir = appendPathComponent(expsDir, expSubDir);
 			Logger.finer("Experiment subdirectory: " + expDir);
@@ -234,6 +235,8 @@ public class GridSweeper
 					String localPath = (String)localPathObj;
 					String remotePath = appendPathComponent(inputDir, inputFiles.getProperty(localPath));
 					
+					// TODO: ensure that uploadFile() creates directories that don't exist
+					// if necessary
 					fts.uploadFile(localPath, remotePath);
 				}
 			}

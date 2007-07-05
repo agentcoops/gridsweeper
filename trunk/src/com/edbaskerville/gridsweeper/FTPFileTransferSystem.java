@@ -386,7 +386,7 @@ public class FTPFileTransferSystem implements FileTransferSystem
 	
 	public void makeDirectory(String path) throws FileTransferException
 	{
-		List<String> components = pathComponents(path);
+		StringList components = pathComponents(path);
 		
 		try
 		{

@@ -57,7 +57,7 @@ public class GridSweeperRunner
 				for(Object key : inputFiles.keySet())
 				{
 					String path = inputFiles.getProperty((String)key);
-					String fileTransferSubpath = setup.getFileTransferSubpath();
+					String fileTransferSubpath = appendPathComponent(setup.getFileTransferSubpath(), "input");
 					
 					String remotePath = appendPathComponent(fileTransferSubpath, path);
 					String localPath = path;

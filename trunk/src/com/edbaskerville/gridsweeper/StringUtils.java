@@ -19,14 +19,14 @@ public class StringUtils
 		fileSep = System.getProperty("file.separator");
 	}
 	
-	static List<String> tokenize(String string)
+	static StringList tokenize(String string)
 	{
 		return tokenize(string, " ", true);
 	}
 	
-	static List<String> tokenize(String string, String delimiter, boolean unescape)
+	static StringList tokenize(String string, String delimiter, boolean unescape)
 	{
-		List<String> tokens = new ArrayList<String>();
+		StringList tokens = new StringList();
 		
 		StringTokenizer tokenizer = new StringTokenizer(string, delimiter);
 		
@@ -213,9 +213,9 @@ public class StringUtils
 		}
 	}
 
-	public static List<String> pathComponents(String path)
+	public static StringList pathComponents(String path)
 	{
-		List<String> tokens = tokenize(path, "/", false);
+		StringList tokens = tokenize(path, "/", false);
 		
 		int size = tokens.size();
 		

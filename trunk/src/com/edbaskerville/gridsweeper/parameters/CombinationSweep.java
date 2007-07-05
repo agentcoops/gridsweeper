@@ -1,6 +1,7 @@
 package com.edbaskerville.gridsweeper.parameters;
 
 import java.util.*;
+import com.edbaskerville.gridsweeper.*;
 
 /**
  * An abstract class representing parameter sweeps that combine multiple sub-sweeps.
@@ -44,9 +45,9 @@ public abstract class CombinationSweep implements Sweep, List<Sweep>
 	 * be used to provide a user override for the default order.
 	 * @return A list of parameter names providing the human-readable order.
 	 */
-	public List<String> getParameterOrder()
+	public StringList getParameterOrder()
 	{
-		List<String> parameterOrder = new ArrayList<String>();
+		StringList parameterOrder = new StringList();
 		
 		for(Sweep sweep : children)
 		{
