@@ -18,11 +18,11 @@ public class ExperimentTestParse
 	}
 	
 	@Test
-	public void settings() throws ExperimentException
+	public void properties() throws ExperimentException
 	{
-		experiment = new Experiment(getURL("settings"));
+		experiment = new Experiment(getURL("properties"));
 		assertEquals(10, experiment.getNumRuns());
-		assertEquals("value", experiment.getSettings().get("anotherSetting"));
+		assertEquals("value", experiment.getProperties().get("anotherProperty"));
 	}
 	
 	@Test

@@ -20,7 +20,7 @@ public class Experiment
 {
 	private String name;
 	
-	private Properties settings;
+	private Properties properties;
 	private Properties abbreviations;
 	private Properties inputFiles;
 	private Properties outputFiles;
@@ -33,14 +33,14 @@ public class Experiment
 	
 	/**
 	 * The default constructor. Initializes {@code numRuns} to 1, and 
-	 * creates empty objects for settings, abbreviations, input/output files,
+	 * creates empty objects for properties, abbreviations, input/output files,
 	 * and the root parameter sweep. 
 	 *
 	 */
 	public Experiment()
 	{
 		numRuns = 1;
-		settings = new Properties();
+		properties = new Properties();
 		abbreviations = new Properties();
 		inputFiles = new Properties();
 		outputFiles = new Properties();
@@ -124,21 +124,21 @@ public class Experiment
 	}
 
 	/** 
-	 * Getter for experiment settings.
-	 * @return The settings object.
+	 * Getter for experiment properties.
+	 * @return The properties object.
 	 */
-	public Properties getSettings()
+	public Properties getProperties()
 	{
-		return settings;
+		return properties;
 	}
 
 	/**
-	 * Setter for experiment settings.
-	 * @param settings The settings object to use.
+	 * Setter for experiment properties.
+	 * @param properties The properties object to use.
 	 */
-	public void setSettings(Properties settings)
+	public void setProperties(Properties properties)
 	{
-		this.settings = settings;
+		this.properties = properties;
 	}
 
 	/**

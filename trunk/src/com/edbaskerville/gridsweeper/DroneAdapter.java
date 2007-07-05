@@ -9,12 +9,12 @@ import com.edbaskerville.gridsweeper.parameters.ParameterMap;
 /**
  * <p>An adapter that runs models designed for Ted Belding's Drone.
  * The Drone model specification leaves quite a bit of room for
- * customization, so {@code DroneAdapter} supports quite a few settings:</p>
+ * customization, so {@code DroneAdapter} supports quite a few properties:</p>
  * 
  * <table>
  * 
  * <tr>
- * <td>Command</td>                 <td>Description</td>
+ * <td>Property</td>                <td>Description</td>
  * <td>Default</td>
  * </tr>
  * 
@@ -92,36 +92,36 @@ public class DroneAdapter implements Adapter
 	private String miscOptions;
 	
 	/**
-	 * Standard {@link Adapter} constructor for {@code DroneAdapter}. Assigns settings
+	 * Standard {@link Adapter} constructor for {@code DroneAdapter}. Assigns properties
 	 * to fields.
-	 * @param settings Settings for the adapter. See the class description
-	 * for supported settings.
+	 * @param properties Properties for the adapter. See the class description
+	 * for supported properties.
 	 * @throws AdapterException When no command is specified.
 	 */
-	public DroneAdapter(Properties settings) throws AdapterException
+	public DroneAdapter(Properties properties) throws AdapterException
 	{
-		command = settings.getProperty("command");
+		command = properties.getProperty("command");
 		if(command == null)
 		{
 			throw new AdapterException("\"command\" property must be specified.");
 		}
 		
-		setParamOption = settings.getProperty("setParamOption", "-D");
+		setParamOption = properties.getProperty("setParamOption", "-D");
 		
-		runNumOption = settings.getProperty("runNumOption", "-N");
-		runNumPrefix = settings.getProperty("runNumPrefix", "");
+		runNumOption = properties.getProperty("runNumOption", "-N");
+		runNumPrefix = properties.getProperty("runNumPrefix", "");
 		
-		rngSeedOption = settings.getProperty("rngSeedOption", "-S");
+		rngSeedOption = properties.getProperty("rngSeedOption", "-S");
 		
-		useInputFile = Boolean.parseBoolean(settings.getProperty("useInputFile", "true"));
-		inputFileOption = settings.getProperty("inputFileOption", "-I");
-		inputFilePath = settings.getProperty("inputFilePath");
+		useInputFile = Boolean.parseBoolean(properties.getProperty("useInputFile", "true"));
+		inputFileOption = properties.getProperty("inputFileOption", "-I");
+		inputFilePath = properties.getProperty("inputFilePath");
 		
-		miscOptions = settings.getProperty("miscOptions");
+		miscOptions = properties.getProperty("miscOptions");
 	}
 
 	/**
-	 * Runs the Drone model as specified by the settings and the arguments to this method.  
+	 * Runs the Drone model as specified by the properties and the arguments to this method.  
 	 * 
 	 * @throws AdapterException If an I/O error occurs. TODO: more robust error checking needed.
 	 */

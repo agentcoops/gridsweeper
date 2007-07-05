@@ -48,7 +48,7 @@ public class ExperimentCaseXMLWriter
 		
 		printExperimentStart();
 		
-		printSettings();
+		printProperties();
 		printInputFiles();
 		printOutputFiles();
 		printAbbrevs();
@@ -93,22 +93,22 @@ public class ExperimentCaseXMLWriter
 	}
 	
 	/**
-	 * Prints XML tags for all the experiment settings. 
+	 * Prints XML tags for all the experiment properties. 
 	 *
 	 */
-	private void printSettings()
+	private void printProperties()
 	{
-		Properties settings = experiment.getSettings();
+		Properties properties = experiment.getProperties();
 		
-		for(Object settingObj : settings.keySet())
+		for(Object settingObj : properties.keySet())
 		{
 			String key = (String)settingObj;
-			String value = settings.getProperty(key);
+			String value = properties.getProperty(key);
 			
 			StringMap attrs = new StringMap();
 			attrs.put("key", key);
 			attrs.put("value", value);
-			printTagStart(1, "setting", attrs, true);
+			printTagStart(1, "property", attrs, true);
 		}
 	}
 	

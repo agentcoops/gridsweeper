@@ -5,7 +5,7 @@ package com.edbaskerville.gridsweeper;
  * file transfer system. Although interfaces cannot contain constructors,
  * it is assumed that a file transfer system class contains a constructor
  * that takes one argument, a {@code java.util.Properties} object
- * containing settings for the system.
+ * containing properties for the system.
  * @author Ed Baskerville
  *
  */

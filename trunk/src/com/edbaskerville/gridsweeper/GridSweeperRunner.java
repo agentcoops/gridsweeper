@@ -69,7 +69,7 @@ public class GridSweeperRunner
 			}
 			
 			String adapterClassName = setup.getAdapterClassName();
-			Properties properties = setup.getSettings();
+			Properties properties = setup.getProperties();
 			Adapter adapter = AdapterFactory.createAdapter(adapterClassName, properties);
 			
 			// Run!

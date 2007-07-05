@@ -307,7 +307,7 @@ public class GridSweeper
 		
 		// Write setup file
 		String stdinPath = appendPathComponent(caseDir, ".gsweep_in." + i);
-		RunSetup setup = new RunSetup(preferences, experiment.getSettings(),
+		RunSetup setup = new RunSetup(preferences, experiment.getProperties(),
 				experiment.getInputFiles(), caseSubDir, expCase.getParameterMap(),
 				i, rngSeed, experiment.getOutputFiles(), adapterClassName);
 		ObjectOutputStream stdinStream = new ObjectOutputStream(new FileOutputStream(stdinPath));

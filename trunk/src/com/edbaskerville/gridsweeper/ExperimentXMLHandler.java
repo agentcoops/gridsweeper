@@ -29,7 +29,7 @@ public class ExperimentXMLHandler extends DefaultHandler
 	 */
 	private enum Tag
 	{
-		SETTING,
+		PROPERTY,
 		ABBREV,
 		ITEM,
 		INPUT,
@@ -140,22 +140,22 @@ public class ExperimentXMLHandler extends DefaultHandler
 				
 				push(Tag.OUTPUT);
 			}
-			else if(qName.equals("setting"))
+			else if(qName.equals("property"))
 			{
 				if(top != experiment)
-					throw new SAXException("setting tag with non-experiment on top of stack");
+					throw new SAXException("property tag with non-experiment on top of stack");
 				
 				String key = attrMap.get("key");
 				String value = attrMap.get("value");
 				
 				if(key == null)
-					throw new SAXException("key attribute missing from setting tag");
+					throw new SAXException("key attribute missing from property tag");
 				if(value == null)
-					throw new SAXException("value attribute missing from setting tag");
+					throw new SAXException("value attribute missing from property tag");
 				
-				experiment.getSettings().put(key, value);
+				experiment.getProperties().put(key, value);
 				
-				push(Tag.SETTING);
+				push(Tag.PROPERTY);
 			}
 			else if(qName.equals("abbrev"))
 			{
@@ -255,10 +255,10 @@ public class ExperimentXMLHandler extends DefaultHandler
 				if(top != Tag.OUTPUT)
 					throw new SAXException("mismatched input end tag");
 			}
-			else if(qName.equals("setting"))
+			else if(qName.equals("property"))
 			{
-				if(top != Tag.SETTING)
-					throw new SAXException("mismatched setting end tag");
+				if(top != Tag.PROPERTY)
+					throw new SAXException("mismatched property end tag");
 			}
 			else if(qName.equals("abbrev"))
 			{

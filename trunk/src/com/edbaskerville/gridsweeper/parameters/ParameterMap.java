@@ -2,7 +2,6 @@ package com.edbaskerville.gridsweeper.parameters;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 /**
  * A subclass of {@code HashMap<String, Object>} created to avoid typing {@code HashMap<String, Object>}.

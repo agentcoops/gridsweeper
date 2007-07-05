@@ -7,7 +7,7 @@ import com.edbaskerville.gridsweeper.parameters.ParameterMap;
 
 /**
  * A class that encapsulates setup data for a model run. Includes a copy of the
- * user preferences to be passed on to the running model, settings for the
+ * user preferences to be passed on to the running model, properties for the
  * experiment, file transfer data, run number, random seed, and the adapter
  * class to use.
  * @author Ed Baskerville
@@ -17,7 +17,7 @@ public class RunSetup implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 	private Preferences preferences;
-	private Properties settings;
+	private Properties properties;
 	private Properties inputFiles;
 	private String fileTransferSubpath;
 	private ParameterMap parameters;
@@ -26,10 +26,10 @@ public class RunSetup implements Serializable
 	private Properties outputFiles;
 	private String adapterClassName;
 	
-	public RunSetup(Preferences preferences, Properties settings, Properties inputFiles, String fileTransferSubpath, ParameterMap parameters, int runNumber, long rngSeed, Properties outputFiles, String adapterClassName)
+	public RunSetup(Preferences preferences, Properties properties, Properties inputFiles, String fileTransferSubpath, ParameterMap parameters, int runNumber, long rngSeed, Properties outputFiles, String adapterClassName)
 	{
 		this.preferences = preferences;
-		this.settings = settings;
+		this.properties = properties;
 		this.inputFiles = inputFiles;
 		this.fileTransferSubpath = fileTransferSubpath;
 		this.parameters = parameters;
@@ -49,9 +49,9 @@ public class RunSetup implements Serializable
 		return preferences;
 	}
 	
-	public Properties getSettings()
+	public Properties getProperties()
 	{
-		return settings;
+		return properties;
 	}
 	
 	public long getRngSeed()

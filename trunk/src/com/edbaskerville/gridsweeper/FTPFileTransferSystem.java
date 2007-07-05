@@ -9,7 +9,7 @@ import static com.edbaskerville.gridsweeper.StringUtils.*;
  * <p>An file transfer system for accessing FTP servers. This class is implemented
  * on top of <a target="_top"
  * href="http://jakarta.apache.org/commons/net/">Jakarta Commons Net</a>'s
- * FTP client. Supported settings
+ * FTP client. Supported properties
  * (all prefixed by umich.cscs.lsa.gridsweeper.FTPFileTransferSystem):</p>
  * 
  * <table>
@@ -53,7 +53,7 @@ public class FTPFileTransferSystem implements FileTransferSystem
 	
 	/**
 	 * Initializes an FTP file transfer system.
-	 * @param properties The settings for the file transfer system.
+	 * @param properties The properties for the file transfer system.
 	 * @throws FileTransferException If the hostname is not specified.
 	 */
 	public FTPFileTransferSystem(Properties properties) throws FileTransferException

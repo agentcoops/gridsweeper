@@ -7,7 +7,7 @@ import com.edbaskerville.gridsweeper.parameters.ParameterMap;
  * set of parameters and return results to the GridSweeperRunner object.
  * Java interfaces cannot specify constructors, but <code>Adapter</code>
  * objects are assumed to support a single-argument constructor with signature
- * {@code Adapter(java.util.Properties settings)}.
+ * {@code Adapter(java.util.Properties properties)}.
  * @author Ed Baskerville
  *
  */
