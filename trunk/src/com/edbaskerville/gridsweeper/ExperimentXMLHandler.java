@@ -80,7 +80,7 @@ public class ExperimentXMLHandler extends DefaultHandler
 	{
 		finer("startElement: " + qName);
 		
-		Map<String, String> attrMap = getMapFromAttributes(attributes);
+		StringMap attrMap = getMapFromAttributes(attributes);
 		Object top = peek();
 		
 		try
@@ -316,13 +316,12 @@ public class ExperimentXMLHandler extends DefaultHandler
     
 	/**
 	 * Converts an XML attributes object to a simple string map.
-	 * TODO: Can {@code Map<String, String>} just be {@code StringMap}?
 	 * @param attributes The XML attributes object.
 	 * @return A string map representing the attributes.
 	 */
-    private Map<String, String> getMapFromAttributes(Attributes attributes)
+    private StringMap getMapFromAttributes(Attributes attributes)
     {
-        Map<String, String> expressionMap = new HashMap<String, String>();
+        StringMap expressionMap = new StringMap();
         int length = attributes.getLength();
         
         for(int i = 0; i < length; i++)
@@ -367,7 +366,7 @@ public class ExperimentXMLHandler extends DefaultHandler
 	 * @param attrMap The attributes of the sweep.
 	 * @throws SAXException
 	 */
-	private void startSweepElement(String qName, Map<String, String> attrMap) throws SAXException
+	private void startSweepElement(String qName, StringMap attrMap) throws SAXException
 	{
 		Object top = peek();
 		
@@ -409,7 +408,7 @@ public class ExperimentXMLHandler extends DefaultHandler
 		}
 	}
 	
-	private void startValueElement(CombinationSweep parent, Map<String, String> attrMap) throws SAXException
+	private void startValueElement(CombinationSweep parent, StringMap attrMap) throws SAXException
 	{
 		String param = attrMap.get("param");
 		String value = attrMap.get("value");
@@ -430,7 +429,7 @@ public class ExperimentXMLHandler extends DefaultHandler
 	 * @param attrMap The sweep's attributes.
 	 * @throws SAXException If the parameter name attribute is missing.
 	 */
-	private void startListElement(CombinationSweep parent, Map<String, String> attrMap) throws SAXException
+	private void startListElement(CombinationSweep parent, StringMap attrMap) throws SAXException
 	{
 		String param = attrMap.get("param");
 		
@@ -449,7 +448,7 @@ public class ExperimentXMLHandler extends DefaultHandler
 	 * @param attrMap The sweep's attributes.
 	 * @throws SAXException If any required attributes are missing.
 	 */
-	private void startRangeElement(CombinationSweep parent, Map<String, String> attrMap) throws SAXException
+	private void startRangeElement(CombinationSweep parent, StringMap attrMap) throws SAXException
 	{
 		String param = attrMap.get("param");
 		String start = attrMap.get("start");
@@ -484,7 +483,7 @@ public class ExperimentXMLHandler extends DefaultHandler
 	 * @param attrMap The sweep's attributes.
 	 * @throws SAXException If any of the required attributes is missing.
 	 */
-	private void startUniformElement(CombinationSweep parent, Map<String, String> attrMap) throws SAXException
+	private void startUniformElement(CombinationSweep parent, StringMap attrMap) throws SAXException
 	{
 		String param = attrMap.get("param");
 		String type = attrMap.get("type");
@@ -527,7 +526,7 @@ public class ExperimentXMLHandler extends DefaultHandler
 	 * @param attrMap The sweep's attributes.
 	 * @throws SAXException Currently, never.
 	 */
-	private void startMultiplicativeElement(CombinationSweep parent, Map<String, String> attrMap) throws SAXException
+	private void startMultiplicativeElement(CombinationSweep parent, StringMap attrMap) throws SAXException
 	{
 		MultiplicativeCombinationSweep sweep = new MultiplicativeCombinationSweep();
 		parent.add(sweep);
@@ -540,7 +539,7 @@ public class ExperimentXMLHandler extends DefaultHandler
 	 * @param attrMap The sweep's attributes
 	 * @throws SAXException Currently, never.
 	 */
-	private void startLinearElement(CombinationSweep parent, Map<String, String> attrMap) throws SAXException
+	private void startLinearElement(CombinationSweep parent, StringMap attrMap) throws SAXException
 	{
 		LinearCombinationSweep sweep = new LinearCombinationSweep();
 		parent.add(sweep);
