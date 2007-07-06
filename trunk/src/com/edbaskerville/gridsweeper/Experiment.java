@@ -86,7 +86,7 @@ public class Experiment
 		// Generate the list of parameter values
 		try
 		{
-			List<ParameterMap> parameterMaps = rootSweep.generateMaps(rng, numRuns);
+			List<ParameterMap> parameterMaps = rootSweep.generateMaps(rng);
 			
 			// If there's an rng seed provided,
 			// and only one parameter combo,

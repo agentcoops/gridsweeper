@@ -21,7 +21,7 @@ public class MultiplicativeCombinationSweepTest
 	@Test
 	public void emptySweep() throws SweepLengthException, DuplicateParameterException
 	{
-		maps = sweep.generateMaps(null, 1);
+		maps = sweep.generateMaps(null);
 		assertEquals(0, maps.size());
 	}
 	
@@ -33,7 +33,7 @@ public class MultiplicativeCombinationSweepTest
 		listSweep.add("yoo-ha");
 		sweep.add(listSweep);
 		
-		maps = sweep.generateMaps(null, 1);
+		maps = sweep.generateMaps(null);
 		assertEquals(2, maps.size());
 		assertEquals("hoo-ah", maps.get(0).get("param"));
 		assertEquals("yoo-ha", maps.get(1).get("param"));
@@ -52,7 +52,7 @@ public class MultiplicativeCombinationSweepTest
 		listSweep2.add("2");
 		sweep.add(listSweep2);
 		
-		maps = sweep.generateMaps(null, 1);
+		maps = sweep.generateMaps(null);
 		assertEquals(4, maps.size());
 		
 		assertEquals("A", maps.get(0).get("param1"));
@@ -86,7 +86,7 @@ public class MultiplicativeCombinationSweepTest
 		listSweep3.add("b");
 		sweep.add(listSweep3);
 		
-		maps = sweep.generateMaps(null, 1);
+		maps = sweep.generateMaps(null);
 		
 		assertEquals("A", maps.get(0).get("param1"));
 		assertEquals("1", maps.get(0).get("param2"));
@@ -132,7 +132,7 @@ public class MultiplicativeCombinationSweepTest
 		try
 		{
 			@SuppressWarnings("unused")
-			List<ParameterMap> maps = sweep.generateMaps(null, 1);
+			List<ParameterMap> maps = sweep.generateMaps(null);
 			fail();
 		}
 		catch(DuplicateParameterException e) {}

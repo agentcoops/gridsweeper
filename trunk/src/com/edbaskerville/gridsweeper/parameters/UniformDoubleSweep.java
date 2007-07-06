@@ -8,7 +8,7 @@ import java.util.*;
  * @author Ed Baskerville
  *
  */
-public class UniformDoubleSweep extends SingleSweep
+public class UniformDoubleSweep extends SingleSweep implements StochasticSweep
 {
 	/**
 	 * The lower bound of the uniform distribution.
@@ -47,17 +47,12 @@ public class UniformDoubleSweep extends SingleSweep
 	 * Generates {@code count} value assignments from the specified uniform distribution.
 	 */
 	@Override
-	public List<ParameterMap> generateMaps(Random rng, int numRuns)
+	public List<ParameterMap> generateMaps(Random rng)
 	{
 		List<ParameterMap> maps = new ArrayList<ParameterMap>(count);
 		for(int i = 0; i < count; i++)
 		{
-			ArrayList<Double> valueList = new ArrayList<Double>(numRuns);
-			for(int j = 0; j < numRuns; j++)
-			{
-				valueList.add(uniformDouble(rng));
-			}
-			maps.add(new ParameterMap(name, valueList));
+			maps.add(new ParameterMap(name, uniformDouble(rng)));
 		}
 		return maps;
 	}

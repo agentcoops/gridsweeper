@@ -36,7 +36,7 @@ public class UniformDoubleSweepTest
 		Random rng = new Random();
 		
 		sweep = new UniformDoubleSweep("param", 0, 1, 2);
-		maps = sweep.generateMaps(rng, 1);
+		maps = sweep.generateMaps(rng);
 		
 		assertEquals(2, maps.size());
 		
@@ -51,7 +51,7 @@ public class UniformDoubleSweepTest
 	public void offsetUniform()
 	{
 		sweep = new UniformDoubleSweep("param", 10, 20, 2);
-		maps = sweep.generateMaps(rng, 1);
+		maps = sweep.generateMaps(rng);
 		
 		assertEquals(2, maps.size());
 		
@@ -68,7 +68,7 @@ public class UniformDoubleSweepTest
 		Random rng = new Random();
 		
 		sweep = new UniformDoubleSweep("param", 20, 10, 2);
-		maps = sweep.generateMaps(rng, 1);
+		maps = sweep.generateMaps(rng);
 		
 		assertEquals(2, maps.size());
 		
@@ -87,7 +87,7 @@ public class UniformDoubleSweepTest
 		double end = 20;
 		
 		sweep = new UniformDoubleSweep("param", start, end, numDraws);
-		maps = sweep.generateMaps(rng, 1);
+		maps = sweep.generateMaps(rng);
 		
 		assertEquals(numDraws, maps.size());
 		

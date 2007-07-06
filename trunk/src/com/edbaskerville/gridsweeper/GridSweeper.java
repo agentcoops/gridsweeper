@@ -235,8 +235,6 @@ public class GridSweeper
 					String localPath = (String)localPathObj;
 					String remotePath = appendPathComponent(inputDir, inputFiles.get(localPath));
 					
-					// TODO: ensure that uploadFile() creates directories that don't exist
-					// if necessary
 					fts.uploadFile(localPath, remotePath);
 				}
 			}

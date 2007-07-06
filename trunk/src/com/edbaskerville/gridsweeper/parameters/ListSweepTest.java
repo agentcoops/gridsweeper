@@ -18,7 +18,7 @@ public class ListSweepTest
 	@Test
 	public void emptySweep()
 	{
-		List<ParameterMap> maps = sweep.generateMaps(null, 1);
+		List<ParameterMap> maps = sweep.generateMaps(null);
 		
 		assertEquals(maps.size(), 0);
 	}
@@ -31,7 +31,7 @@ public class ListSweepTest
 		sweep.add("14");
 		sweep.add("-15");
 		
-		List<ParameterMap> maps = sweep.generateMaps(null, 1);
+		List<ParameterMap> maps = sweep.generateMaps(null);
 		
 		assertEquals("5", maps.get(0).get("param"));
 		assertEquals("6", maps.get(1).get("param"));
