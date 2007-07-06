@@ -24,7 +24,8 @@ public interface FileTransferSystem
 	public void disconnect() throws FileTransferException;
 	
 	/**
-	 * Uploads a file. The directory hierarchy containing the destination must already exist.
+	 * Uploads a file. If the directory hierarchy containing the file does not yet exist,
+	 * this method should create it.
 	 * This method is assumed to clobber any existing file in the destination location.
 	 * @param localPath The path of the local file to upload.
 	 * @param remotePath The path on the remote filesystem.
@@ -33,7 +34,8 @@ public interface FileTransferSystem
 	public void uploadFile(String localPath, String remotePath) throws FileTransferException;
 	
 	/**
-	 * Downloads a file. The directory hierarchy containing the destination must already exist.
+	 * Downloads a file. If the directory hierarchy containing the file does not yet exist,
+	 * this method should create it.
 	 * This method is assumed to clobber any existing file in the destination location.
 	 * @param remotePath The path of the file in the remote filesystem.
 	 * @param localPath The local path at which to store the file.

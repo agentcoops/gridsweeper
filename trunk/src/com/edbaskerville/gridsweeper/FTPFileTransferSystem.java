@@ -173,6 +173,13 @@ public class FTPFileTransferSystem implements FileTransferSystem
 	
 	public void downloadFile(String remotePath, String localPath) throws FileTransferException
 	{
+		if(remotePath.length() != 0 && remotePath.charAt(0) == '/')
+			remotePath = remotePath.substring(1);
+		
+		// Ensure the local directory exists
+		String containingDir = deleteLastPathComponent(localPath);
+		makeLocalDirectory(containingDir);
+		
 		// Get an input stream from FTP server
 		InputStream remoteStream;
 		try
@@ -250,8 +257,38 @@ public class FTPFileTransferSystem implements FileTransferSystem
 		}
 	}
 
+	protected void makeLocalDirectory(String localDir) throws FileTransferException
+	{
+		StringList components = pathComponents(localDir);
+		
+		String pathSoFar = "";
+		for(String component : components)
+		{
+			pathSoFar = appendPathComponent(pathSoFar, component);
+			File file = new File(pathSoFar);
+			
+			if(file.exists())
+			{
+				if(!file.isDirectory())
+				{
+					throw new FileTransferException("Non-directory file already exists in desired directory path.");
+				}
+			}
+			else
+			{
+				if(!file.mkdir())
+				{
+					throw new FileTransferException("Could not create directory: " + pathSoFar);
+				}
+			}
+		}
+	}
+
 	public String[] list(String path) throws FileTransferException
 	{
+		if(path.length() != 0 && path.charAt(0) == '/')
+			path = path.substring(1);
+		
 		try
 		{
 			FTPFile[] files;
@@ -274,6 +311,9 @@ public class FTPFileTransferSystem implements FileTransferSystem
 	
 	public boolean isDirectory(String path) throws FileTransferException
 	{
+		if(path.length() != 0 && path.charAt(0) == '/')
+			path = path.substring(1);
+		
 		try
 		{
 			FTPFile file = getFTPFile(path);
@@ -288,6 +328,9 @@ public class FTPFileTransferSystem implements FileTransferSystem
 	
 	public void deleteFile(String path) throws FileTransferException
 	{
+		if(path.length() != 0 && path.charAt(0) == '/')
+			path = path.substring(1);
+		
 		try
 		{
 			if(!ftpClient.deleteFile(path))
@@ -302,6 +345,14 @@ public class FTPFileTransferSystem implements FileTransferSystem
 	
 	public void uploadFile(String localPath, String remotePath) throws FileTransferException
 	{
+		if(remotePath.length() != 0 && remotePath.charAt(0) == '/')
+			remotePath = remotePath.substring(1);
+		
+		// Ensure containing directory exists
+		String containingDirectory = deleteLastPathComponent(remotePath);
+		makeDirectory(containingDirectory);
+		
+		
 		File localFile = new File(expandTildeInPath(localPath));
 		
 		// Get a file input stream
@@ -372,6 +423,9 @@ public class FTPFileTransferSystem implements FileTransferSystem
 	
 	public boolean fileExists(String path) throws FileTransferException
 	{
+		if(path.length() != 0 && path.charAt(0) == '/')
+			path = path.substring(1);
+		
 		FTPFile file;
 		try
 		{
@@ -386,6 +440,13 @@ public class FTPFileTransferSystem implements FileTransferSystem
 	
 	public void makeDirectory(String path) throws FileTransferException
 	{
+		if(path.length() == 0)
+		{
+			return;
+		}
+		else if(path.charAt(0) == '/')
+			path = path.substring(1);
+		
 		StringList components = pathComponents(path);
 		
 		try
@@ -418,6 +479,9 @@ public class FTPFileTransferSystem implements FileTransferSystem
 
 	public void removeDirectory(String path) throws FileTransferException
 	{
+		if(path.length() != 0 && path.charAt(0) == '/')
+			path = path.substring(1);
+		
 		try
 		{
 			String[] listing = list(path);
@@ -452,6 +516,9 @@ public class FTPFileTransferSystem implements FileTransferSystem
 	 */
 	protected FTPFile getFTPFile(String path) throws Exception
 	{
+		if(path.length() != 0 && path.charAt(0) == '/')
+			path = path.substring(1);
+		
 		String filename = lastPathComponent(path);
 		String dirPath = deleteLastPathComponent(path);
 		

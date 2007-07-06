@@ -28,16 +28,12 @@ public class StringUtils
 	{
 		StringList tokens = new StringList();
 		
-		StringTokenizer tokenizer = new StringTokenizer(string, delimiter);
+		String[] tokensArray = string.split(delimiter);
 		
-		while(tokenizer.hasMoreTokens())
+		for(String token : tokensArray)
 		{
-			String token = tokenizer.nextToken();
-			if(unescape)
-			{
-				token = unescape(token);
-			}
-			tokens.add(token);
+			if(unescape) tokens.add(unescape(token));
+			else tokens.add(token);
 		}
 		
 		return tokens;
@@ -219,10 +215,12 @@ public class StringUtils
 		
 		int size = tokens.size();
 		
-		// Remove empty string caused by trailing slash if present
-		if(size > 0 && tokens.get(size - 1).equals(""))
+		// If there's a final slash, add it to the last item
+		if(path.length() > 0 && path.charAt(path.length() - 1) == '/')
 		{
-			tokens.remove(--size);
+			String lastItem = tokens.get(size - 1);
+			tokens.remove(size - 1);
+			tokens.add(lastItem + "/");
 		}
 		
 		// Replace empty string caused by initial slash with actual slash

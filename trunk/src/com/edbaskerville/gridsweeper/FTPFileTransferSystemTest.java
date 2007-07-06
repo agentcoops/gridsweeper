@@ -5,6 +5,31 @@ import java.util.*;
 import org.junit.*;
 import static org.junit.Assert.*;
 
+/**
+ * <p>This class runs a number of tests for FTP file transfer. The tests
+ * are designed to assume that you have local access to the FTP server,
+ * so it's best to set up an FTP server within your own home directory.
+ * If it's not in your own home directory, make sure that your user
+ * is part of the group, as the default permissions policy appears
+ * to be 750 for new files, at least with Mac OS X Tiger's FTP server.</p>
+ * 
+ * <p> In addition to setting up an FTP server, you need to do the following
+ * before running the tests:
+ * </p>
+ * 
+ * <ul>
+ * <li>Change hostname/username/password/root directory to match your setup
+ * in the {@code setUp()} method</li>
+ * <li>Create a file called {@code "download"} in the FTP directory.</li>
+ * <li>Create a directory called {@code "subdir"} with three files, {@code "1"},
+ * {@code "2"}, and {@code "3"}.   
+ * </ul>
+ * 
+ * <p>Then the tests should work. If you get a missing class error,
+ * make sure Jakarta Commons Net and ORO are installed and in the classpath.</p>
+ * @author Ed Baskerville
+ *
+ */
 public class FTPFileTransferSystemTest
 {
 	FTPFileTransferSystem ftpFS;
@@ -14,9 +39,9 @@ public class FTPFileTransferSystemTest
 	{
 		Properties properties = new Properties();
 		properties.setProperty("Hostname", "localhost");
-		properties.setProperty("Username", "ftpuser");
-		properties.setProperty("Password", "ftp");
-		properties.setProperty("Directory", "tmp");
+		properties.setProperty("Username", "gsweep");
+		properties.setProperty("Password", "gridsweeper");
+		properties.setProperty("Directory", "ftp");
 		
 		ftpFS = new FTPFileTransferSystem(properties);
 	}
@@ -40,6 +65,13 @@ public class FTPFileTransferSystemTest
 	{
 		ftpFS.connect();
 		
+		try
+		{
+			File file = new File("/tmp/props");
+			file.delete();
+		}
+		catch(Exception e) {}
+		
 		// Create properties file in /tmp
 		Properties tmpProps = new Properties();
 		tmpProps.setProperty("hi there", "yo there");
@@ -49,7 +81,29 @@ public class FTPFileTransferSystemTest
 		ftpFS.uploadFile("/tmp/props", "props");
 		
 		// Verify file exists
-		File file = new File("/Users/ftpuser/tmp/props");
+		File file = new File("/Users/gsweep/ftp/props");
+		assertTrue(file.exists());
+		
+		ftpFS.disconnect();
+	}
+	
+	@Test
+	public void uploadRecursive() throws Exception
+	{
+		ftpFS.connect();
+		
+		try { ftpFS.removeDirectory("recursiveUploadDir"); } catch(Exception e) {}
+		
+		// Create properties file in /tmp
+		Properties tmpProps = new Properties();
+		tmpProps.setProperty("hi there", "yo there");
+		tmpProps.store(new FileOutputStream("/tmp/props"), "this is a file");
+		
+		// Upload file to server
+		ftpFS.uploadFile("/tmp/props", "recursiveUploadDir/subdir/props");
+		
+		// Verify file exists
+		File file = new File("/Users/gsweep/ftp/recursiveUploadDir/subdir/props");
 		assertTrue(file.exists());
 		
 		ftpFS.disconnect();
@@ -60,9 +114,42 @@ public class FTPFileTransferSystemTest
 	{
 		ftpFS.connect();
 		
+		try
+		{
+			// Delete local file if it exists
+			File file = new File("/tmp/download");
+			file.delete();
+		}
+		catch(Exception e) {}
+		
 		// Download file to /tmp
 		ftpFS.downloadFile("download", "/tmp/download");
 		File file = new File("/tmp/download");
+		assertTrue(file.exists());
+		
+		ftpFS.disconnect();
+	}
+	
+	@Test
+	public void downloadRecursive() throws Exception
+	{
+		ftpFS.connect();
+		
+		// Delete local directory if it exists
+		try
+		{
+			File file = new File("/tmp/downloadRecursive/subdir/download");
+			file.delete();
+			file = new File("/tmp/downloadRecursive/subdir");
+			file.delete();
+			file = new File("/tmp/downloadRecursive");
+			file.delete();
+		}
+		catch(Exception e) {}
+		
+		// Download file to /tmp/downloadRecursive/subdir
+		ftpFS.downloadFile("download", "/tmp/downloadRecursive/subdir/download");
+		File file = new File("/tmp/downloadRecursive/subdir/download");
 		assertTrue(file.exists());
 		
 		ftpFS.disconnect();
@@ -95,7 +182,7 @@ public class FTPFileTransferSystemTest
 		ftpFS.makeDirectory("dir");
 		
 		// Verify directory exists
-		File dir = new File("/Users/ftpuser/tmp/dir");
+		File dir = new File("/Users/gsweep/ftp/dir");
 		assertTrue(dir.exists());
 		
 		ftpFS.disconnect();
@@ -112,7 +199,7 @@ public class FTPFileTransferSystemTest
 		ftpFS.makeDirectory("dir2/with/subdir");
 		
 		// Verify directory exists
-		File dir = new File("/Users/ftpuser/tmp/dir2/with/subdir");
+		File dir = new File("/Users/gsweep/ftp/dir2/with/subdir");
 		assertTrue(dir.exists());
 		
 		ftpFS.disconnect();		
@@ -129,7 +216,7 @@ public class FTPFileTransferSystemTest
 		ftpFS.removeDirectory("dir");
 		
 		// Verify directory doesn't exist
-		File dir = new File("/Users/ftpuser/tmp/dir");
+		File dir = new File("/Users/gsweep/ftp/dir");
 		assertFalse(dir.exists());
 		
 		ftpFS.disconnect();
@@ -146,7 +233,7 @@ public class FTPFileTransferSystemTest
 		ftpFS.removeDirectory("dir2");
 		
 		// Verify directory doesn't exist
-		File dir = new File("/Users/ftpuser/tmp/dir2");
+		File dir = new File("/Users/gsweep/ftp/dir2");
 		assertFalse(dir.exists());
 		
 		ftpFS.disconnect();
@@ -165,11 +252,9 @@ public class FTPFileTransferSystemTest
 	@Test
 	public void isDirectoryTrue() throws Exception
 	{
-		makeDirectory();
-		
 		ftpFS.connect();
 		
-		assertTrue(ftpFS.isDirectory("dir"));
+		assertTrue(ftpFS.isDirectory("subdir"));
 		
 		ftpFS.disconnect();
 	}
@@ -180,13 +265,22 @@ public class FTPFileTransferSystemTest
 		ftpFS.connect();
 		
 		String[] names = ftpFS.list("subdir");
-		assertEquals(3, names.length);
-		if(names.length == 3)
+		for(String name : names) System.out.println(name);
+		
+		assertTrue(names.length >= 3);
+		
+		boolean found1 = false, found2 = false, found3 = false;
+		
+		for(String name : names)
 		{
-			assertEquals("1", names[0]);
-			assertEquals("2", names[1]);
-			assertEquals("3", names[2]);
+			if(name.equals("1")) found1 = true;
+			else if(name.equals("2")) found2 = true;
+			else if(name.equals("3")) found3 = true;
 		}
+		
+		assertTrue(found1);
+		assertTrue(found2);
+		assertTrue(found3);
 		
 		ftpFS.disconnect();
 	}

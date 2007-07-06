@@ -125,4 +125,46 @@ public class StringUtilsTest
 		
 		assertEquals("/some/path/component", appendPathComponent(path, subpath));
 	}
+	
+	@Test
+	public void componentsWithoutRootNoTS()
+	{
+		String path = "some/path";
+		StringList components = pathComponents(path);
+		assertEquals(components.size(), 2);
+		assertEquals("some", components.get(0));
+		assertEquals("path", components.get(1));
+	}
+	
+	@Test
+	public void componentsWithoutRootTS()
+	{
+		String path = "some/path/";
+		StringList components = pathComponents(path);
+		assertEquals(components.size(), 2);
+		assertEquals("some", components.get(0));
+		assertEquals("path/", components.get(1));	
+	}
+	
+	@Test
+	public void componentsWithRootNoTS()
+	{
+		String path = "/some/path";
+		StringList components = pathComponents(path);
+		assertEquals(components.size(), 3);
+		assertEquals("/", components.get(0));
+		assertEquals("some", components.get(1));
+		assertEquals("path", components.get(2));
+	}
+	
+	@Test
+	public void componentsWithRootTS()
+	{
+		String path = "/some/path/";
+		StringList components = pathComponents(path);
+		assertEquals(components.size(), 3);
+		assertEquals("/", components.get(0));
+		assertEquals("some", components.get(1));
+		assertEquals("path/", components.get(2));
+	}
 }
