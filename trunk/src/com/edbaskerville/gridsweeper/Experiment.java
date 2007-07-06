@@ -21,9 +21,9 @@ public class Experiment
 	private String name;
 	
 	private Properties properties;
-	private Properties abbreviations;
-	private Properties inputFiles;
-	private Properties outputFiles;
+	private StringMap abbreviations;
+	private StringMap inputFiles;
+	private StringList outputFiles;
 	
 	private MultiplicativeCombinationSweep rootSweep;
 	private StringList parameterOrder;
@@ -41,9 +41,9 @@ public class Experiment
 	{
 		numRuns = 1;
 		properties = new Properties();
-		abbreviations = new Properties();
-		inputFiles = new Properties();
-		outputFiles = new Properties();
+		abbreviations = new StringMap();
+		inputFiles = new StringMap();
+		outputFiles = new StringList();
 		rootSweep = new MultiplicativeCombinationSweep();
 	}
 	
@@ -145,7 +145,7 @@ public class Experiment
 	 * Getter for abbrevations.
 	 * @return The abbreviations object.
 	 */
-	public Properties getAbbreviations()
+	public StringMap getAbbreviations()
 	{
 		return abbreviations;
 	}
@@ -154,7 +154,7 @@ public class Experiment
 	 * Setter for parameter name abbreviations. 
 	 * @param abbreviations The abbreviations object to use.
 	 */
-	public void setAbbreviations(Properties abbreviations)
+	public void setAbbreviations(StringMap abbreviations)
 	{
 		this.abbreviations = abbreviations;
 	}
@@ -233,7 +233,7 @@ public class Experiment
 	 * This object is only used when file transfer is on.
 	 * @return The input files object.
 	 */
-	public Properties getInputFiles()
+	public StringMap getInputFiles()
 	{
 		return inputFiles;
 	}
@@ -245,19 +245,16 @@ public class Experiment
 	 * This object is only used when file transfer is on.
 	 * @param inputFiles
 	 */
-	public void setInputFiles(Properties inputFiles)
+	public void setInputFiles(StringMap inputFiles)
 	{
 		this.inputFiles = inputFiles;
 	}
 
 	/**
-	 * Getter for the output files object. TODO: this will be changed from a Properties
-	 * object to a simple list of strings, so that the source path within the
-	 * executable working directory will be the same as the destination path
-	 * in the output directory on the submission host.
+	 * Getter for the output files object.
 	 * @return The output files object.
 	 */
-	public Properties getOutputFiles()
+	public StringList getOutputFiles()
 	{
 		return outputFiles;
 	}
@@ -269,7 +266,7 @@ public class Experiment
 	 * in the output directory on the submission host.
 	 * @param outputFiles The output files object to use.
 	 */
-	public void setOutputFiles(Properties outputFiles)
+	public void setOutputFiles(StringList outputFiles)
 	{
 		this.outputFiles = outputFiles;
 	}

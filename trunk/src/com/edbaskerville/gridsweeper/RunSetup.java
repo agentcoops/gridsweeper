@@ -18,15 +18,15 @@ public class RunSetup implements Serializable
 	private static final long serialVersionUID = 1L;
 	private Preferences preferences;
 	private Properties properties;
-	private Properties inputFiles;
+	private StringMap inputFiles;
 	private String fileTransferSubpath;
 	private ParameterMap parameters;
 	private int runNumber;
 	private long rngSeed;
-	private Properties outputFiles;
+	private StringList outputFiles;
 	private String adapterClassName;
 	
-	public RunSetup(Preferences preferences, Properties properties, Properties inputFiles, String fileTransferSubpath, ParameterMap parameters, int runNumber, long rngSeed, Properties outputFiles, String adapterClassName)
+	public RunSetup(Preferences preferences, Properties properties, StringMap inputFiles, String fileTransferSubpath, ParameterMap parameters, int runNumber, long rngSeed, StringList outputFiles, String adapterClassName)
 	{
 		this.preferences = preferences;
 		this.properties = properties;
@@ -69,12 +69,12 @@ public class RunSetup implements Serializable
 		return parameters;
 	}
 
-	public Properties getInputFiles()
+	public StringMap getInputFiles()
 	{
 		return inputFiles;
 	}
 	
-	public Properties getOutputFiles()
+	public StringList getOutputFiles()
 	{
 		return outputFiles;
 	}

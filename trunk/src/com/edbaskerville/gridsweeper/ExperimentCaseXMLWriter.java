@@ -118,12 +118,12 @@ public class ExperimentCaseXMLWriter
 	 */
 	private void printInputFiles()
 	{
-		Properties inputFiles = experiment.getInputFiles();
+		StringMap inputFiles = experiment.getInputFiles();
 		
 		for(Object srcObj : inputFiles.keySet())
 		{
 			String source = (String)srcObj;
-			String destination = inputFiles.getProperty(source);
+			String destination = inputFiles.get(source);
 			
 			StringMap attrs = new StringMap();
 			attrs.put("source", source);
@@ -138,16 +138,12 @@ public class ExperimentCaseXMLWriter
 	 */
 	private void printOutputFiles()
 	{
-		Properties outputFiles = experiment.getOutputFiles();
+		StringList outputFiles = experiment.getOutputFiles();
 		
-		for(Object srcObj : outputFiles.keySet())
+		for(String outputFile : outputFiles)
 		{
-			String source = (String)srcObj;
-			String destination = outputFiles.getProperty(source);
-			
 			StringMap attrs = new StringMap();
-			attrs.put("source", source);
-			attrs.put("destination", destination);
+			attrs.put("path", outputFile);
 			printTagStart(1, "output", attrs, true);
 		}
 	}
@@ -158,12 +154,12 @@ public class ExperimentCaseXMLWriter
 	 */
 	private void printAbbrevs()
 	{
-		Properties abbrevs = experiment.getAbbreviations();
+		StringMap abbrevs = experiment.getAbbreviations();
 		
 		for(Object paramObj : abbrevs.keySet())
 		{
 			String param = (String)paramObj;
-			String abbrev = abbrevs.getProperty(param);
+			String abbrev = abbrevs.get(param);
 			
 			StringMap attrs = new StringMap();
 			attrs.put("param", param);

@@ -52,11 +52,11 @@ public class GridSweeperRunner
 				fts = FileTransferSystemFactory.getFactory().getFileTransferSystem(preferences);
 				fts.connect();
 				
-				Properties inputFiles = setup.getInputFiles();
+				StringMap inputFiles = setup.getInputFiles();
 				
 				for(Object key : inputFiles.keySet())
 				{
-					String path = inputFiles.getProperty((String)key);
+					String path = inputFiles.get((String)key);
 					String fileTransferSubpath = appendPathComponent(setup.getFileTransferSubpath(), "input");
 					
 					String remotePath = appendPathComponent(fileTransferSubpath, path);
@@ -83,15 +83,14 @@ public class GridSweeperRunner
 			{
 				fts.connect();
 				
-				Properties outputFiles = setup.getOutputFiles();
+				StringList outputFiles = setup.getOutputFiles();
 				
-				for(Object key : outputFiles.keySet())
+				for(String outputFile : outputFiles)
 				{
-					String localPath = (String)key;
 					String fileTransferSubpath = setup.getFileTransferSubpath();
-					String remotePath = appendPathComponent(fileTransferSubpath, localPath);
+					String remotePath = appendPathComponent(fileTransferSubpath, outputFile);
 					
-					fts.uploadFile(localPath, remotePath);
+					fts.uploadFile(outputFile, remotePath);
 				}
 				
 				fts.disconnect();

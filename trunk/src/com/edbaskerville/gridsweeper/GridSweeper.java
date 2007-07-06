@@ -229,11 +229,11 @@ public class GridSweeper
 				String inputDir = appendPathComponent(expSubDir, "input");
 				fts.makeDirectory(inputDir);
 				
-				Properties inputFiles = experiment.getInputFiles();
+				StringMap inputFiles = experiment.getInputFiles();
 				for(Object localPathObj : inputFiles.keySet())
 				{
 					String localPath = (String)localPathObj;
-					String remotePath = appendPathComponent(inputDir, inputFiles.getProperty(localPath));
+					String remotePath = appendPathComponent(inputDir, inputFiles.get(localPath));
 					
 					// TODO: ensure that uploadFile() creates directories that don't exist
 					// if necessary

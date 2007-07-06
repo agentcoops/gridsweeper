@@ -119,7 +119,7 @@ public class ExperimentXMLHandler extends DefaultHandler
 				if(destination == null)
 					throw new SAXException("destination attribute missing from input tag");
 				
-				experiment.getInputFiles().setProperty(source, destination);
+				experiment.getInputFiles().put(source, destination);
 				
 				push(Tag.INPUT);
 			}
@@ -128,15 +128,12 @@ public class ExperimentXMLHandler extends DefaultHandler
 				if(top != experiment)
 					throw new SAXException("output tag with non-experiment on top of stack");
 				
-				String source = attrMap.get("source");
-				String destination = attrMap.get("destination");
+				String path = attrMap.get("path");
 				
-				if(source == null)
-					throw new SAXException("source attribute missing from output tag");
-				if(destination == null)
-					throw new SAXException("destination attribute missing from output tag");
+				if(path == null)
+					throw new SAXException("path attribute missing from output tag");
 				
-				experiment.getOutputFiles().setProperty(source, destination);
+				experiment.getOutputFiles().add(path);
 				
 				push(Tag.OUTPUT);
 			}
