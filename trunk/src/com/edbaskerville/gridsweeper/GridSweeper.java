@@ -52,6 +52,8 @@ public class GridSweeper
 	static String timeStr;
 	static String expDir;
 	
+	static String fileTransferSubpath;
+	
 	static Session drmaaSession;
 	
 	static
@@ -62,6 +64,8 @@ public class GridSweeper
 		preferences = Preferences.sharedPreferences();
 		className = GridSweeper.class.toString();
 		cal = new GregorianCalendar();
+		
+		fileTransferSubpath = null;
 	}
 	
 	/**
@@ -205,6 +209,14 @@ public class GridSweeper
 			{
 				fts = FileTransferSystemFactory.getFactory().getFileTransferSystem(preferences);
 				fts.connect();
+				
+				boolean alreadyExists;
+				do
+				{
+					fileTransferSubpath = UUID.randomUUID().toString();
+					alreadyExists = fts.fileExists(fileTransferSubpath);
+				}
+				while(alreadyExists);
 			}
 			
 			String expsDir = expandTildeInPath(preferences.getProperty("ExperimentsDirectory"));
@@ -226,18 +238,19 @@ public class GridSweeper
 			// and upload input files
 			if(!dryRun && useFileTransfer)
 			{
-				String inputDir = appendPathComponent(expSubDir, "input");
+				String inputDir = appendPathComponent(fileTransferSubpath, "input");
 				fts.makeDirectory(inputDir);
 				
 				StringMap inputFiles = experiment.getInputFiles();
-				for(Object localPathObj : inputFiles.keySet())
+				for(String localPath : inputFiles.keySet())
 				{
-					String localPath = (String)localPathObj;
 					String remotePath = appendPathComponent(inputDir, inputFiles.get(localPath));
 					
 					fts.uploadFile(localPath, remotePath);
 				}
-			}
+				
+				fts.disconnect();
+			} 
 			
 			if(!dryRun)
 			{
@@ -251,7 +264,6 @@ public class GridSweeper
 			{
 				runCase(expCase);
 			}
-			if(!dryRun && useFileTransfer) fts.disconnect();
 		}
 		catch(Exception e)
 		{

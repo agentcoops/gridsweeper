@@ -81,4 +81,12 @@ public interface FileTransferSystem
 	 * @throws FileTransferException
 	 */
 	public boolean isDirectory(String path) throws FileTransferException;
+	
+	/**
+	 * Determines whether a file or directory exists at a given path.
+	 * @param path The path to evaluate.
+	 * @return {@code true} if the path exists, {@code false} otherwise.
+	 * @throws FileTransferException
+	 */
+	public boolean fileExists(String path) throws FileTransferException;
 }

@@ -6,10 +6,6 @@ import com.edbaskerville.gridsweeper.parameters.*;
 /**
  * Represents a single case of an experiment, including parameter settings
  * and a list of random seeds, one for each run of the case.
- * TODO: There's a major design bug in how these are represented. Stochastic
- * parameter settings will not vary from run to run with this representation.
- * The solution: associate a different parameter map for every run?
- * Seems wasteful, but is certainly the simplest solution.
  * @author Ed Baskerville
  *
  */

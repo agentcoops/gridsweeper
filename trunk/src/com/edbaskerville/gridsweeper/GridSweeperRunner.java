@@ -14,16 +14,6 @@ import com.edbaskerville.gridsweeper.parameters.ParameterMap;
  */
 public class GridSweeperRunner
 {
-	/*
-	 * TODO: fix how file transfer works. Input files should be segregated
-	 * in their own directory so that upon run completion the entire model output
-	 * directory can be retrieved from the file transer system without needlessly
-	 * transferring back input files.
-	 * Furthermore, there's no reason for output files to be a Properties object:
-	 * the path within the working directory should be the same as the path
-	 * in the output directory on the server. 
-	 */
-	
 	/**
 	 * Runs the model. First, reads the {@link RunSetup} object from standard input,
 	 * and extracts settings for the run. If file transfer is on, input files
@@ -54,9 +44,9 @@ public class GridSweeperRunner
 				
 				StringMap inputFiles = setup.getInputFiles();
 				
-				for(Object key : inputFiles.keySet())
+				for(String key : inputFiles.keySet())
 				{
-					String path = inputFiles.get((String)key);
+					String path = inputFiles.get(key);
 					String fileTransferSubpath = appendPathComponent(setup.getFileTransferSubpath(), "input");
 					
 					String remotePath = appendPathComponent(fileTransferSubpath, path);

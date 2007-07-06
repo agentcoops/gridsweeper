@@ -260,10 +260,7 @@ public class Experiment
 	}
 
 	/**
-	 * Setter for the output files object. TODO: this will be changed from a Properties
-	 * object to a simple list of strings, so that the source path within the
-	 * executable working directory will be the same as the destination path
-	 * in the output directory on the submission host.
+	 * Setter for the output files object.
 	 * @param outputFiles The output files object to use.
 	 */
 	public void setOutputFiles(StringList outputFiles)
@@ -280,16 +277,13 @@ public class Experiment
 	 */
 	public String getCaseDescription(ExperimentCase experimentCase)
 	{
-		ParameterMap changingParameters = (ParameterMap)experimentCase.getParameterMap().clone();
+		ParameterMap parameterMap = (ParameterMap)experimentCase.getParameterMap();
 		
-		// TODO: I see a bug. Only SingleValueSweep 
-		// objects at the root level will be detected, since there's no recursion.
-		for(Sweep sweep : rootSweep)
+		ParameterMap changingParameters = new ParameterMap();
+		
+		for(String name : getParameterOrderUsed())
 		{
-			if(sweep instanceof SingleValueSweep)
-			{
-				changingParameters.remove(((SingleValueSweep)sweep).getName());
-			}
+			changingParameters.put(name, parameterMap.get(name));
 		}
 		
 		return changingParameters.toString();
