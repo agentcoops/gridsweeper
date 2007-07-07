@@ -58,6 +58,8 @@ public class FTPFileTransferSystem implements FileTransferSystem
 	 */
 	public FTPFileTransferSystem(Properties properties) throws FileTransferException
 	{
+		Logger.finer("properties: " + properties);
+		
 		hostname = properties.getProperty("Hostname");
 		if(hostname == null) throw new FileTransferException("Cannot initialize FTP file system without hostname.");
 		

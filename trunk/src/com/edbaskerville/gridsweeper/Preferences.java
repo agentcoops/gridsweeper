@@ -127,12 +127,15 @@ public class Preferences extends Properties
 	 */
 	public Properties getPropertiesForClass(String className)
 	{
+		Logger.finer("Getting properties for class " + className);
+		
 		Properties properties = new Properties();
 		String classNamePlusDot = className + ".";
 		
-		for(Object key : properties.keySet())
+		for(Object key : keySet())
 		{
 			String propName = (String)key;
+			Logger.finer("checking property " + propName);
 			if(propName.indexOf(classNamePlusDot) == 0)
 			{
 				String shortKey = propName.substring(classNamePlusDot.length());

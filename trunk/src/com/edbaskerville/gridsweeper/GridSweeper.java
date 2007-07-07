@@ -187,7 +187,7 @@ public class GridSweeper
 	/**
 	 * Runs the experiment. Experiment results are collated in a master experiment directory,
 	 * specified in the user preferences, in a subdirectory tagged with the experiment name
-	 * and date/time ({@code <name>/YYYY-MM-DD-hh-mm-ss}). If a shared filesystem is not
+	 * and date/time ({@code <name>/YYYY-MM-DD/hh-mm-ss}). If a shared filesystem is not
 	 * available, files are first staged to the experiment results directory on the
 	 * file transfer system. Then a DRMAA session is established, and each case is submitted.
 	 * 
