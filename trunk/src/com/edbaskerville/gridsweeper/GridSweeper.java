@@ -331,7 +331,9 @@ public class GridSweeper
 	 */
 	private static void runCaseRun(ExperimentCase expCase, String caseDir, String caseSubDir, int i, Long rngSeed) throws DrmaaException, IOException
 	{
-		String caseRunName = experiment.getName() + " - " + caseSubDir + " - run " + i + " (" + dateStr + ", " + timeStr.replace('-', ':') + ")";
+		String caseRunName = experiment.getName() + " - "
+			+ caseSubDir + " - run " + i
+			+ " (" + dateStr + ", " + timeStr + ")";
 
 		// Write XML
 		String xmlPath = appendPathComponent(caseDir, "case." + i + ".gsweep");
