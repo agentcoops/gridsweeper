@@ -371,6 +371,9 @@ public class GridSweeper
 		
 		Properties environment = new Properties();
 		environment.setProperty("GRIDSWEEPER_ROOT", root);
+		
+		String classpath = System.getenv("CLASSPATH");
+		if(classpath != null) environment.setProperty("CLASSPATH", classpath);
 		jt.setJobEnvironment(environment);
 		
 		String jobId = drmaaSession.runJob(jt);
