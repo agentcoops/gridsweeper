@@ -48,8 +48,7 @@ public class MultiplicativeCombinationSweep extends CombinationSweep
 		
 		return generateMaps(children, rng);
 	}
-	
-	private List<ParameterMap> generateMaps(List<Sweep> children, Random rng) throws SweepLengthException, DuplicateParameterException
+
 	/**
 	 * Recursively generates maps from the children that have not yet been combined.
 	 * It should be possible (?) to implement this method without recursion as an optimization.
@@ -59,6 +58,7 @@ public class MultiplicativeCombinationSweep extends CombinationSweep
 	 * @throws SweepLengthException
 	 * @throws DuplicateParameterException
 	 */
+	private List<ParameterMap> generateMaps(List<Sweep> children, Random rng) throws SweepLengthException, DuplicateParameterException
 	{
 		assert children.size() > 0;
 		

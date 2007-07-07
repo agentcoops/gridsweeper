@@ -2,8 +2,8 @@
 
 <experiment name="sample" numRuns="2">
 	
-	<setting key="com.edbaskerville.gridsweeper.DroneAdapter.command" value="/bin/echo" />
-	<setting key="com.edbaskerville.gridsweeper.DroneAdapter.miscOptions" value="-n" />
+	<property key="com.edbaskerville.gridsweeper.DroneAdapter.command" value="/bin/echo" />
+	<property key="com.edbaskerville.gridsweeper.DroneAdapter.miscOptions" value="-n" />
 	
 	<abbrev param="alpha" abbrev="a" />
 	<abbrev param="beta" abbrev="b" />

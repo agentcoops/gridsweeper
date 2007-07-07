@@ -198,13 +198,13 @@ public class GridSweeper
 		Logger.entering(className, "prepare");
 		
 		useFileTransfer = !preferences.getBooleanProperty("UseSharedFileSystem");
-		
+
+		FileTransferSystem fts = null;
 		try
 		{
 			Logger.finer("preferences: " + preferences);
 			
 			// Set up file transfer system if asked for
-			FileTransferSystem fts = null;
 			if(!dryRun && useFileTransfer)
 			{
 				fts = FileTransferSystemFactory.getFactory().getFileTransferSystem(preferences);
@@ -218,7 +218,14 @@ public class GridSweeper
 				}
 				while(alreadyExists);
 			}
+		}
+		catch(Exception e)
+		{
+			throw new GridSweeperException("Could not set up file trasfer system", e);
+		}
 			
+		try
+		{
 			String expsDir = expandTildeInPath(preferences.getProperty("ExperimentsDirectory"));
 			
 			// First set up big directory for the whole experiment
@@ -226,14 +233,21 @@ public class GridSweeper
 			String expName = experiment.getName();
 			dateStr = getDateString(cal);
 			timeStr = getTimeString(cal);
-			String expSubDir = String.format("%s%s%s-%s", expName, getFileSeparator(), dateStr, getFileSeparator(), timeStr);
+			String expSubDir = String.format("%s%s%s%s%s", expName, getFileSeparator(), dateStr, getFileSeparator(), timeStr);
 			
 			expDir = appendPathComponent(expsDir, expSubDir);
 			Logger.finer("Experiment subdirectory: " + expDir);
 			
 			File expDirFile = new File(expDir);
 			expDirFile.mkdirs();
-			
+		}
+		catch(Exception e)
+		{
+			throw new GridSweeperException("Could not set up local dirs", e);
+		}
+		
+		try
+		{
 			// If file transfer is on, make the directory
 			// and upload input files
 			if(!dryRun && useFileTransfer)
@@ -250,8 +264,15 @@ public class GridSweeper
 				}
 				
 				fts.disconnect();
-			} 
+			}
+		}
+		catch(Exception e)
+		{
+			throw new GridSweeperException("Could not create remote dirs", e);
+		}
 			
+		try
+		{
 			if(!dryRun)
 			{
 				// Establish DRMAA session
@@ -267,7 +288,7 @@ public class GridSweeper
 		}
 		catch(Exception e)
 		{
-			throw new GridSweeperException("Could not set up local dirs", e);
+			throw new GridSweeperException("Could not run experiments", e);
 		}
 		
 		Logger.exiting(className, "prepare");
@@ -310,7 +331,7 @@ public class GridSweeper
 	 */
 	private static void runCaseRun(ExperimentCase expCase, String caseDir, String caseSubDir, int i, Long rngSeed) throws DrmaaException, IOException
 	{
-		String caseRunName = experiment.getName() + "-" + dateStr + "-" + timeStr + "-" + caseSubDir + "-" + i;
+		String caseRunName = experiment.getName() + " - " + caseSubDir + " - run " + i + " (" + dateStr + ", " + timeStr.replace('-', ':') + ")";
 
 		// Write XML
 		String xmlPath = appendPathComponent(caseDir, "case." + i + ".gsweep");
@@ -334,6 +355,7 @@ public class GridSweeper
 		jt.setInputPath(":" + stdinPath);
 		jt.setOutputPath(":" + appendPathComponent(caseDir, ".gsweep_out." + i));
 		jt.setErrorPath(":" + appendPathComponent(caseDir, ".gsweep_err." + i));
+		jt.setBlockEmail(true);
 		
 		try
 		{
