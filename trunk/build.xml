@@ -24,7 +24,7 @@
 	
 	<target name="jar" depends="compile" description="Build jar">
 		<manifest file="MANIFEST.MF">
-			<attribute name="Main-Class" value="com.edbaskerville.gridsweeper.GridSweeper"/>
+			<attribute name="Main-Class" value="edu.umich.lsa.cscs.gridsweeper.GridSweeper"/>
 		</manifest>
 
 		<mkdir dir="${classes}"/>
