@@ -122,5 +122,6 @@ public class GridSweeperRunner
 	{
 		OutputStream os = new BufferedOutputStream(new FileOutputStream(filename));
 		os.write(data);
+		os.close();
 	}
 }
