@@ -20,8 +20,8 @@ public class DateUtils
 	public static String getDateString(Calendar cal)
 	{
 		int year = cal.get(Calendar.YEAR);
-		int month = cal.get(Calendar.MONTH);
-		int day = cal.get(Calendar.DAY_OF_MONTH) + 1;
+		int month = cal.get(Calendar.MONTH) + 1;
+		int day = cal.get(Calendar.DAY_OF_MONTH);
 		
 		return format("%d-%02d-%02d", year, month, day);
 	}
