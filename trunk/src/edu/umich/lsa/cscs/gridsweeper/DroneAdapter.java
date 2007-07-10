@@ -146,7 +146,7 @@ public class DroneAdapter implements Adapter
 			arguments.add(setParamOption + name + "=" + parameterMap.get(name));
 		}
 		
-		StringBuilder messageBuilder = new StringBuilder(command);
+		StringBuffer messageBuilder = new StringBuffer(command);
 		for(String arg : arguments)
 		{
 			messageBuilder.append(" " + StringUtils.escape(arg, " "));
