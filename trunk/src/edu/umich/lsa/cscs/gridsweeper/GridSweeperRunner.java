@@ -87,6 +87,20 @@ public class GridSweeperRunner
 				
 				fts.disconnect();
 			}
+			
+			// If file transfer is off, write standard output and standard error
+			// to local files.
+			// If file transfer is on, this will happen at the client end of things
+			if(!useFileTransfer)
+			{
+				String stdoutFilename = "stdout." + runNumber;
+				byte[] stdoutData = results.getStdoutData();
+				writeData(stdoutFilename, stdoutData);
+				
+				String stderrFilename = "stderr." + runNumber;
+				byte[] stderrData = results.getStderrData();
+				writeData(stderrFilename, stderrData);
+			}
 		}
 		catch(Exception e)
 		{
@@ -102,5 +116,11 @@ public class GridSweeperRunner
 			stdoutStream.writeObject(results);
 		}
 		catch(Exception e) {}
+	}
+
+	private static void writeData(String filename, byte[] data) throws IOException
+	{
+		OutputStream os = new BufferedOutputStream(new FileOutputStream(filename));
+		os.write(data);
 	}
 }
