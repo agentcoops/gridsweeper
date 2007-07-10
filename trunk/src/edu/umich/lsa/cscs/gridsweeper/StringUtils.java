@@ -48,7 +48,7 @@ public class StringUtils
 			replacements.put(original, escape(original)); 
 		}
 
-		StringBuilder escapedStringBuilder = new StringBuilder();
+		StringBuffer escapedStringBuilder = new StringBuffer();
 		for(int i = 0; i < string.length(); i++)
 		{
 			String original = string.substring(i, i+1);
