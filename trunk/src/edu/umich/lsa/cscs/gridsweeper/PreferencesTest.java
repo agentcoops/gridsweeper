@@ -5,18 +5,18 @@ import static org.junit.Assert.*;
 
 public class PreferencesTest
 {
-	Preferences preferences;
+	Settings settings;
 	
 	@Before
 	public void setUp()
 	{
-		preferences = Preferences.sharedPreferences();
+		settings = Settings.sharedSettings();
 	}
 	
 	@Test
 	public void setAndGet()
 	{
-		preferences.setProperty("key", "value");
-		assertEquals("value", preferences.getProperty("key"));
+		settings.setProperty("key", "value");
+		assertEquals("value", settings.getProperty("key"));
 	}
 }

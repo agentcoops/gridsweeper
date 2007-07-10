@@ -7,51 +7,36 @@ import edu.umich.lsa.cscs.gridsweeper.parameters.ParameterMap;
 
 /**
  * A class that encapsulates setup data for a model run. Includes a copy of the
- * user preferences to be passed on to the running model, properties for the
- * experiment, file transfer data, run number, random seed, and the adapter
- * class to use.
+ * settings to be passed on to the running model, file transfer data, run number,
+ * random seed, and the adapter class to use.
  * @author Ed Baskerville
  *
  */
 public class RunSetup implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-	private Preferences preferences;
-	private Properties properties;
+	private Settings settings;
 	private StringMap inputFiles;
 	private String fileTransferSubpath;
 	private ParameterMap parameters;
 	private int runNumber;
 	private long rngSeed;
 	private StringList outputFiles;
-	private String adapterClassName;
 	
-	public RunSetup(Preferences preferences, Properties properties, StringMap inputFiles, String fileTransferSubpath, ParameterMap parameters, int runNumber, long rngSeed, StringList outputFiles, String adapterClassName)
+	public RunSetup(Settings settings, StringMap inputFiles, String fileTransferSubpath, ParameterMap parameters, int runNumber, long rngSeed, StringList outputFiles)
 	{
-		this.preferences = preferences;
-		this.properties = properties;
+		this.settings = settings;
 		this.inputFiles = inputFiles;
 		this.fileTransferSubpath = fileTransferSubpath;
 		this.parameters = parameters;
 		this.runNumber = runNumber;
 		this.rngSeed = rngSeed;
 		this.outputFiles = outputFiles;
-		this.adapterClassName = adapterClassName;
-	}
-
-	public String getAdapterClassName()
-	{
-		return adapterClassName;
 	}
 	
-	public Preferences getPreferences()
+	public Settings getSettings()
 	{
-		return preferences;
-	}
-	
-	public Properties getProperties()
-	{
-		return properties;
+		return settings;
 	}
 	
 	public long getRngSeed()
@@ -87,9 +72,7 @@ public class RunSetup implements Serializable
 	public String toString()
 	{
 		HashMap<String, Object> map = new HashMap<String, Object>();
-		map.put("adapterClassName", adapterClassName);
-		map.put("preferences", preferences);
-		map.put("properties", properties);
+		map.put("settings", settings);
 		map.put("inputFiles", inputFiles);
 		map.put("fileTransferSubpath", fileTransferSubpath);
 		map.put("runNumber", "" + runNumber);

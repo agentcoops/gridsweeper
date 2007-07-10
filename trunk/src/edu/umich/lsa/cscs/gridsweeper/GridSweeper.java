@@ -32,7 +32,6 @@ public class GridSweeper
 		EXPERIMENT
 	}
 	
-	static String adapterClassName;
 	static String experimentPath;
 	
 	static String root;
@@ -41,7 +40,8 @@ public class GridSweeper
 	static boolean dryRun;
 	static List<ExperimentCase> cases;
 	
-	static Preferences preferences;
+	static Settings settings;
+	static Settings commandLineSettings;
 	
 	static boolean useFileTransfer;
 	
@@ -61,7 +61,8 @@ public class GridSweeper
 		experiment = null;
 		dryRun = false;
 		
-		preferences = Preferences.sharedPreferences();
+		settings = Settings.sharedSettings();
+		commandLineSettings = new Settings();
 		className = GridSweeper.class.toString();
 		cal = new GregorianCalendar();
 		
@@ -80,7 +81,6 @@ public class GridSweeper
 	{
 		Logger.entering(className, "main");
 		
-		adapterClassName = Preferences.sharedPreferences().getProperty("AdapterClass");
 		experimentPath = null;
 		
 		root = System.getenv("GRIDSWEEPER_ROOT");
@@ -128,7 +128,7 @@ public class GridSweeper
 					else if(arg.equals("-d")) dryRun = true;
 					break;
 				case ADAPTER:
-					adapterClassName = arg;
+					commandLineSettings.put("AdapterClass", arg);
 					state = ArgState.START;
 					break;
 				case EXPERIMENT:
@@ -186,7 +186,7 @@ public class GridSweeper
 	
 	/**
 	 * Runs the experiment. Experiment results are collated in a master experiment directory,
-	 * specified in the user preferences, in a subdirectory tagged with the experiment name
+	 * specified in the user settings, in a subdirectory tagged with the experiment name
 	 * and date/time ({@code <name>/YYYY-MM-DD/hh-mm-ss}). If a shared filesystem is not
 	 * available, files are first staged to the experiment results directory on the
 	 * file transfer system. Then a DRMAA session is established, and each case is submitted.
@@ -197,17 +197,19 @@ public class GridSweeper
 	{
 		Logger.entering(className, "prepare");
 		
-		useFileTransfer = !preferences.getBooleanProperty("UseSharedFileSystem");
+		useFileTransfer = !settings.getBooleanProperty("UseSharedFileSystem");
 
 		FileTransferSystem fts = null;
 		try
 		{
-			Logger.finer("preferences: " + preferences);
+			Logger.finer("settings: " + settings);
 			
 			// Set up file transfer system if asked for
 			if(!dryRun && useFileTransfer)
 			{
-				fts = FileTransferSystemFactory.getFactory().getFileTransferSystem(preferences);
+				String className = settings.getSetting("FileTransferSystemClassName");
+				Settings ftsSettings = settings.getSettingsForClass(className);
+				fts = FileTransferSystemFactory.getFactory().getFileTransferSystem(className, ftsSettings);
 				fts.connect();
 				
 				boolean alreadyExists;
@@ -226,7 +228,7 @@ public class GridSweeper
 			
 		try
 		{
-			String expsDir = expandTildeInPath(preferences.getProperty("ExperimentsDirectory"));
+			String expsDir = expandTildeInPath(settings.getProperty("ExperimentsDirectory"));
 			
 			// First set up big directory for the whole experiment
 			// Located in <experimentDir>/<experimentName>/<experimentDate>/<experimentTime>
@@ -343,9 +345,9 @@ public class GridSweeper
 		
 		// Write setup file
 		String stdinPath = appendPathComponent(caseDir, ".gsweep_in." + i);
-		RunSetup setup = new RunSetup(preferences, experiment.getProperties(),
+		RunSetup setup = new RunSetup(settings,
 				experiment.getInputFiles(), caseSubDir, expCase.getParameterMap(),
-				i, rngSeed, experiment.getOutputFiles(), adapterClassName);
+				i, rngSeed, experiment.getOutputFiles());
 		ObjectOutputStream stdinStream = new ObjectOutputStream(new FileOutputStream(stdinPath));
 		stdinStream.writeObject(setup);
 		

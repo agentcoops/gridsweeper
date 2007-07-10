@@ -1,7 +1,6 @@
 package edu.umich.lsa.cscs.gridsweeper;
 
 import java.lang.reflect.Constructor;
-import java.util.Properties;
 
 /**
  * A factory that creates {@link FileTransferSystem} instances.
@@ -26,27 +25,24 @@ public class FileTransferSystemFactory
 	}
 	
 	/**
-	 * Gets a file transfer system from a {@link Preferences} object. The {@code Preferences}
+	 * Gets a file transfer system from a {@link Settings} object. The {@code Settings}
 	 * object contains the class of the file transfer system as well as any
-	 * system-specific preferences, specified using Java package reverse-DNS naming (e.g.,
+	 * system-specific settings, specified using Java package reverse-DNS naming (e.g.,
 	 * edu.umich.lsa.cscs.gridsweeper.FTPFileTransferSystem.Username).
-	 * @param preferences The preferences object specifying the file transfer system
+	 * @param className TODO
+	 * @param settings The settings object specifying the file transfer system
 	 * and its properties.
 	 * @return A file transfer system.
 	 * @throws FileTransferException If the object could not be created.
 	 */
-	public FileTransferSystem getFileTransferSystem(Preferences preferences) throws FileTransferException
+	public FileTransferSystem getFileTransferSystem(String className, Settings settings) throws FileTransferException
 	{
-		String className = preferences.getProperty("FileTransferSystemClass");
-		
-		Properties ftsProperties = preferences.getPropertiesForClass(className);
-		
 		try
 		{
-			Class ftsClass = Class.forName(preferences.getProperty("FileTransferSystemClass"));
-			Class[] parameterTypes = new Class[] { Properties.class };
+			Class ftsClass = Class.forName(settings.getProperty("FileTransferSystemClass"));
+			Class[] parameterTypes = new Class[] { Settings.class };
 			Constructor constructor = ftsClass.getConstructor(parameterTypes);
-			Object[] initargs = new Object[] { ftsProperties };
+			Object[] initargs = new Object[] { settings };
 			FileTransferSystem fts = (FileTransferSystem)constructor.newInstance(initargs);
 			
 			return fts;

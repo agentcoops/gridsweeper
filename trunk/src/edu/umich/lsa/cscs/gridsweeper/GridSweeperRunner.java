@@ -1,6 +1,5 @@
 package edu.umich.lsa.cscs.gridsweeper;
 
-import java.util.*;
 import java.io.*;
 
 import static edu.umich.lsa.cscs.gridsweeper.StringUtils.*;
@@ -32,15 +31,17 @@ public class GridSweeperRunner
 			ObjectInputStream stdinStream = new ObjectInputStream(System.in);
 			RunSetup setup = (RunSetup)stdinStream.readObject();
 			
-			// Get GridSweeper preferences
-			Preferences preferences = setup.getPreferences();
+			// Get GridSweeper settings
+			Settings settings = setup.getSettings();
 			
 			// Download input files
-			boolean useFileTransfer = !preferences.getBooleanProperty("UseSharedFileSystem");
+			boolean useFileTransfer = !settings.getBooleanProperty("UseSharedFileSystem");
 			FileTransferSystem fts = null;
 			if(useFileTransfer)
 			{
-				fts = FileTransferSystemFactory.getFactory().getFileTransferSystem(preferences);
+				String className = settings.getSetting("FileTransferSystemClassName");
+				Settings ftsSettings = settings.getSettingsForClass(className);
+				fts = FileTransferSystemFactory.getFactory().getFileTransferSystem(className, ftsSettings);
 				fts.connect();
 				
 				StringMap inputFiles = setup.getInputFiles();
@@ -59,9 +60,9 @@ public class GridSweeperRunner
 				fts.disconnect();
 			}
 			
-			String adapterClassName = setup.getAdapterClassName();
-			Properties properties = setup.getProperties();
-			Adapter adapter = AdapterFactory.createAdapter(adapterClassName, properties);
+			String adapterClassName = settings.getSetting("AdapterClass");
+			Settings adapterSettings = settings.getSettingsForClass(adapterClassName);
+			Adapter adapter = AdapterFactory.createAdapter(adapterClassName, adapterSettings);
 			
 			// Run!
 			ParameterMap parameters = setup.getParameters();

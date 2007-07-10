@@ -37,13 +37,13 @@ public class FTPFileTransferSystemTest
 	@Before
 	public void setUp() throws Exception
 	{
-		Properties properties = new Properties();
-		properties.setProperty("Hostname", "localhost");
-		properties.setProperty("Username", "gsweep");
-		properties.setProperty("Password", "gridsweeper");
-		properties.setProperty("Directory", "ftp");
+		Settings settings = new Settings();
+		settings.setProperty("Hostname", "localhost");
+		settings.setProperty("Username", "gsweep");
+		settings.setProperty("Password", "gridsweeper");
+		settings.setProperty("Directory", "ftp");
 		
-		ftpFS = new FTPFileTransferSystem(properties);
+		ftpFS = new FTPFileTransferSystem(settings);
 	}
 	
 	@Test

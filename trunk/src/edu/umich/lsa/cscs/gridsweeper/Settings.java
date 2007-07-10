@@ -4,13 +4,13 @@ import java.util.*;
 import java.io.*;
 
 /**
- * <p>A class to handle user preferences. Provides a shared instance that
- * includes standard values for user preferences. Preferences for plugins
+ * <p>A class to handle user settings. Provides a shared instance that
+ * includes standard values for user settings. Settings for plugins
  * are scoped using their reverse-DNS class names, e.g.,
  * {@code edu.umich.lsa.cscs.gridsweeper.FTPFileTransferSystem.Username}.
- * {@code Preferences} is a subclass of {@code java.util.Properties},
+ * {@code Settings} is a subclass of {@code java.util.Properties},
  * and simply adds default values and a couple convenience methods.
- * Preferences included by default:</p>
+ * Settings included by default:</p>
  * 
  * <table>
  * 
@@ -46,17 +46,17 @@ import java.io.*;
  * @author Ed Baskerville
  *
  */
-public class Preferences extends Properties
+public class Settings extends Properties
 {
 	private static final long serialVersionUID = 1L;
 	
-	static Preferences sharedPreferences;
+	static Settings sharedSettings;
 	
 	/** 
 	 * Default constructor, simply calls the superclass implementation.
 	 *
 	 */
-	public Preferences()
+	public Settings()
 	{
 		super();
 	}
@@ -65,21 +65,21 @@ public class Preferences extends Properties
 	 * One-argument constructor with defaults, simpily calls the superclass implementation.
 	 * @param defaults
 	 */
-	public Preferences(Preferences defaults)
+	public Settings(Properties defaults)
 	{
 		super(defaults);
 	}
 	
 	/**
-	 * Returns the shared preferences object, creating it if it does not yet exist.
+	 * Returns the shared settings object, creating it if it does not yet exist.
 	 * Upon initial creation, the object is initialized with hard-coded default values.
-	 * @return The shared preferences object.
+	 * @return The shared settings object.
 	 */
-	public static Preferences sharedPreferences()
+	public static Settings sharedSettings()
 	{
-		if(sharedPreferences == null)
+		if(sharedSettings == null)
 		{
-			Preferences defaults = new Preferences();
+			Settings defaults = new Settings();
 			
 			defaults.setProperty("RootDirectory", "/usr/local/gridsweeper");
 			defaults.setProperty("ExperimentsDirectory", "~/Experiments");
@@ -91,18 +91,18 @@ public class Preferences extends Properties
 			
 			defaults.setProperty("edu.umich.lsa.cscs.gridsweeper.FTPFileTransferSystem.Username", "anonymous");
 			
-			sharedPreferences = new Preferences(defaults);
+			sharedSettings = new Settings(defaults);
 			try
 			{
-				sharedPreferences.load(new FileInputStream(System.getProperty("user.home") + "/.gridsweeper"));
-				Logger.fine("Loaded user preferences:");
-				Logger.fine(sharedPreferences.toString());
+				sharedSettings.load(new FileInputStream(System.getProperty("user.home") + "/.gridsweeper"));
+				Logger.fine("Loaded user settings:");
+				Logger.fine(sharedSettings.toString());
 			}
 			catch(FileNotFoundException e) {}
 			catch(IOException e) {}
 		}
 		
-		return sharedPreferences;
+		return sharedSettings;
 	}
 	
 	/**
@@ -119,17 +119,17 @@ public class Preferences extends Properties
 	}
 	
 	/**
-	 * Extracts all the preferences specific to a given class and returns them
-	 * in a new {@code Properties} object with the class prefix removed from 
-	 * the key.
+	 * Extracts all the settings specific to a given class and returns them
+	 * in a new {@code Settings} object with the class prefix removed from 
+	 * keys.
 	 * @param className The name of the class.
-	 * @return The properties object for this class.
+	 * @return The settings object for this class.
 	 */
-	public Properties getPropertiesForClass(String className)
+	public Settings getSettingsForClass(String className)
 	{
-		Logger.finer("Getting properties for class " + className);
+		Logger.finer("Getting settings for class " + className);
 		
-		Properties properties = new Properties();
+		Settings settings = new Settings();
 		String classNamePlusDot = className + ".";
 		
 		for(Object key : keySet())
@@ -139,10 +139,15 @@ public class Preferences extends Properties
 			if(propName.indexOf(classNamePlusDot) == 0)
 			{
 				String shortKey = propName.substring(classNamePlusDot.length());
-				properties.setProperty(shortKey, getProperty(propName));
+				settings.setProperty(shortKey, getProperty(propName));
 			}
 		}
 		
-		return properties;
+		return settings;
+	}
+	
+	public String getSetting(String name)
+	{
+		return getProperty(name);
 	}
 }

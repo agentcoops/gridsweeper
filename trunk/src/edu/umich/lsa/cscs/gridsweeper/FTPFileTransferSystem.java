@@ -1,7 +1,6 @@
 package edu.umich.lsa.cscs.gridsweeper;
 
 import java.io.*;
-import java.util.*;
 import org.apache.commons.net.ftp.*;
 
 import static edu.umich.lsa.cscs.gridsweeper.StringUtils.*;
@@ -54,27 +53,27 @@ public class FTPFileTransferSystem implements FileTransferSystem
 	
 	/**
 	 * Initializes an FTP file transfer system.
-	 * @param properties The properties for the file transfer system.
+	 * @param settings The settings for the file transfer system.
 	 * @throws FileTransferException If the hostname is not specified.
 	 */
-	public FTPFileTransferSystem(Properties properties) throws FileTransferException
+	public FTPFileTransferSystem(Settings settings) throws FileTransferException
 	{
-		Logger.finer("properties: " + properties);
+		Logger.finer("settings: " + settings);
 		
-		hostname = properties.getProperty("Hostname");
+		hostname = settings.getProperty("Hostname");
 		if(hostname == null) throw new FileTransferException("Cannot initialize FTP file system without hostname.");
 		
-		String portStr = properties.getProperty("Port");
+		String portStr = settings.getProperty("Port");
 		if(portStr != null)
 		{
-			port = Integer.parseInt(properties.getProperty("Port"));
+			port = Integer.parseInt(settings.getProperty("Port"));
 		}
 		else port = 0;
 		
-		username = properties.getProperty("Username");
-		password = properties.getProperty("Password");
+		username = settings.getProperty("Username");
+		password = settings.getProperty("Password");
 		
-		directory = properties.getProperty("Directory");
+		directory = settings.getProperty("Directory");
 		
 		ftpClient = new FTPClient();
 	}
