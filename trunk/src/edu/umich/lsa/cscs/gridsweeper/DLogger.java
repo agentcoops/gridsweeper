@@ -198,6 +198,7 @@ public class DLogger
 		{
 			fileHandler = new FileHandler(pattern);
 			fileHandler.setLevel(level);
+			logger.addHandler(fileHandler);
 		}
 		catch(Exception e)
 		{
