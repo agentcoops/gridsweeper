@@ -252,10 +252,10 @@ public class ExperimentXMLHandler extends DefaultHandler
 				if(top != Tag.OUTPUT)
 					throw new SAXException("mismatched input end tag");
 			}
-			else if(qName.equals("property"))
+			else if(qName.equals("setting"))
 			{
 				if(top != Tag.SETTING)
-					throw new SAXException("mismatched property end tag");
+					throw new SAXException("mismatched setting end tag");
 			}
 			else if(qName.equals("abbrev"))
 			{
