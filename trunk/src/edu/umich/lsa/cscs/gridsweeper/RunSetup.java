@@ -83,4 +83,19 @@ public class RunSetup implements Serializable
 	{
 		return fileTransferSubpath;
 	}
+	
+	public String toString()
+	{
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("adapterClassName", adapterClassName);
+		map.put("preferences", preferences);
+		map.put("properties", properties);
+		map.put("inputFiles", inputFiles);
+		map.put("fileTransferSubpath", fileTransferSubpath);
+		map.put("runNumber", "" + runNumber);
+		map.put("rngSeed", "" + rngSeed);
+		map.put("outputFiles", outputFiles);
+		
+		return map.toString();
+	}
 }
