@@ -8,8 +8,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.*;
+import java.util.logging.*;
 import static edu.umich.lsa.cscs.gridsweeper.StringUtils.*;
 import static edu.umich.lsa.cscs.gridsweeper.DateUtils.*;
+import static edu.umich.lsa.cscs.gridsweeper.DLogger.*;
 
 /**
  * The GridSweeper command-line tool for job submission. Takes a .gsweep
@@ -79,7 +81,10 @@ public class GridSweeper
 	 */
 	public static void main(String[] args) throws GridSweeperException
 	{
-		Logger.entering(className, "main");
+		// Set up logging to /tmp/gridsweeper.log
+		DLogger.addFileHandler(Level.ALL, "%t/gridsweeper.log");
+		
+		entering(className, "main");
 		
 		experimentPath = null;
 		
@@ -108,7 +113,7 @@ public class GridSweeper
 		// Wait for job completion
 		finish();
 		
-		Logger.exiting(className, "main");
+		exiting(className, "main");
 	}
 	
 	/**
@@ -118,7 +123,7 @@ public class GridSweeper
 	 */
 	private static void parseArgs(String[] args)
 	{
-		Logger.entering(className, "parseArgs");
+		entering(className, "parseArgs");
 		
 		ArgState state = ArgState.START;
 		
@@ -142,7 +147,7 @@ public class GridSweeper
 			}
 		}
 		
-		Logger.exiting(className, "parseArgs");
+		exiting(className, "parseArgs");
 	}
 	
 	/**
@@ -152,7 +157,7 @@ public class GridSweeper
 	 */
 	private static void loadExperiment() throws GridSweeperException
 	{
-		Logger.entering(className, "loadExperiment");
+		entering(className, "loadExperiment");
 		
 		if(experimentPath == null)
 		{
@@ -168,7 +173,7 @@ public class GridSweeper
 			throw new GridSweeperException("Could not load experiment file.", e);
 		}
 		
-		Logger.exiting(className, "loadExperiment");
+		exiting(className, "loadExperiment");
 	}
 	
 	/**
@@ -199,14 +204,14 @@ public class GridSweeper
 	 */
 	private static void run() throws GridSweeperException
 	{
-		Logger.entering(className, "prepare");
+		entering(className, "prepare");
 		
 		useFileTransfer = !settings.getBooleanProperty("UseSharedFileSystem");
 
 		FileTransferSystem fts = null;
 		try
 		{
-			Logger.finer("settings: " + settings);
+			finer("settings: " + settings);
 			
 			// Set up file transfer system if asked for
 			if(!dryRun && useFileTransfer)
@@ -242,7 +247,7 @@ public class GridSweeper
 			String expSubDir = String.format("%s%s%s%s%s", expName, getFileSeparator(), dateStr, getFileSeparator(), timeStr);
 			
 			expDir = appendPathComponent(expsDir, expSubDir);
-			Logger.finer("Experiment subdirectory: " + expDir);
+			finer("Experiment subdirectory: " + expDir);
 			
 			File expDirFile = new File(expDir);
 			expDirFile.mkdirs();
@@ -297,7 +302,7 @@ public class GridSweeper
 			throw new GridSweeperException("Could not run experiments", e);
 		}
 		
-		Logger.exiting(className, "prepare");
+		exiting(className, "prepare");
 	}
 	
 	/**
@@ -312,7 +317,7 @@ public class GridSweeper
 	{		
 		String caseSubDir = experiment.getDirectoryNameForCase(expCase);
 		String caseDir = appendPathComponent(expDir, caseSubDir);
-		Logger.finer("Case subdirectory: " + caseDir);
+		finer("Case subdirectory: " + caseDir);
 		
 		File caseDirFile = new File(caseDir);
 		caseDirFile.mkdirs();

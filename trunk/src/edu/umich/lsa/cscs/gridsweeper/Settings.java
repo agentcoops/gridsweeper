@@ -2,6 +2,7 @@ package edu.umich.lsa.cscs.gridsweeper;
 
 import java.util.*;
 import java.io.*;
+import static edu.umich.lsa.cscs.gridsweeper.DLogger.*;
 
 /**
  * <p>A class to handle user settings. Provides a shared instance that
@@ -95,8 +96,8 @@ public class Settings extends Properties
 			try
 			{
 				sharedSettings.load(new FileInputStream(System.getProperty("user.home") + "/.gridsweeper"));
-				Logger.fine("Loaded user settings:");
-				Logger.fine(sharedSettings.toString());
+				fine("Loaded user settings:");
+				fine(sharedSettings.toString());
 			}
 			catch(FileNotFoundException e) {}
 			catch(IOException e) {}
@@ -127,7 +128,7 @@ public class Settings extends Properties
 	 */
 	public Settings getSettingsForClass(String className)
 	{
-		Logger.finer("Getting settings for class " + className);
+		finer("Getting settings for class " + className);
 		
 		Settings settings = new Settings();
 		String classNamePlusDot = className + ".";
@@ -135,7 +136,7 @@ public class Settings extends Properties
 		for(Object key : keySet())
 		{
 			String propName = (String)key;
-			Logger.finer("checking property " + propName);
+			finer("checking property " + propName);
 			if(propName.indexOf(classNamePlusDot) == 0)
 			{
 				String shortKey = propName.substring(classNamePlusDot.length());

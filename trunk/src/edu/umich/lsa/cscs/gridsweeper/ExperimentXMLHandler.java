@@ -9,7 +9,7 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import edu.umich.lsa.cscs.gridsweeper.parameters.*;
 
-import static edu.umich.lsa.cscs.gridsweeper.Logger.*;
+import static edu.umich.lsa.cscs.gridsweeper.DLogger.*;
 
 /**
  * The SAX-based XML parser for experiment XML (.gsweep) files.

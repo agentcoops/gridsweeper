@@ -7,18 +7,19 @@ import java.util.logging.*;
  * @author Ed Baskerville
  *
  */
-public class Logger
+public class DLogger
 {
-	private static java.util.logging.Logger logger;
+	private static Logger logger;
+	private static ConsoleHandler consoleHandler;
+	private static FileHandler fileHandler;
 	
 	static
 	{
 		logger = java.util.logging.Logger.getLogger("edu.umich.lsa.cscs.gridsweeper");
 		logger.setLevel(Level.ALL);
 		
-		ConsoleHandler handler = new ConsoleHandler();
-		handler.setLevel(Level.ALL);
-		logger.addHandler(handler);
+		consoleHandler = null;
+		fileHandler = null;
 	}
 	
 	public static java.util.logging.Logger getLogger()
@@ -156,4 +157,61 @@ public class Logger
 		logger.warning(msg);
 	}
 	
+	/**
+	 * Creates a logging handler that outputs to stderr, and sets its logging level.
+	 * If one already exists, this method just sets the level of the existing handler.
+	 * @param level The logging level to output to stderr.
+	 */
+	public static void addConsoleHandler(Level level)
+	{
+		if(consoleHandler == null)
+		{
+			consoleHandler = new ConsoleHandler();
+			logger.addHandler(consoleHandler);
+		}		
+		consoleHandler.setLevel(level);
+	}
+	
+	
+	public static void removeConsoleHandler()
+	{
+		if(consoleHandler != null)
+		{
+			logger.removeHandler(consoleHandler);
+			consoleHandler = null;
+		}
+	}
+	
+	/**
+	 * Creates a logging handler that outputs to a file, and sets its logging level.
+	 * If one already exists, this method replaces the existing one.
+	 * @param pattern A pattern for the filename, as described in the {@code java.util.logging.Logger} documentation.
+	 */
+	public static void addFileHandler(Level level, String pattern)
+	{
+		if(fileHandler != null)
+		{
+			logger.removeHandler(fileHandler);
+			fileHandler = null;
+		}
+		try
+		{
+			fileHandler = new FileHandler(pattern);
+			fileHandler.setLevel(level);
+		}
+		catch(Exception e)
+		{
+			fileHandler = null;
+			e.printStackTrace();
+		}
+	}
+	
+	public static void removeFileHandler()
+	{
+		if(fileHandler != null)
+		{
+			logger.removeHandler(fileHandler);
+			fileHandler =  null;
+		}
+	}
 }
