@@ -22,7 +22,7 @@ public class ExperimentTestParse
 	{
 		experiment = new Experiment(getURL("properties"));
 		assertEquals(10, experiment.getNumRuns());
-		assertEquals("value", experiment.getProperties().get("anotherProperty"));
+		assertEquals("value", experiment.getSettings().get("anotherProperty"));
 	}
 	
 	@Test

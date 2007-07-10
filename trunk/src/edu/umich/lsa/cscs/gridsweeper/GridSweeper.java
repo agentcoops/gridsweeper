@@ -95,6 +95,10 @@ public class GridSweeper
 		// Load experiment file
 		loadExperiment();
 		
+		// Combine settings from command-line arguments and experiment
+		settings.putAll(experiment.getSettings());
+		settings.putAll(commandLineSettings);
+		
 		// Generate experiment cases, etc.
 		setUpExperiment();
 		

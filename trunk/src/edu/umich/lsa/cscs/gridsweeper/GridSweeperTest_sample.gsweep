@@ -2,8 +2,8 @@
 
 <experiment name="sample" numRuns="2">
 	
-	<property key="edu.umich.lsa.cscs.gridsweeper.DroneAdapter.command" value="/bin/echo" />
-	<property key="edu.umich.lsa.cscs.gridsweeper.DroneAdapter.miscOptions" value="-n" />
+	<setting key="edu.umich.lsa.cscs.gridsweeper.DroneAdapter.command" value="/bin/echo" />
+	<setting key="edu.umich.lsa.cscs.gridsweeper.DroneAdapter.miscOptions" value="-n" />
 	
 	<abbrev param="alpha" abbrev="a" />
 	<abbrev param="beta" abbrev="b" />

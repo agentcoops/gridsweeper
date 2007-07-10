@@ -2,6 +2,6 @@
 
 <experiment name="test_properties" numRuns="10">
 	
-	<property key="anotherProperty" value="value" />
+	<setting key="anotherSetting" value="value" />
 
 </experiment>

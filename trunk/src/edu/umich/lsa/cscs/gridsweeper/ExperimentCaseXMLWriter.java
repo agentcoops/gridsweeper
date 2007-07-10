@@ -98,7 +98,7 @@ public class ExperimentCaseXMLWriter
 	 */
 	private void printProperties()
 	{
-		Properties properties = experiment.getProperties();
+		Properties properties = experiment.getSettings();
 		
 		for(Object settingObj : properties.keySet())
 		{
