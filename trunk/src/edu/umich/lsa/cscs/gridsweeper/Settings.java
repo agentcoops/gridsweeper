@@ -4,6 +4,8 @@ import java.util.*;
 import java.io.*;
 import static edu.umich.lsa.cscs.gridsweeper.DLogger.*;
 
+// TODO: make settings objects case-insensitive by overriding setProperty, getProperty, etc.
+
 /**
  * <p>A class to handle user settings. Provides a shared instance that
  * includes standard values for user settings. Settings for plugins
@@ -32,7 +34,7 @@ import static edu.umich.lsa.cscs.gridsweeper.DLogger.*;
  * </tr>
  * 
  * <tr>
- * <td>@{code UseSharedFileSystem}</td> <td>{@code true}</td>
+ * <td>@{code UseFileTransfer}</td> <td>{@code false}</td>
  * </tr>
  * 
  * <tr>
@@ -87,7 +89,7 @@ public class Settings extends Properties
 			
 			defaults.setProperty("AdapterClass", "edu.umich.lsa.cscs.gridsweeper.DroneAdapter");
 			
-			defaults.setProperty("UseSharedFileSystem", "true");
+			defaults.setProperty("UseFileTransfer", "false");
 			defaults.setProperty("FileTransferSystemClass", "edu.umich.lsa.cscs.gridsweeper.FTPFileTransferSystem");
 			
 			defaults.setProperty("edu.umich.lsa.cscs.gridsweeper.FTPFileTransferSystem.Username", "anonymous");

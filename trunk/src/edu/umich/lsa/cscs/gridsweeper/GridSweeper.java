@@ -16,7 +16,11 @@ import static edu.umich.lsa.cscs.gridsweeper.DLogger.*;
 /**
  * The GridSweeper command-line tool for job submission. Takes a .gsweep
  * XML experiment file and submits it to the grid for execution via DRMAA.
- * Warning: Written on a houseboat in Paris. May still contain strange French bugs.
+ * Warning: begun on a houseboat in Paris. May still contain strange French bugs.
+ * 
+ * TODO: Refactor all functionality into a class that can be reused for
+ * both the command-line tool and graphical application.
+ * 
  * @author Ed Baskerville
  *
  */
@@ -31,21 +35,34 @@ public class GridSweeper
 	{
 		START,
 		ADAPTER,
-		EXPERIMENT
+		COMMAND,
+		INPUT,
+		OUTPUT,
+		RUNTYPE
 	}
 	
-	static String experimentPath;
+	enum RunType
+	{
+		RUN,
+		DRY,
+		NORUN
+	}
 	
-	static String root;
+	static String experimentPath = null;
+	static String outputPath = null;
 	
-	static Experiment experiment;
-	static boolean dryRun;
-	static List<ExperimentCase> cases;
+	static String root = null;
+	
+	static Experiment experiment = null;
+	static RunType runType = RunType.RUN;
+	static List<ExperimentCase> cases = null;
 	
 	static Settings settings;
 	static Settings commandLineSettings;
+	static Settings commandLineAdapterSettings;
+	static Settings commandLineFileTransferSettings;
 	
-	static boolean useFileTransfer;
+	static boolean useFileTransfer = false;
 	
 	static String className;
 	static Calendar cal;
@@ -54,21 +71,18 @@ public class GridSweeper
 	static String timeStr;
 	static String expDir;
 	
-	static String fileTransferSubpath;
+	static String fileTransferSubpath = null;
 	
 	static Session drmaaSession;
 	
 	static
 	{
-		experiment = null;
-		dryRun = false;
-		
 		settings = Settings.sharedSettings();
 		commandLineSettings = new Settings();
+		commandLineAdapterSettings = new Settings();
+		commandLineFileTransferSettings = new Settings();
 		className = GridSweeper.class.toString();
 		cal = new GregorianCalendar();
-		
-		fileTransferSubpath = null;
 	}
 	
 	/**
@@ -85,8 +99,6 @@ public class GridSweeper
 		DLogger.addFileHandler(Level.ALL, "%t/gridsweeper.log");
 		
 		entering(className, "main");
-		
-		experimentPath = null;
 		
 		root = System.getenv("GRIDSWEEPER_ROOT");
 		if(root == null)
@@ -108,20 +120,124 @@ public class GridSweeper
 		setUpExperiment();
 		
 		// Run jobs
-		run();
-
-		// Wait for job completion
-		finish();
+		if(runType != RunType.NORUN)
+		{
+			run();
+	
+			// Wait for job completion
+			finish();
+		}
 		
 		exiting(className, "main");
 	}
 	
 	/**
-	 * Parses command-line arguments. Currently only handles -a (adapter class),
-	 * -e (experiment file path), and -d (whether to perform a dry run).
+	 * <p>Parses command-line arguments. Currently only handles -a (adapter class),
+	 * -e (experiment file path), and -d (whether to perform a dry run).</p>
+	 * 
+	 * <table valign="top">
+	 * 
+	 * <tr>
+	 * <td><b>Switch</b></td>
+	 * <td><b>Description</b></td>
+	 * </tr>
+	 * 
+	 * <tr>
+	 * <td>-a, --adapter</td>
+	 * <td>
+	 * Adapter class name, e.g., {@code edu.umich.lsa.cscs.gridsweeper.DroneAdapter}.
+	 * Only the first {@code -a} argument will be used. When GridSweeper is run
+	 * using the {@code gdrone} tool, {@code -a} is already provided, and any
+	 * provided by the user will be ignored.
+	 * </td>
+	 * </tr>
+	 *
+	 * <tr>
+	 * <td>-c, --command</td>
+	 * <td>
+	 * Command (model executable path) to run. In effect, this sets the "command"
+	 * setting in the adapter domain, e.g.,
+	 * {@code edu.umich.lsa.cscs.gridsweeper.Drone.command}, so if the adapter class
+	 * does not support the "command" setting, this argument has no effect.
+	 * </td>
+	 * </tr>
+	 * 
+	 * <tr>
+	 * <td>-i, --input</td>
+	 * <td>
+	 * Path to experiment XML input file. This is usually required,
+	 * but can theoretically be left out if all the necessary experiment
+	 * information is provided with other command-line switches—for the
+	 * Drone adapter, this would mean that {@code -c} and {@code -n}
+	 * would be required, among others. Note that command-line settings
+	 * override any settings made in the experiment XML file, which
+	 * in turn override any settings in the user’s {@code ~/.gridsweeper}
+	 * configuration file.
+	 * </td>
+	 * </tr>
+	 * 
+	 * <tr>
+	 * <td>-o, --output</td>
+	 * <td>
+	 * <p>Path at which experiment XML should be written. The outputted file
+	 * will contain all the settings needed to re-run the experiment using
+	 * <br/><br/>
+	 * {@code gsweep -e <experimentXMLPath>}
+	 * <br/><br/>
+	 * and nothing else. This will <em>not</em> be an exact replica of this
+	 * run, because the seed for GridSweeper’s random number generator will
+	 * be generated at runtime. A file that will be able to produce an
+	 * <em>exact</em> reproduction of this experiment will be generated
+	 * in the experiment results directory.</p>
+	 * <p>
+	 * All settings will be written out to this file, including those
+	 * set in the user’s {@code ~/.gridsweeper} configuration file,
+	 * in the input experiment file, and those set at the command line,
+	 * so that the above command should re-run the experiment as before
+	 * unless some setting in the {@code ~/.gridsweeper} changes the behavior. 
+	 * </p>
+	 * </td>
+	 * </tr>
+	 * 
+	 * <tr>
+	 * <td>-r, --runtype</td>
+	 * <td>
+	 * <p>Run style, either {@code run}, {@code dry}, or {@code norun}.
+	 * Defaults to {@code run}. If {@code dry} is specified, a “dry run”
+	 * is performed, simulating the parameter sweep without actually 
+	 * submitting jobs to the grid to be run. Output directories are created
+	 * and are populated with case files needed to reproduce each case,
+	 * so you can test that all the parameter settings are correct before
+	 * running the experiment for real. If {@code norun} is specified,
+	 * the only effect of this command will be to generate a new experiment
+	 * XML file as provided with the {@code -o} option.
+	 * </td>
+	 * </tr>
+	 * 
+	 * <tr>
+	 * <td><em>param</em>=<em>value</em></td>
+	 * <td>
+	 * Sets a fixed parameter <em>param</em> to value <em>value</em>,
+	 * valid for all runs of the model.
+	 * </td>
+	 * </tr>
+	 * 
+	 * <tr>
+	 * <td><em>param</em>=<em>start</em>:<em>incr</em>:<em>end</em></td>
+	 * <td>
+	 * Sweeps parameter <em>param</em>, starting at value <em>start</em>
+	 * and incrementing by <em>incr</em> until the value is greater than
+	 * <em>end</em>. The value <em>end</em> is only used, then, if it is
+	 * exactly a multiple of <em>incr</em> greater than <em>start</em>.
+	 * (Rounding error is not a problem, because an infinite-precision
+	 * decimal number representation is used.)   
+	 * </td>
+	 * </tr>
+	 * 
+	 * </table>
 	 * @param args Command-line arguments.
 	 */
-	private static void parseArgs(String[] args)
+	private static void parseArgs(String[] args) throws GridSweeperException
 	{
 		entering(className, "parseArgs");
 		
@@ -132,17 +248,47 @@ public class GridSweeper
 			switch(state)
 			{
 				case START:
-					if(arg.equals("-a")) state = ArgState.ADAPTER;
-					else if(arg.equals("-e")) state = ArgState.EXPERIMENT;
-					else if(arg.equals("-d")) dryRun = true;
+					if(arg.equals("-a") || arg.equals("--adapter")) state = ArgState.ADAPTER;
+					else if(arg.equals("-c") || arg.equals("--command")) state = ArgState.COMMAND;
+					else if(arg.equals("-i") || arg.equals("--input")) state = ArgState.INPUT;
+					else if(arg.equals("-o") || arg.equals("--output")) state = ArgState.OUTPUT;
+					else if(arg.equals("-r") || arg.equals("--runtype")) state = ArgState.RUNTYPE;
 					break;
 				case ADAPTER:
-					commandLineSettings.put("AdapterClass", arg);
+					if(!commandLineSettings.contains("AdapterClass"))
+						commandLineSettings.put("AdapterClass", arg);
 					state = ArgState.START;
 					break;
-				case EXPERIMENT:
+				case COMMAND:
+					if(!commandLineSettings.contains("command"))
+						commandLineSettings.put("command", arg);
+					state = ArgState.START;
+					break;
+				case INPUT:
 					experimentPath = arg;
 					state = ArgState.START;
+					break;
+				case OUTPUT:
+					outputPath = arg;
+					state = ArgState.START;
+					break;
+				case RUNTYPE:
+					if(arg.equalsIgnoreCase("run"))
+					{
+						runType = RunType.RUN;
+					}
+					else if(arg.equals("dry"))
+					{
+						runType = RunType.DRY;
+					}
+					else if(arg.equals("norun"))
+					{
+						runType = RunType.NORUN;
+					}
+					else
+					{
+						throw new GridSweeperException("Invalid run type " + arg + "specified.");
+					}
 					break;
 			}
 		}
@@ -182,7 +328,11 @@ public class GridSweeper
 	 */
 	private static void setUpExperiment() throws GridSweeperException
 	{
-		try
+		// TODO: add parameter settings loaded from command line to experiment.
+
+		// TODO: output XML experiment file, if provided by -o
+		
+		if(runType != RunType.NORUN) try
 		{
 			// Assemble cases
 			cases = experiment.generateCases(new Random());
@@ -206,7 +356,7 @@ public class GridSweeper
 	{
 		entering(className, "prepare");
 		
-		useFileTransfer = !settings.getBooleanProperty("UseSharedFileSystem");
+		useFileTransfer = settings.getBooleanProperty("UseFileTransfer");
 
 		FileTransferSystem fts = null;
 		try
@@ -214,7 +364,7 @@ public class GridSweeper
 			finer("settings: " + settings);
 			
 			// Set up file transfer system if asked for
-			if(!dryRun && useFileTransfer)
+			if(runType==RunType.RUN && useFileTransfer)
 			{
 				String className = settings.getSetting("FileTransferSystemClassName");
 				Settings ftsSettings = settings.getSettingsForClass(className);
@@ -261,7 +411,7 @@ public class GridSweeper
 		{
 			// If file transfer is on, make the directory
 			// and upload input files
-			if(!dryRun && useFileTransfer)
+			if(runType==RunType.RUN && useFileTransfer)
 			{
 				String inputDir = appendPathComponent(fileTransferSubpath, "input");
 				fts.makeDirectory(inputDir);
@@ -284,7 +434,7 @@ public class GridSweeper
 			
 		try
 		{
-			if(!dryRun)
+			if(runType==RunType.RUN)
 			{
 				// Establish DRMAA session
 				drmaaSession = SessionFactory.getFactory().getSession();
@@ -399,6 +549,15 @@ public class GridSweeper
 	 */
 	private static void finish() throws GridSweeperException
 	{
+		// TODO: wait for all jobs to complete, giving notification
+		// as each one arrives
+		// TODO: provide mechanism to detach this session to the background,
+		// in some way that works even if the user logs out
+		// This is a bit like a daemon, so cf:
+		// http://pezra.barelyenough.org/blog/2005/03/java-daemon/
+		// http://wrapper.tanukisoftware.org/doc/english/prop-daemonize.html
+		// TODO: upon full completion, send an email to the user
+		
 		try
 		{
 			drmaaSession.exit();
