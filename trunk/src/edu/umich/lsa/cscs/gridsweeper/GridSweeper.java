@@ -289,16 +289,8 @@ public class GridSweeper
 					{
 						singleValueSweepMatcher.reset(arg);
 						rangeSweepMatcher.reset(arg);
-						
-						if(singleValueSweepMatcher.matches())
-						{
-							String name = singleValueSweepMatcher.group(1);
-							String value = singleValueSweepMatcher.group(2);
-							fine("Matched parameter " + name + "=" + value);
-							
-							commandLineSweeps.add(new SingleValueSweep(name, value));
-						}
-						else if(rangeSweepMatcher.matches())
+
+						if(rangeSweepMatcher.matches())
 						{
 							String name = rangeSweepMatcher.group(1);
 							BigDecimal start = new BigDecimal(rangeSweepMatcher.group(2));
@@ -306,6 +298,14 @@ public class GridSweeper
 							BigDecimal end = new BigDecimal(rangeSweepMatcher.group(4));
 							
 							commandLineSweeps.add(new RangeListSweep(name, start, end, incr));
+						}
+						else if(singleValueSweepMatcher.matches())
+						{
+							String name = singleValueSweepMatcher.group(1);
+							String value = singleValueSweepMatcher.group(2);
+							fine("Matched parameter " + name + "=" + value);
+							
+							commandLineSweeps.add(new SingleValueSweep(name, value));
 						}
 					}
 					break;
