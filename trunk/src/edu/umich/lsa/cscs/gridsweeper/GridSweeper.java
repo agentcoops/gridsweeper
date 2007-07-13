@@ -91,6 +91,8 @@ public class GridSweeper
 		className = GridSweeper.class.toString();
 		cal = new GregorianCalendar();
 		
+		commandLineSweeps = new ArrayList<Sweep>();
+		
 		singleValueSweepMatcher = Pattern.compile("(\\S+)\\s*=\\s*(\\S+)").matcher("");
 	}
 	
