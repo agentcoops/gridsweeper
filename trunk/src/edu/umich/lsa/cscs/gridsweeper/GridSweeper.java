@@ -9,6 +9,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.logging.*;
 import java.util.regex.*;
@@ -81,6 +82,7 @@ public class GridSweeper
 	static Session drmaaSession;
 	
 	static Matcher singleValueSweepMatcher;
+	static Matcher rangeSweepMatcher;
 	
 	static
 	{
@@ -93,7 +95,13 @@ public class GridSweeper
 		
 		commandLineSweeps = new ArrayList<Sweep>();
 		
-		singleValueSweepMatcher = Pattern.compile("(\\S+)\\s*=\\s*(\\S+)").matcher("");
+		// Create argument parsing regexes
+		String nws = "(\\S+)"; // non-whitespace, at least one character, with group
+		String ws = "\\s*";    // whitespace, zero or more, no group
+		String num = "(-?\\d*\\.?\\d*)"; // signed decimal number
+		
+		singleValueSweepMatcher = Pattern.compile(nws + ws + "=" + ws + nws).matcher("");
+		rangeSweepMatcher = Pattern.compile(nws+ws+"="+ws+num+ws+":"+ws+num+ws+":"+ws+num).matcher(""); 
 	}
 	
 	/**
@@ -280,6 +288,7 @@ public class GridSweeper
 					else
 					{
 						singleValueSweepMatcher.reset(arg);
+						rangeSweepMatcher.reset(arg);
 						
 						if(singleValueSweepMatcher.matches())
 						{
@@ -288,6 +297,15 @@ public class GridSweeper
 							fine("Matched parameter " + name + "=" + value);
 							
 							commandLineSweeps.add(new SingleValueSweep(name, value));
+						}
+						else if(rangeSweepMatcher.matches())
+						{
+							String name = rangeSweepMatcher.group(1);
+							BigDecimal start = new BigDecimal(rangeSweepMatcher.group(2));
+							BigDecimal incr = new BigDecimal(rangeSweepMatcher.group(3));
+							BigDecimal end = new BigDecimal(rangeSweepMatcher.group(4));
+							
+							commandLineSweeps.add(new RangeListSweep(name, start, end, incr));
 						}
 					}
 					break;
