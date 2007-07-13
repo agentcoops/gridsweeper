@@ -80,6 +80,8 @@ public class GridSweeper
 	
 	static Session drmaaSession;
 	
+	static Matcher singleValueSweepMatcher;
+	
 	static
 	{
 		settings = Settings.sharedSettings();
@@ -88,6 +90,8 @@ public class GridSweeper
 		commandLineFileTransferSettings = new Settings();
 		className = GridSweeper.class.toString();
 		cal = new GregorianCalendar();
+		
+		singleValueSweepMatcher = Pattern.compile("(\\S+)\\s*=\\s*(\\S+)").matcher("");
 	}
 	
 	/**
@@ -120,6 +124,10 @@ public class GridSweeper
 		// Combine settings from command-line arguments and experiment
 		settings.putAll(experiment.getSettings());
 		settings.putAll(commandLineSettings);
+		for(Sweep sweep : commandLineSweeps)
+		{
+			experiment.getRootSweep().add(sweep);
+		}
 		
 		// Generate experiment cases, etc.
 		setUpExperiment();
@@ -269,13 +277,15 @@ public class GridSweeper
 					}
 					else
 					{
-						Pattern p = Pattern.compile("(\\S+)\\s*=\\s*(\\S+)");
-						Matcher m = p.matcher(arg);
-						if(m.matches())
+						singleValueSweepMatcher.reset(arg);
+						
+						if(singleValueSweepMatcher.matches())
 						{
-							String paramName = m.group(1);
-							String value = m.group(2);
-							fine("Matched parameter " + paramName + "=" + value);
+							String name = singleValueSweepMatcher.group(1);
+							String value = singleValueSweepMatcher.group(2);
+							fine("Matched parameter " + name + "=" + value);
+							
+							commandLineSweeps.add(new SingleValueSweep(name, value));
 						}
 					}
 					break;
