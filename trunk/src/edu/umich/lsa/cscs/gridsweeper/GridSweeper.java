@@ -263,6 +263,10 @@ public class GridSweeper
 						state = ArgState.OUTPUT;
 					else if(arg.equals("-r") || arg.equals("--runtype"))
 						state = ArgState.RUNTYPE;
+					else if(arg.equals("--debug"))
+					{
+						DLogger.addConsoleHandler(Level.ALL);
+					}
 					else
 					{
 						Pattern p = Pattern.compile("(\\S+)\\s*=\\s*(\\S+)");
