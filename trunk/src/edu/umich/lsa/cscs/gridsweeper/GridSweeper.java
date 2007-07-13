@@ -2,6 +2,8 @@ package edu.umich.lsa.cscs.gridsweeper;
 
 import org.ggf.drmaa.*;
 
+import edu.umich.lsa.cscs.gridsweeper.parameters.*;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -9,6 +11,8 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.*;
 import java.util.logging.*;
+import java.util.regex.*;
+
 import static edu.umich.lsa.cscs.gridsweeper.StringUtils.*;
 import static edu.umich.lsa.cscs.gridsweeper.DateUtils.*;
 import static edu.umich.lsa.cscs.gridsweeper.DLogger.*;
@@ -61,6 +65,7 @@ public class GridSweeper
 	static Settings commandLineSettings;
 	static Settings commandLineAdapterSettings;
 	static Settings commandLineFileTransferSettings;
+	static List<Sweep> commandLineSweeps;
 	
 	static boolean useFileTransfer = false;
 	
@@ -248,11 +253,27 @@ public class GridSweeper
 			switch(state)
 			{
 				case START:
-					if(arg.equals("-a") || arg.equals("--adapter")) state = ArgState.ADAPTER;
-					else if(arg.equals("-c") || arg.equals("--command")) state = ArgState.COMMAND;
-					else if(arg.equals("-i") || arg.equals("--input")) state = ArgState.INPUT;
-					else if(arg.equals("-o") || arg.equals("--output")) state = ArgState.OUTPUT;
-					else if(arg.equals("-r") || arg.equals("--runtype")) state = ArgState.RUNTYPE;
+					if(arg.equals("-a") || arg.equals("--adapter"))
+						state = ArgState.ADAPTER;
+					else if(arg.equals("-c") || arg.equals("--command"))
+						state = ArgState.COMMAND;
+					else if(arg.equals("-i") || arg.equals("--input"))
+						state = ArgState.INPUT;
+					else if(arg.equals("-o") || arg.equals("--output"))
+						state = ArgState.OUTPUT;
+					else if(arg.equals("-r") || arg.equals("--runtype"))
+						state = ArgState.RUNTYPE;
+					else
+					{
+						Pattern p = Pattern.compile("(\\S+)\\s*=\\s*(\\S+)");
+						Matcher m = p.matcher(arg);
+						if(m.matches())
+						{
+							String paramName = m.group(1);
+							String value = m.group(2);
+							fine("Matched parameter " + paramName + "=" + value);
+						}
+					}
 					break;
 				case ADAPTER:
 					if(!commandLineSettings.contains("AdapterClass"))
