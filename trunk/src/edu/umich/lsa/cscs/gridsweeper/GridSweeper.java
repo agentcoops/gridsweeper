@@ -172,11 +172,11 @@ public class GridSweeper
 	 * <td>
 	 * Path to experiment XML input file. This is usually required,
 	 * but can theoretically be left out if all the necessary experiment
-	 * information is provided with other command-line switches—for the
+	 * information is provided with other command-line switches‚Äîfor the
 	 * Drone adapter, this would mean that {@code -c} and {@code -n}
 	 * would be required, among others. Note that command-line settings
 	 * override any settings made in the experiment XML file, which
-	 * in turn override any settings in the user’s {@code ~/.gridsweeper}
+	 * in turn override any settings in the user‚Äôs {@code ~/.gridsweeper}
 	 * configuration file.
 	 * </td>
 	 * </tr>
@@ -190,13 +190,13 @@ public class GridSweeper
 	 * {@code gsweep -e <experimentXMLPath>}
 	 * <br/><br/>
 	 * and nothing else. This will <em>not</em> be an exact replica of this
-	 * run, because the seed for GridSweeper’s random number generator will
+	 * run, because the seed for GridSweeper‚Äôs random number generator will
 	 * be generated at runtime. A file that will be able to produce an
 	 * <em>exact</em> reproduction of this experiment will be generated
 	 * in the experiment results directory.</p>
 	 * <p>
 	 * All settings will be written out to this file, including those
-	 * set in the user’s {@code ~/.gridsweeper} configuration file,
+	 * set in the user‚Äôs {@code ~/.gridsweeper} configuration file,
 	 * in the input experiment file, and those set at the command line,
 	 * so that the above command should re-run the experiment as before
 	 * unless some setting in the {@code ~/.gridsweeper} changes the behavior. 
@@ -208,7 +208,7 @@ public class GridSweeper
 	 * <td>-r, --runtype</td>
 	 * <td>
 	 * <p>Run style, either {@code run}, {@code dry}, or {@code norun}.
-	 * Defaults to {@code run}. If {@code dry} is specified, a “dry run”
+	 * Defaults to {@code run}. If {@code dry} is specified, a ‚Äúdry run‚Äù
 	 * is performed, simulating the parameter sweep without actually 
 	 * submitting jobs to the grid to be run. Output directories are created
 	 * and are populated with case files needed to reproduce each case,
