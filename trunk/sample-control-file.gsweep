@@ -1,22 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<experiment name="sample" numRuns="10">
+<experiment name="sample" numRuns="1">
 	
-	<abbrev param="param1" abbrev="p1" />
-	<abbrev param="param2" abbrev="p2" />
-	<abbrev param="param3" abbrev="p3" />
-	<abbrev param="param4" abbrev="p4" />
+	<setting key="edu.umich.lsa.cscs.gridsweeper.DroneAdapter.command" value="/bin/echo" />
+	<setting key="edu.umich.lsa.cscs.gridsweeper.DroneAdapter.miscOptions" value="-n" />
 	
-	<value param="param1" value="0.5" />
+	<abbrev param="alpha" abbrev="a" />
+	<abbrev param="beta" abbrev="b" />
+	<abbrev param="gamma" abbrev="g" />
+	<abbrev param="nu" abbrev="n" />
 	
-	<list param="param2">
-		<item value="0.1" />
-		<item value="0.3" />
-		<item value="0.9" />
-	</list>
+	<value param="alpha" value="0.5" />
 	
-	<range param="param3" start="0.1" end="0.9" increment="0.1" />
+	<value param="beta" value="0.3"/>
 	
-	<uniform param="param4" type="double" start="0" end="1" count="10" />
+	<range param="gamma" start="0.1" end="0.1" increment="0.1" />
+	
+	<range param="nu" start="0.3" end="0.3" increment="0.1" />
 
 </experiment>
