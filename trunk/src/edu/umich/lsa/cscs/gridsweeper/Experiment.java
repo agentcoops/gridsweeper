@@ -370,4 +370,9 @@ public class Experiment
 	{
 		this.parameterOrder = parameterOrder;
 	}
+
+	public void writeToFile(String path)
+	{
+		// TODO Auto-generated method stub
+	}
 }

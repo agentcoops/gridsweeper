@@ -2,7 +2,7 @@ package edu.umich.lsa.cscs.gridsweeper;
 
 import org.junit.*;
 
-public class GridSweeperTest
+public class GridSweeperToolTest
 {
 	@Test
 	public void sample() throws Exception
@@ -15,7 +15,7 @@ public class GridSweeperTest
 				getPath("sample")
 			};
 		
-		GridSweeper.main(args);
+		GridSweeperTool.main(args);
 	}
 	
 	private String getPath(String testName)
