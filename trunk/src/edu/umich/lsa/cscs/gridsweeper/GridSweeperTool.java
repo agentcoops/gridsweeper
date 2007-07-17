@@ -51,7 +51,8 @@ public class GridSweeperTool
 		className = GridSweeperTool.class.getName();
 		
 		// Matches non-empty LHS = non-empty RHS, groups trimmed LHS and trimmed RHS
-		equalMatcher = Pattern.compile("\\A\\s*([!=]+)\\s*=\\s*([!=]+)\\s*\\z").matcher("");
+		equalMatcher = Pattern.compile("\\A\\s*([^=]+?)\\s*=\\s*([^=]+?)\\s*\\z").matcher("");
+		//equalMatcher = Pattern.compile("([^=]+)=([^=]+)").matcher("");
 		
 		// Matches signed decimal number
 		numMatcher = Pattern.compile("\\A(-?\\d*\\.?\\d*)\\z").matcher("");
@@ -232,7 +233,7 @@ public class GridSweeperTool
 	 * </table>
 	 * @param args Command-line arguments.
 	 */
-	private void parseArgs(String[] args, Settings cliSettings, List<Sweep> cliSweeps)
+	void parseArgs(String[] args, Settings cliSettings, List<Sweep> cliSweeps)
 		throws GridSweeperException
 	{
 		
@@ -337,7 +338,7 @@ public class GridSweeperTool
 	 * @return The parsed sweep.
 	 * @throws GridSweeperException When the argument does not represent a valid sweep.
 	 */
-	private Sweep parseSweepArg(String arg) throws GridSweeperException
+	Sweep parseSweepArg(String arg) throws GridSweeperException
 	{
 		// Code below is the decision tree for parsing sweeps.
 		
@@ -366,7 +367,7 @@ public class GridSweeperTool
 		}
 	}
 
-	private Sweep parseParallelSweep(String arg, String[] names, String rhs) throws GridSweeperException
+	Sweep parseParallelSweep(String arg, String[] names, String rhs) throws GridSweeperException
 	{
 		// Split at colon boundaries to see if this is a range sweep list
 		String[] rhsColonPieces = rhs.split("\\s*:\\s*");
@@ -384,15 +385,14 @@ public class GridSweeperTool
 		}
 	}
 
-	private Sweep parseParallelRangeSweep(String arg, String[] names, String[] rhsColonPieces) throws GridSweeperException
+	Sweep parseParallelRangeSweep(String arg, String[] names, String[] rhsColonPieces) throws GridSweeperException
 	{
-		
 		// The number of pieces must be equal to
 		// 3 * names.length (start/end/incr for each parameter)
 		// - (names.length - 1) (pieces at boundaries between
 		//                       ranges are shared)
 		// = 2 * names.length + 1 
-		if(rhsColonPieces.length != 2 * names.length - 1)
+		if(rhsColonPieces.length != 2 * names.length + 1)
 		{
 			parseFail(arg);
 		}
@@ -474,7 +474,7 @@ public class GridSweeperTool
 		return sweep;
 	}
 	
-	private Sweep parseParallelListSweep(String arg, String[] names, String rhs) throws GridSweeperException
+	Sweep parseParallelListSweep(String arg, String[] names, String rhs) throws GridSweeperException
 	{
 		ParallelCombinationSweep sweep = new ParallelCombinationSweep();
 		
@@ -603,7 +603,7 @@ public class GridSweeperTool
 		return sweep;
 	}
 	
-	private Sweep parseSingleSweep(String arg, String name, String rhs) throws GridSweeperException
+	Sweep parseSingleSweep(String arg, String name, String rhs) throws GridSweeperException
 	{
 		// Check for pieces separated by colons on RHS
 		String[] rhsColonPieces = rhs.split("\\s*:\\s*");
@@ -656,19 +656,16 @@ public class GridSweeperTool
 			if(rhsCommaPieces.length > 1)
 			{
 				// Parse as a list sweep
-				parseListSweep(arg, name, rhsCommaPieces);
+				return parseListSweep(arg, name, rhsCommaPieces);
 			}
 			else
 			{
-				parseSingleValueSweep(arg, name, rhs); 
+				return parseSingleValueSweep(arg, name, rhs); 
 			}
 		}
-		
-		parseFail(arg);
-		return null;
 	}
 
-	private Sweep parseRangeSweep(String arg, String name, String[] rhsColonPieces) throws GridSweeperException
+	Sweep parseRangeSweep(String arg, String name, String[] rhsColonPieces) throws GridSweeperException
 	{
 		if(rhsColonPieces.length != 3)
 		{
@@ -682,7 +679,7 @@ public class GridSweeperTool
 		return new RangeListSweep(name, start, end, incr);
 	}
 
-	private Sweep parseStochasticSweep(String arg, String name, String[] rhsColonPieces) throws GridSweeperException
+	Sweep parseStochasticSweep(String arg, String name, String[] rhsColonPieces) throws GridSweeperException
 	{
 		String distName = rhsColonPieces[0];
 		
@@ -710,7 +707,7 @@ public class GridSweeperTool
 		return null;
 	}
 
-	private Sweep parseListSweep(String arg, String name, String[] values) throws GridSweeperException
+	Sweep parseListSweep(String arg, String name, String[] values) throws GridSweeperException
 	{
 		// Whitespace-trim, unescape, and reject if any pieces are the empty string
 		for(int i = 0; i < values.length; i++)
@@ -725,7 +722,7 @@ public class GridSweeperTool
 		return new ListSweep(name, new StringList(values));
 	}
 
-	private Sweep parseSingleValueSweep(String arg, String name, String value) throws GridSweeperException
+	Sweep parseSingleValueSweep(String arg, String name, String value) throws GridSweeperException
 	{
 		return new SingleValueSweep(name, unescape(value));
 	}

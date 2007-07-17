@@ -67,4 +67,28 @@ public class UniformDoubleSweep extends SingleSweep implements StochasticSweep
 	{
 		return new Double(start + rng.nextDouble() * (end - start));
 	}
+
+	public int getCount() {
+		return count;
+	}
+
+	public void setCount(int count) {
+		this.count = count;
+	}
+
+	public double getEnd() {
+		return end;
+	}
+
+	public void setEnd(double end) {
+		this.end = end;
+	}
+
+	public double getStart() {
+		return start;
+	}
+
+	public void setStart(double start) {
+		this.start = start;
+	}
 }

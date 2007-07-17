@@ -13,6 +13,16 @@ public class ListSweep extends SingleSweep
 {
 	private StringList values;
 	
+	public StringList getValues()
+	{
+		return values;
+	}
+
+	public void setValues(StringList values)
+	{
+		this.values = values;
+	}
+
 	public ListSweep(String name, StringList values)
 	{
 		super(name);

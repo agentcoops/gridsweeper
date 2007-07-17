@@ -86,4 +86,28 @@ public class RangeListSweep extends SingleSweep
 		
 		return maps;
 	}
+
+	public BigDecimal getStart() {
+		return start;
+	}
+
+	public void setStart(BigDecimal start) {
+		this.start = start;
+	}
+
+	public BigDecimal getEnd() {
+		return end;
+	}
+
+	public void setEnd(BigDecimal end) {
+		this.end = end;
+	}
+
+	public BigDecimal getIncrement() {
+		return increment;
+	}
+
+	public void setIncrement(BigDecimal increment) {
+		this.increment = increment;
+	}
 }
