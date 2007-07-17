@@ -387,12 +387,11 @@ public class GridSweeperTool
 	private Sweep parseParallelRangeSweep(String arg, String[] names, String[] rhsColonPieces) throws GridSweeperException
 	{
 		
-		/* The number of pieces must be equal to
-		   3 * names.length (start/end/incr for each parameter)
-		  - (names.length - 1) (pieces at boundaries between
-		                         ranges are shared)
-		   = 2 * names.length + 1
-		 */ 
+		// The number of pieces must be equal to
+		// 3 * names.length (start/end/incr for each parameter)
+		// - (names.length - 1) (pieces at boundaries between
+		//                       ranges are shared)
+		// = 2 * names.length + 1 
 		if(rhsColonPieces.length != 2 * names.length - 1)
 		{
 			parseFail(arg);
@@ -411,6 +410,7 @@ public class GridSweeperTool
 			
 			String[] endStart = null;
 			
+			// Extract the sweep start, end, increment for each parameter
 			for(int i = 0; i < names.length; i++)
 			{
 				if(i == 0)
@@ -476,8 +476,131 @@ public class GridSweeperTool
 	
 	private Sweep parseParallelListSweep(String arg, String[] names, String rhs) throws GridSweeperException
 	{
-		parseFail(arg);
-		return null;
+		ParallelCombinationSweep sweep = new ParallelCombinationSweep();
+		
+		// Split at comma boundaries
+		String[] commaPieces = rhs.split("\\s*,\\s*");
+		assert(commaPieces.length > 0);
+		
+		List<String[]> commaWhitespacePieces = new ArrayList<String []>();
+		boolean allMatchNameCount = true;
+		for(String commaPiece : commaPieces)
+		{
+			// If empty string, give up
+			if(commaPiece.equals("")) parseFail(arg);
+			
+			String[] whitespacePieces = commaPiece.split("\\s+");
+			assert(whitespacePieces.length > 0);
+			
+			// If any lengths are different from the number of names,
+			// this can't be a list in the format
+			// p1 p2 p3 = p1v1 p2v1 p3v1, p1v2 p2v2 p3v2, p1v3 p2v3 p3v3, ...
+			if(allMatchNameCount && whitespacePieces.length != names.length) allMatchNameCount = false;
+			
+			commaWhitespacePieces.add(whitespacePieces);
+		}
+		
+		// If every whitespace split has the same number of pieces as the name count,
+		// then we'll interpret this as a list of this type:
+		// p1 p2 p3 = p1v1 p2v1 p3v1, p1v2 p2v2 p3v2, p1v3 p2v3 p3v3, ...
+		if(allMatchNameCount)
+		{
+			for(int i = 0; i < names.length; i++)
+			{
+				StringList values = new StringList();
+				for(String[] whitespacePieces : commaWhitespacePieces)
+				{
+					String piece = whitespacePieces[i];
+					if(piece.equals("")) parseFail(arg);
+					values.add(unescape(piece));
+				}
+				
+				ListSweep subSweep = new ListSweep(names[i], values);
+				sweep.add(subSweep);
+			}
+		}
+		else
+		{
+			// Otherwise, we'll assume the list is of this type:
+			// p1 p2 p3 p4 p5 = p1v1,p1v2,p1v3,p1v4 p2v1,p2v2,p2v3,p2v4 p3v1,p3v2,p3v3,p3v4 p4v1,p4v2,p4v3,p4v4 p5v1,p5v2,p5v3,p5v4
+			// meaning the commaWhitespacePieces arrays will have counts, e.g.,
+			// 1 1 1 2 1 1 2 1 1 2 1 1 2 1 1 1
+			
+			// First, figure out how many values each list should have
+			// by looking for the first instance of a 2-count array
+			int numVals = 0;
+			int size = commaWhitespacePieces.size();
+			for(int i = 0; i < size; i++)
+			{
+				numVals++;
+				String[] whitespacePieces = commaWhitespacePieces.get(i);
+				if(whitespacePieces.length == 2) break;
+				else if(whitespacePieces.length != 1) parseFail(arg);
+			}
+			
+			// Verify that the total length of the commonWhitespacePieces list is correct
+			// Analogous to the situation with parallel range list sweeps,
+			// there should be this many items:
+			// numVals * names.length
+			// - (names.length - 1) (pieces at boundaries between
+			//                         ranges are shared)
+			// = (numVals - 1) * names.length + 1
+			// Sanity check for example above: numVals = 4, names.length = 5,
+			// so # items should = (4 - 1) * 5 + 1 = 16. Check.
+			if(size != (numVals - 1) * names.length + 1) parseFail(arg);
+			
+			// For each parameter name...
+			for(int i = 0; i < names.length; i++)
+			{
+				StringList values = new StringList();
+				
+				// Get each value in the list, with special treatment at boundaries
+				for(int j = 0; j < numVals; j++)
+				{
+					String piece;
+					if(j == 0)
+					{
+						String[] whitespacePieces = commaWhitespacePieces.get(i * (numVals - 1));
+						if(i == 0)
+						{
+							if(whitespacePieces.length != 1) parseFail(arg);
+							piece = whitespacePieces[0];
+						}
+						else
+						{
+							if(whitespacePieces.length != 2) parseFail(arg);
+							piece = whitespacePieces[1];
+						}
+					}
+					else if(j == numVals - 1)
+					{
+						String[] whitespacePieces = commaWhitespacePieces.get((i + 1) * (numVals - 1));
+						if(i == names.length - 1)
+						{
+							if(whitespacePieces.length != 1) parseFail(arg);
+						}
+						else
+						{
+							if(whitespacePieces.length != 2) parseFail(arg);
+						}
+						piece = whitespacePieces[0];
+					}
+					else
+					{
+						String[] whitespacePieces = commaWhitespacePieces.get(i * (numVals - 1) + j);
+						if(whitespacePieces.length != 1) parseFail(arg);
+						piece = whitespacePieces[0];
+					}
+					
+					if(piece.equals("")) parseFail(arg);
+					values.add(unescape(piece));
+				}
+				
+				sweep.add(new ListSweep(names[i], values));
+			}
+		}
+		
+		return sweep;
 	}
 	
 	private Sweep parseSingleSweep(String arg, String name, String rhs) throws GridSweeperException
