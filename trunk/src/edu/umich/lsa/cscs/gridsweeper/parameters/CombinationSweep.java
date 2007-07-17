@@ -75,4 +75,14 @@ public abstract class CombinationSweep implements Sweep
 		return children.add(o);
 	}
 
+	public List<Sweep> getChildren()
+	{
+		return children;
+	}
+
+	public void setChildren(List<Sweep> children)
+	{
+		this.children = children;
+	}
+
 }

@@ -20,4 +20,13 @@ public class StringList extends ArrayList<String>
 	{
 		super(collection);
 	}
+	
+	public StringList(String[] strings)
+	{
+		super(strings.length);
+		for(String string : strings)
+		{
+			add(string);
+		}
+	}
 }

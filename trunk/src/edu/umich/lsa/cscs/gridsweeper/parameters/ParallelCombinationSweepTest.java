@@ -5,14 +5,14 @@ import static org.junit.Assert.*;
 
 import java.util.*;
 
-public class LinearCombinationSweepTest
+public class ParallelCombinationSweepTest
 {
-	private LinearCombinationSweep sweep;
+	private ParallelCombinationSweep sweep;
 	
 	@Before
 	public void setUp()
 	{
-		sweep = new LinearCombinationSweep();
+		sweep = new ParallelCombinationSweep();
 	}
 	
 	@Test

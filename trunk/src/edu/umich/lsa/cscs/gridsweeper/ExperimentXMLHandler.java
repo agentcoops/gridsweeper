@@ -205,7 +205,7 @@ public class ExperimentXMLHandler extends DefaultHandler
 			{
 				startSweepElement(qName, attrMap);
 			}
-			else if(qName.equals("linear"))
+			else if(qName.equals("parallel"))
 			{
 				startSweepElement(qName, attrMap);
 			}
@@ -292,10 +292,10 @@ public class ExperimentXMLHandler extends DefaultHandler
 				if(!(top instanceof MultiplicativeCombinationSweep))
 					throw new SAXException("mismatched multiplicative end tag");
 			}
-			else if(qName.equals("linear"))
+			else if(qName.equals("parallel"))
 			{
-				if(!(top instanceof LinearCombinationSweep))
-					throw new SAXException("mismatched linear end tag");
+				if(!(top instanceof ParallelCombinationSweep))
+					throw new SAXException("mismatched parallel end tag");
 			}
 			else
 			{
@@ -399,9 +399,9 @@ public class ExperimentXMLHandler extends DefaultHandler
 		{
 			startMultiplicativeElement(parent, attrMap);
 		}
-		else if(qName.equals("linear"))
+		else if(qName.equals("parallel"))
 		{
-			startLinearElement(parent, attrMap);
+			startParallelElement(parent, attrMap);
 		}
 	}
 	
@@ -531,14 +531,14 @@ public class ExperimentXMLHandler extends DefaultHandler
 	}
 	
 	/**
-	 * Parses the start of a linear/parallel sweep.
+	 * Parses the start of a parallel sweep.
 	 * @param parent The sweep's parent.
 	 * @param attrMap The sweep's attributes
 	 * @throws SAXException Currently, never.
 	 */
-	private void startLinearElement(CombinationSweep parent, StringMap attrMap) throws SAXException
+	private void startParallelElement(CombinationSweep parent, StringMap attrMap) throws SAXException
 	{
-		LinearCombinationSweep sweep = new LinearCombinationSweep();
+		ParallelCombinationSweep sweep = new ParallelCombinationSweep();
 		parent.add(sweep);
 		push(sweep);
 	}
