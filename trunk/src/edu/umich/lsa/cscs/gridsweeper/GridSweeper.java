@@ -301,6 +301,8 @@ public class GridSweeper
 	 */
 	public void finish() throws GridSweeperException
 	{
+		if(runType == RunType.NORUN) return;
+		
 		// TODO: wait for all jobs to complete, giving notification
 		// as each one arrives
 		// TODO: provide mechanism to detach this session to the background,
