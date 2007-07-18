@@ -28,21 +28,6 @@ import static edu.umich.lsa.cscs.gridsweeper.DLogger.*;
  */
 public class GridSweeper
 {
-	/**
-	 * A state enum for the argument-parsing state machine.
-	 * @author Ed Baskerville
-	 *
-	 */
-	enum ArgState
-	{
-		START,
-		ADAPTER,
-		COMMAND,
-		INPUT,
-		OUTPUT,
-		RUNTYPE
-	}
-	
 	enum RunType
 	{
 		RUN,
@@ -119,6 +104,8 @@ public class GridSweeper
 	 */
 	public void runJobs() throws GridSweeperException
 	{
+		if(runType == RunType.NORUN) return;
+		
 		entering(className, "run");
 		
 		useFileTransfer = settings.getBooleanProperty("UseFileTransfer");
