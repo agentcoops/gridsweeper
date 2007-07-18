@@ -302,6 +302,7 @@ public class GridSweeperTool
 					{
 						throw new GridSweeperException("Invalid run type " + arg + "specified.");
 					}
+					state = ArgState.START;
 					break;
 			}
 		}
