@@ -3,7 +3,6 @@
 <experiment name="sample" numRuns="1">
 	
 	<setting key="edu.umich.lsa.cscs.gridsweeper.DroneAdapter.command" value="/bin/echo" />
-	<setting key="edu.umich.lsa.cscs.gridsweeper.DroneAdapter.miscOptions" value="-n" />
 	
 	<abbrev param="alpha" abbrev="a" />
 	<abbrev param="beta" abbrev="b" />
