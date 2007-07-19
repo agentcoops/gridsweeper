@@ -12,11 +12,8 @@ import edu.umich.lsa.cscs.gridsweeper.parameters.ParameterMap;
  * @author Ed Baskerville
  *
  */
-public class ExperimentCaseXMLWriter
+public class ExperimentCaseXMLWriter extends XMLWriter
 {
-	private static String xmlDeclaration = "<?xml version=\"1.0\"?>";
-	
-	private PrintStream xmlStream;
 	private Experiment experiment;
 	private ExperimentCase expCase;
 	private String caseName;
@@ -33,7 +30,7 @@ public class ExperimentCaseXMLWriter
 	 */
 	public ExperimentCaseXMLWriter(String path, Experiment experiment, ExperimentCase expCase, String caseName, BigInteger rngSeed) throws FileNotFoundException
 	{
-		this.xmlStream = new PrintStream(new BufferedOutputStream(new FileOutputStream(path)));
+		super(path);
 		this.experiment = experiment;
 		this.expCase = expCase;
 		this.caseName = caseName;
@@ -57,16 +54,7 @@ public class ExperimentCaseXMLWriter
 		
 		printCaseEnd();
 		
-		xmlStream.close();
-	}
-	
-	/**
-	 * Prints the XML declaration line.
-	 *
-	 */
-	private void printDeclaration()
-	{
-		xmlStream.println(xmlDeclaration);
+		close();
 	}
 	
 	/*
@@ -79,7 +67,7 @@ public class ExperimentCaseXMLWriter
 		StringMap attrs = new StringMap();
 		attrs.put("name", name);
 		attrs.put("rngSeed", rngSeed.toString());
-		printTagStart(0, "case", attrs, false);
+		printTagStart("case", attrs, false);
 	}
 	
 	/**
@@ -88,7 +76,7 @@ public class ExperimentCaseXMLWriter
 	 */
 	private void printCaseEnd()
 	{
-		printTagEnd(0, "case");
+		printTagEnd("case");
 	}
 	
 	/**
@@ -107,7 +95,7 @@ public class ExperimentCaseXMLWriter
 			StringMap attrs = new StringMap();
 			attrs.put("key", key);
 			attrs.put("value", value);
-			printTagStart(1, "setting", attrs, true);
+			printTagStart("setting", attrs, true);
 		}
 	}
 	
@@ -127,7 +115,7 @@ public class ExperimentCaseXMLWriter
 			StringMap attrs = new StringMap();
 			attrs.put("source", source);
 			attrs.put("destination", destination);
-			printTagStart(1, "input", attrs, true);
+			printTagStart("input", attrs, true);
 		}
 	}
 	
@@ -143,7 +131,7 @@ public class ExperimentCaseXMLWriter
 		{
 			StringMap attrs = new StringMap();
 			attrs.put("path", outputFile);
-			printTagStart(1, "output", attrs, true);
+			printTagStart("output", attrs, true);
 		}
 	}
 	
@@ -163,7 +151,7 @@ public class ExperimentCaseXMLWriter
 			StringMap attrs = new StringMap();
 			attrs.put("param", param);
 			attrs.put("abbrev", abbrev);
-			printTagStart(1, "abbrev", attrs, true);
+			printTagStart("abbrev", attrs, true);
 		}
 	}
 	
@@ -182,39 +170,7 @@ public class ExperimentCaseXMLWriter
 			StringMap attrs = new StringMap();
 			attrs.put("param", param);
 			attrs.put("value", value);
-			printTagStart(1, "value", attrs, true);
+			printTagStart("value", attrs, true);
 		}
-	}
-	
-	/**
-	 * Prints a starting XML tag, with optional termination.
-	 * @param level The indentation level for this tag.
-	 * @param name The tag name.
-	 * @param attrs A map of atributes.
-	 * @param terminate Whether or not to terminate the tag.
-	 */
-	private void printTagStart(int level, String name, StringMap attrs, boolean terminate)
-	{
-		for(int i = 0; i < level; i++) xmlStream.print("\t");
-		xmlStream.print("<" + name);
-		
-		for(String attr : attrs.keySet())
-		{
-			xmlStream.print(" " + attr + "=\"" + attrs.get(attr) + "\"");
-		}
-		
-		if(terminate) xmlStream.print("/");
-		xmlStream.println(">");
-	}
-	
-	/**
-	 * Prints an ending XML tag
-	 * @param level The indentation level for this tag.
-	 * @param name The tag name.
-	 */
-	private void printTagEnd(int level, String name)
-	{
-		for(int i = 0; i < level; i++) xmlStream.print("\t");
-		xmlStream.println("</" + name + ">"); 
 	}
 }
