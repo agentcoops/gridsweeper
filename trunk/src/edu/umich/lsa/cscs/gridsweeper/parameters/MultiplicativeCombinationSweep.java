@@ -2,6 +2,8 @@ package edu.umich.lsa.cscs.gridsweeper.parameters;
 
 import java.util.*;
 
+import edu.umich.lsa.cscs.gridsweeper.XMLWriter;
+
 /**
  * Represents a combination of sub-sweeps, where all combinations of children
  * parameter/value assignments are generated. The only restriction on children
@@ -101,5 +103,17 @@ public class MultiplicativeCombinationSweep extends CombinationSweep
 		}
 		
 		return combinedMaps;
+	}
+
+	public void writeXML(XMLWriter xmlWriter)
+	{
+		xmlWriter.printTagStart("multiplicative", null, false);
+		
+		for(Sweep sweep : children)
+		{
+			sweep.writeXML(xmlWriter);
+		}
+		
+		xmlWriter.printTagEnd("multiplicative");
 	}
 }

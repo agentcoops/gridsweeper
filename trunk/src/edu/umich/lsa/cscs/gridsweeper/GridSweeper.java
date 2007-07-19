@@ -20,7 +20,7 @@ import static edu.umich.lsa.cscs.gridsweeper.DateUtils.*;
 import static edu.umich.lsa.cscs.gridsweeper.DLogger.*;
 
 /**
- * The GridSweeper command-line tool for job submission. Takes a .gsweep
+ * The GridSweeper command-line tool for job submission. Takes a .gsexp
  * XML experiment file and submits it to the grid for execution via DRMAA.
  * Warning: begun on a houseboat in Paris. May still contain strange French bugs.
  * 
@@ -67,14 +67,6 @@ public class GridSweeper
 	}
 	
 	/**
-	 * Writes the experiment to a file.
-	 */
-	public void writeExperiment(String path)
-	{
-		experiment.writeToFile(path);
-	}
-	
-	/**
 	 * Generates experiment cases in preparation for running the experiment.
 	 * @throws GridSweeperException If case generation fails.
 	 */
@@ -83,7 +75,7 @@ public class GridSweeper
 		if(runType != RunType.NORUN) try
 		{
 			// Assemble cases
-			cases = experiment.generateCases(new Random());
+			cases = experiment.generateCases();
 		}
 		catch (ExperimentException e)
 		{
@@ -221,7 +213,7 @@ public class GridSweeper
 	 * @throws IOException If the case XML cannot be written out (in {@link #runCaseRun}).
 	 */
 	public void runCase(ExperimentCase expCase) throws FileNotFoundException, DrmaaException, IOException
-	{		
+	{
 		String caseSubDir = experiment.getDirectoryNameForCase(expCase);
 		String caseDir = appendPathComponent(expDir, caseSubDir);
 		finer("Case subdirectory: " + caseDir);
@@ -229,7 +221,25 @@ public class GridSweeper
 		File caseDirFile = new File(caseDir);
 		caseDirFile.mkdirs();
 		
-		// For each run, output XML and run the damn thing
+		String caseName;
+		if(caseSubDir.equals(""))
+		{
+			caseName = experiment.getName()
+			+ " (" + dateStr + ", " + timeStr + ")";
+		}
+		else
+		{
+			caseName = experiment.getName() + " - "
+			+ caseSubDir + " (" + dateStr + ", " + timeStr + ")";
+		}
+
+		// Write XML
+		String xmlPath = appendPathComponent(caseDir, "case.gscase");
+		ExperimentCaseXMLWriter xmlWriter = new ExperimentCaseXMLWriter(
+				xmlPath, expCase, caseName);
+		xmlWriter.writeXML();
+		
+		// Run each individual run on the grid
 		List<BigInteger> rngSeeds = expCase.getRngSeeds();
 		for(int i = 0; i < rngSeeds.size(); i++)
 		{
@@ -263,12 +273,6 @@ public class GridSweeper
 			+ caseSubDir + " - run " + i
 			+ " (" + dateStr + ", " + timeStr + ")";
 		}
-
-		// Write XML
-		String xmlPath = appendPathComponent(caseDir, "case." + i + ".gsweep");
-		ExperimentCaseXMLWriter xmlWriter = new ExperimentCaseXMLWriter(
-				xmlPath, experiment, expCase, caseRunName, rngSeed);
-		xmlWriter.writeXML();
 		
 		if(runType == RunType.RUN)
 		{

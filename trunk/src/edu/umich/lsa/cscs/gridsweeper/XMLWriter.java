@@ -38,7 +38,7 @@ public class XMLWriter
 		for(int i = 0; i < level; i++) xmlStream.print("\t");
 		xmlStream.print("<" + name);
 		
-		for(String attr : attrs.keySet())
+		if(attrs != null) for(String attr : attrs.keySet())
 		{
 			xmlStream.print(" " + attr + "=\"" + attrs.get(attr) + "\"");
 		}

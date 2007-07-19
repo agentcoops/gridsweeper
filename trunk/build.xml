@@ -29,7 +29,7 @@
 
 		<mkdir dir="${classes}"/>
 		<jar 
-			excludes="**/*Test.class **/*.gsweep"
+			excludes="**/*Test.class **/*.gsweep **/*.gsexp"
 			jarfile="${jarfile}"
 			basedir="${bin}"
 			manifest="MANIFEST.MF"

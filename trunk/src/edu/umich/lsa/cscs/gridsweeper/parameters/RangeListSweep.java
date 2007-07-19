@@ -2,6 +2,9 @@ package edu.umich.lsa.cscs.gridsweeper.parameters;
 
 import java.util.*;
 import java.math.*;
+import edu.umich.lsa.cscs.gridsweeper.*;
+
+import edu.umich.lsa.cscs.gridsweeper.XMLWriter;
 
 /**
  * Represents a range of values assigned to a parameter. All values are represented with
@@ -109,5 +112,16 @@ public class RangeListSweep extends SingleSweep
 
 	public void setIncrement(BigDecimal increment) {
 		this.increment = increment;
+	}
+
+	public void writeXML(XMLWriter xmlWriter)
+	{
+		StringMap attrs = new StringMap();
+		attrs.put("param", getName());
+		attrs.put("start", getStart().toString());
+		attrs.put("end", getEnd().toString());
+		attrs.put("increment", getIncrement().toString());
+		
+		xmlWriter.printTagStart("range", attrs, true);
 	}
 }

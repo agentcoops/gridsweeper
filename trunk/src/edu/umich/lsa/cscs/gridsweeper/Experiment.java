@@ -2,6 +2,7 @@ package edu.umich.lsa.cscs.gridsweeper;
 
 import java.math.BigInteger;
 import java.util.*;
+
 import javax.xml.parsers.*;
 
 import edu.umich.lsa.cscs.gridsweeper.parameters.*;
@@ -30,7 +31,7 @@ public class Experiment
 	private StringList parameterOrder;
 	
 	private int numRuns;
-	private Long rngSeed;
+	private long rngSeed;
 	private int rngSeedBits = 16;
 	
 	/**
@@ -48,6 +49,8 @@ public class Experiment
 		inputFiles = new StringMap();
 		outputFiles = new StringList();
 		rootSweep = new MultiplicativeCombinationSweep();
+		
+		rngSeed = (new Random()).nextLong();
 	}
 	
 	/**
@@ -79,12 +82,11 @@ public class Experiment
 	 * @return A list of experiment cases
 	 * @throws ExperimentException
 	 */
-	public List<ExperimentCase> generateCases(Random rng) throws ExperimentException
+	public List<ExperimentCase> generateCases() throws ExperimentException
 	{
 		List<ExperimentCase> cases = new ArrayList<ExperimentCase>();
 		
-		// If there's a provided initial seed for the rng, seed it 
-		if(rngSeed != null) rng.setSeed(rngSeed);
+		Random rng = new Random(rngSeed);
 		
 		// Generate the list of parameter values
 		try
@@ -171,7 +173,7 @@ public class Experiment
 	 * the random seeds for runs as well as for stochastic sweeps. 
 	 * @return The seed for the random number generator.
 	 */
-	public Long getRngSeed()
+	public long getRngSeed()
 	{
 		return rngSeed;
 	}
@@ -181,7 +183,7 @@ public class Experiment
 	 * the random seeds for runs as well as for stochastic sweeps.
 	 * @param rngSeed The random seed to use. 
 	 */
-	public void setRngSeed(Long rngSeed)
+	public void setRngSeed(long rngSeed)
 	{
 		this.rngSeed = rngSeed;
 	}
@@ -359,11 +361,16 @@ public class Experiment
 		this.parameterOrder = parameterOrder;
 	}
 
-	public void writeToFile(String path)
+	public void writeToFile(String path, boolean writeRngSeed)
 	{
 		// TODO Auto-generated method stub
 	}
 
+	public int getRngSeedBits()
+	{
+		return rngSeedBits;
+	}
+	
 	public void setRngSeedBits(int rngSeedBits)
 	{
 		this.rngSeedBits = rngSeedBits;

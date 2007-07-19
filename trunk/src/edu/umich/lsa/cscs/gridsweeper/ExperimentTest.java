@@ -24,7 +24,7 @@ public class ExperimentTest
 	@Test
 	public void generateCases() throws ExperimentException
 	{
-		List<ExperimentCase> cases = experiment.generateCases(new Random());
+		List<ExperimentCase> cases = experiment.generateCases();
 		
 		assertEquals(1, cases.size());
 		

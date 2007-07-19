@@ -2,6 +2,9 @@ package edu.umich.lsa.cscs.gridsweeper.parameters;
 
 import java.util.*;
 
+import edu.umich.lsa.cscs.gridsweeper.StringMap;
+import edu.umich.lsa.cscs.gridsweeper.XMLWriter;
+
 /**
  * Represents the most primitive concrete sweep: a single value assigned to a parameter.
  * @author Ed Baskerville
@@ -56,5 +59,14 @@ public class SingleValueSweep extends SingleSweep
 	public void setValue(String value)
 	{
 		this.value = value;
+	}
+
+	public void writeXML(XMLWriter xmlWriter)
+	{
+		StringMap attrs = new StringMap();
+		attrs.put("param", getName());
+		attrs.put("value", getValue());
+		
+		xmlWriter.printTagStart("value", attrs, true);
 	}
 }

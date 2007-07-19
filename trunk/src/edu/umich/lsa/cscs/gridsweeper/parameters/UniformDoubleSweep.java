@@ -2,6 +2,9 @@ package edu.umich.lsa.cscs.gridsweeper.parameters;
 
 import java.util.*;
 
+import edu.umich.lsa.cscs.gridsweeper.StringMap;
+import edu.umich.lsa.cscs.gridsweeper.XMLWriter;
+
 /**
  * Represents the assignment of some number of values to a parameter from a
  * uniform distribution of type double.
@@ -90,5 +93,16 @@ public class UniformDoubleSweep extends SingleSweep implements StochasticSweep
 
 	public void setStart(double start) {
 		this.start = start;
+	}
+
+	public void writeXML(XMLWriter xmlWriter)
+	{
+		StringMap attrs = new StringMap();
+		attrs.put("param", getName());
+		attrs.put("start", "" + getStart());
+		attrs.put("end", "" + getEnd());
+		attrs.put("count", "" + getCount());
+		
+		xmlWriter.printTagStart("uniform", attrs, true);
 	}
 }

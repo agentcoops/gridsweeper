@@ -1,6 +1,7 @@
 package edu.umich.lsa.cscs.gridsweeper.parameters;
 
-import java.util.Random;
+import java.util.*;
+import edu.umich.lsa.cscs.gridsweeper.*;
 
 /**
  * The root interface for parameter sweeps. Defines one method, <code>generateMaps()</code>,
@@ -21,5 +22,7 @@ public interface Sweep
 	 * @throws DuplicateParameterException If child sweeps generate duplicate/conflicting
 	 * settings for a parameter.
 	 */
-	public java.util.List<ParameterMap> generateMaps(Random rng) throws SweepLengthException, DuplicateParameterException;
+	public List<ParameterMap> generateMaps(Random rng) throws SweepLengthException, DuplicateParameterException;
+	
+	public void writeXML(XMLWriter xmlWriter);
 }

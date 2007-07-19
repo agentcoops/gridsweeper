@@ -51,4 +51,20 @@ public class ListSweep extends SingleSweep
 	{
 		return values.add(o);
 	}
+
+	public void writeXML(XMLWriter xmlWriter)
+	{
+		StringMap attrs = new StringMap();
+		attrs.put("param", getName());
+		xmlWriter.printTagStart("list", attrs, false);
+		
+		for(String value : values)
+		{
+			StringMap itemAttrs = new StringMap();
+			itemAttrs.put("value", value);
+			xmlWriter.printTagStart("item", itemAttrs, true); 
+		}
+		
+		xmlWriter.printTagEnd("list");
+	}
 }
