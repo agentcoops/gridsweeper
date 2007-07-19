@@ -5,6 +5,7 @@ package edu.umich.lsa.cscs.gridsweeper;
 
 import static edu.umich.lsa.cscs.gridsweeper.DLogger.*;
 
+import java.io.FileNotFoundException;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.logging.*;
@@ -198,6 +199,17 @@ public class GridSweeperTool
 			experiment.getRootSweep().add(sweep);
 		}
 		
+		// Write experiment XML as provided by --output option
+		try
+		{
+			experiment.writeToFile(outputPath, false);
+		}
+		catch(FileNotFoundException e)
+		{
+			throw new GridSweeperException(
+					"Could not write to output path " + outputPath + ".", e);
+		}
+		
 		gs.setExperiment(experiment);
 		
 		// Generate experiment cases, etc.
@@ -354,6 +366,7 @@ public class GridSweeperTool
 		
 		for(String arg : args)
 		{
+			finer("parsing argument: " + arg);
 			switch(state)
 			{
 				case START:
