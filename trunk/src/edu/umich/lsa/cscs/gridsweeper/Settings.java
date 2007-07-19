@@ -53,7 +53,23 @@ public class Settings extends Properties
 {
 	private static final long serialVersionUID = 1L;
 	
+	static final Settings defaultSettings;
 	static Settings sharedSettings;
+	
+	static
+	{
+		defaultSettings = new Settings();
+		
+		defaultSettings.setProperty("RootDirectory", "/usr/local/gridsweeper");
+		defaultSettings.setProperty("ExperimentsDirectory", "~/Experiments");
+		
+		defaultSettings.setProperty("AdapterClass", "edu.umich.lsa.cscs.gridsweeper.DroneAdapter");
+		
+		defaultSettings.setProperty("UseFileTransfer", "false");
+		defaultSettings.setProperty("FileTransferSystemClass", "edu.umich.lsa.cscs.gridsweeper.FTPFileTransferSystem");
+		
+		defaultSettings.setProperty("edu.umich.lsa.cscs.gridsweeper.FTPFileTransferSystem.Username", "anonymous");
+	}
 	
 	/** 
 	 * Default constructor, simply calls the superclass implementation.
@@ -82,19 +98,7 @@ public class Settings extends Properties
 	{
 		if(sharedSettings == null)
 		{
-			Settings defaults = new Settings();
-			
-			defaults.setProperty("RootDirectory", "/usr/local/gridsweeper");
-			defaults.setProperty("ExperimentsDirectory", "~/Experiments");
-			
-			defaults.setProperty("AdapterClass", "edu.umich.lsa.cscs.gridsweeper.DroneAdapter");
-			
-			defaults.setProperty("UseFileTransfer", "false");
-			defaults.setProperty("FileTransferSystemClass", "edu.umich.lsa.cscs.gridsweeper.FTPFileTransferSystem");
-			
-			defaults.setProperty("edu.umich.lsa.cscs.gridsweeper.FTPFileTransferSystem.Username", "anonymous");
-			
-			sharedSettings = new Settings(defaults);
+			sharedSettings = new Settings(defaultSettings);
 			try
 			{
 				sharedSettings.load(new FileInputStream(System.getProperty("user.home") + "/.gridsweeper"));
@@ -106,6 +110,11 @@ public class Settings extends Properties
 		}
 		
 		return sharedSettings;
+	}
+	
+	public static Settings defaultSettings()
+	{
+		return defaultSettings;
 	}
 	
 	/**
@@ -152,5 +161,17 @@ public class Settings extends Properties
 	public String getSetting(String name)
 	{
 		return getProperty(name);
+	}
+
+	public void putAllForClass(Settings settings, String className)
+	{
+		// Load adapter settings by prepending class prefix
+		for(Object keyObj : settings.keySet())
+		{
+			String key = (String)keyObj;
+			setProperty(className + "." + key, settings.getProperty(key));
+		}
+		// TODO Auto-generated method stub
+		
 	}
 }

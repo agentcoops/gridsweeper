@@ -16,7 +16,7 @@ public class ExperimentTest
 	@Before
 	public void setUp() throws Exception
 	{
-		experiment = new Experiment();
+		experiment = new Experiment(null);
 		experiment.setNumRuns(10);
 		experiment.getRootSweep().add(new SingleValueSweep("param", "1"));
 	}

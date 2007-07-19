@@ -1,5 +1,6 @@
 package edu.umich.lsa.cscs.gridsweeper;
 
+import java.math.BigInteger;
 import java.util.*;
 import javax.xml.parsers.*;
 
@@ -30,6 +31,7 @@ public class Experiment
 	
 	private int numRuns;
 	private Long rngSeed;
+	private int rngSeedBits = 16;
 	
 	/**
 	 * The default constructor. Initializes {@code numRuns} to 1, and 
@@ -37,10 +39,11 @@ public class Experiment
 	 * and the root parameter sweep. 
 	 *
 	 */
-	public Experiment()
+	public Experiment(Settings settings)
 	{
 		numRuns = 1;
-		settings = new Settings();
+		this.settings = new Settings(Settings.defaultSettings());
+		if(settings != null) this.settings.putAll(settings);
 		abbreviations = new StringMap();
 		inputFiles = new StringMap();
 		outputFiles = new StringList();
@@ -53,9 +56,9 @@ public class Experiment
 	 * @param experimentURL The URL containing the XML. 
 	 * @throws ExperimentException If the XML cannot be parsed.
 	 */
-	public Experiment(java.net.URL experimentURL) throws ExperimentException
+	public Experiment(Settings settings, java.net.URL experimentURL) throws ExperimentException
 	{
-		this();
+		this(settings);
 		try
 		{
 			SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
@@ -88,31 +91,16 @@ public class Experiment
 		{
 			List<ParameterMap> parameterMaps = rootSweep.generateMaps(rng);
 			
-			// If there's an rng seed provided,
-			// and only one parameter combo,
-			// and only one run,
-			// we're going to use that rng seed for the one run.
-			// This gives proper behavior for reproducing cases.
-			if(rngSeed != null && parameterMaps.size() == 1 && numRuns == 1)
+			// Generate the experiment cases
+			for(ParameterMap parameterMap : parameterMaps)
 			{
-				List<Long> rngSeeds = new ArrayList<Long>(1);
-				rngSeeds.add(rngSeed);
-				cases.add(new ExperimentCase(parameterMaps.get(0), rngSeeds));
-			}
-			
-			// Otherwise generate a big pile of cases.
-			else
-			{
-				for(ParameterMap parameterMap : parameterMaps)
+				List<BigInteger> rngSeeds = new ArrayList<BigInteger>(numRuns);
+				for(int i = 0; i < numRuns; i++)
 				{
-					List<Long> rngSeeds = new ArrayList<Long>(numRuns);
-					for(int i = 0; i < numRuns; i++)
-					{
-						rngSeeds.add(rng.nextLong());
-					}
-					
-					cases.add(new ExperimentCase(parameterMap, rngSeeds));
+					rngSeeds.add(new BigInteger(rngSeedBits, rng));
 				}
+				
+				cases.add(new ExperimentCase(parameterMap, rngSeeds));
 			}
 		}
 		catch(Exception e)
@@ -127,7 +115,7 @@ public class Experiment
 	 * Getter for experiment settings.
 	 * @return The settings object.
 	 */
-	public Properties getSettings()
+	public Settings getSettings()
 	{
 		return settings;
 	}
@@ -374,5 +362,10 @@ public class Experiment
 	public void writeToFile(String path)
 	{
 		// TODO Auto-generated method stub
+	}
+
+	public void setRngSeedBits(int rngSeedBits)
+	{
+		this.rngSeedBits = rngSeedBits;
 	}
 }

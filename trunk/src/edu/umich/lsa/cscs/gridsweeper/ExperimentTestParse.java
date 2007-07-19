@@ -13,14 +13,14 @@ public class ExperimentTestParse
 	@Test
 	public void empty() throws ExperimentException
 	{
-		experiment = new Experiment(getURL("empty"));
+		experiment = new Experiment(null, getURL("empty"));
 		assertEquals("test_empty", experiment.getName());
 	}
 	
 	@Test
 	public void properties() throws ExperimentException
 	{
-		experiment = new Experiment(getURL("properties"));
+		experiment = new Experiment(null, getURL("properties"));
 		assertEquals(10, experiment.getNumRuns());
 		assertEquals("value", experiment.getSettings().get("anotherProperty"));
 	}
@@ -28,7 +28,7 @@ public class ExperimentTestParse
 	@Test
 	public void abbrevs() throws ExperimentException
 	{
-		experiment = new Experiment(getURL("abbrevs"));
+		experiment = new Experiment(null, getURL("abbrevs"));
 		assertEquals("p1", experiment.getAbbreviations().get("param1"));
 		assertEquals("p2", experiment.getAbbreviations().get("param2"));
 	}

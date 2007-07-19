@@ -1,6 +1,7 @@
 package edu.umich.lsa.cscs.gridsweeper;
 
 import java.io.*;
+import java.math.BigInteger;
 import java.util.*;
 
 import edu.umich.lsa.cscs.gridsweeper.parameters.ParameterMap;
@@ -19,7 +20,7 @@ public class ExperimentCaseXMLWriter
 	private Experiment experiment;
 	private ExperimentCase expCase;
 	private String caseName;
-	private long rngSeed;
+	private BigInteger rngSeed;
 	
 	/**
 	 * Constructor for {@code ExperimentCaseXMLWriter}.
@@ -30,7 +31,7 @@ public class ExperimentCaseXMLWriter
 	 * @param rngSeed The random seed.
 	 * @throws FileNotFoundException If the output file cannot be opened.
 	 */
-	public ExperimentCaseXMLWriter(String path, Experiment experiment, ExperimentCase expCase, String caseName, long rngSeed) throws FileNotFoundException
+	public ExperimentCaseXMLWriter(String path, Experiment experiment, ExperimentCase expCase, String caseName, BigInteger rngSeed) throws FileNotFoundException
 	{
 		this.xmlStream = new PrintStream(new BufferedOutputStream(new FileOutputStream(path)));
 		this.experiment = experiment;
@@ -46,15 +47,15 @@ public class ExperimentCaseXMLWriter
 	{
 		printDeclaration();
 		
-		printExperimentStart();
+		printCaseStart();
 		
-		printProperties();
+		printSettings();
 		printInputFiles();
 		printOutputFiles();
 		printAbbrevs();
 		printParamValues();
 		
-		printExperimentEnd();
+		printCaseEnd();
 		
 		xmlStream.close();
 	}
@@ -71,44 +72,42 @@ public class ExperimentCaseXMLWriter
 	/*
 	 * Prints the start of the experiment tag, with attributes.
 	 */
-	private void printExperimentStart()
+	private void printCaseStart()
 	{
 		String name = caseName;
-		String numRuns = "1";
 		
 		StringMap attrs = new StringMap();
 		attrs.put("name", name);
-		attrs.put("numRuns", numRuns);
-		attrs.put("rngSeed", new Long(rngSeed).toString());
-		printTagStart(0, "experiment", attrs, false);
+		attrs.put("rngSeed", rngSeed.toString());
+		printTagStart(0, "case", attrs, false);
 	}
 	
 	/**
 	 * Prints the end experiment tag.
 	 *
 	 */
-	private void printExperimentEnd()
+	private void printCaseEnd()
 	{
-		printTagEnd(0, "experiment");
+		printTagEnd(0, "case");
 	}
 	
 	/**
-	 * Prints XML tags for all the experiment properties. 
+	 * Prints XML tags for all the experiment settings. 
 	 *
 	 */
-	private void printProperties()
+	private void printSettings()
 	{
-		Properties properties = experiment.getSettings();
+		Settings settings = experiment.getSettings();
 		
-		for(Object settingObj : properties.keySet())
+		for(Object settingObj : settings.keySet())
 		{
 			String key = (String)settingObj;
-			String value = properties.getProperty(key);
+			String value = settings.getProperty(key);
 			
 			StringMap attrs = new StringMap();
 			attrs.put("key", key);
 			attrs.put("value", value);
-			printTagStart(1, "property", attrs, true);
+			printTagStart(1, "setting", attrs, true);
 		}
 	}
 	

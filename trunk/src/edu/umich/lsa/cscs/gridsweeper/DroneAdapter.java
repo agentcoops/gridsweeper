@@ -1,6 +1,7 @@
 package edu.umich.lsa.cscs.gridsweeper;
 
 import java.io.*;
+import java.math.BigInteger;
 import java.util.*;
 
 import edu.umich.lsa.cscs.gridsweeper.parameters.ParameterMap;
@@ -124,7 +125,7 @@ public class DroneAdapter implements Adapter
 	 * 
 	 * @throws AdapterException If an I/O error occurs. TODO: more robust error checking needed.
 	 */
-	public RunResults run(ParameterMap parameterMap, int runNumber, long rngSeed) throws AdapterException
+	public RunResults run(ParameterMap parameterMap, int runNumber, BigInteger rngSeed) throws AdapterException
 	{
 		StringList arguments = new StringList();
 		

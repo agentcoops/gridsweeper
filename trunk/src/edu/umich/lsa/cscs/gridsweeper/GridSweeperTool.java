@@ -34,10 +34,12 @@ public class GridSweeperTool
 	{
 		START,
 		ADAPTER,
+		NAME,
+		NUM_RUNS,
+		RNG_SEED_BITS,
 		COMMAND,
 		INPUT,
-		OUTPUT,
-		RUNTYPE
+		OUTPUT
 	}
 	
 	
@@ -66,10 +68,34 @@ public class GridSweeperTool
 	Experiment experiment;
 
 
-	public static void main(String[] args) throws GridSweeperException
+	public static void main(String[] args)
 	{
+		boolean debug = false;
+		
+		for(String arg : args)
+		{
+			if(arg.equals("-D") || arg.equals("--debug"))
+			{
+				DLogger.addConsoleHandler(Level.ALL);
+				debug = true;
+			}
+		}
+		
 		GridSweeperTool tool = new GridSweeperTool();
-		tool.run(args);
+		
+		try
+		{
+			tool.run(args);
+		}
+		catch(GridSweeperException e)
+		{
+			System.err.println(e.getMessage());
+			
+			if(debug)
+			{
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	public GridSweeperTool()
@@ -99,15 +125,74 @@ public class GridSweeperTool
 		
 		// Parse args
 		Settings cliSettings = new Settings();
+		Settings adapterSettings = new Settings();
+		Settings fileTransferSettings = new Settings();
 		List<Sweep> cliSweeps = new ArrayList<Sweep>();
-		parseArgs(args, cliSettings, cliSweeps);
+		parseArgs(args, cliSettings, adapterSettings, fileTransferSettings, cliSweeps);
 		
 		// Load experiment file
 		loadExperiment();
 		
+		// Override name if specified at command line
+		String name = cliSettings.getProperty("Name");
+		if(name != null)
+		{
+			experiment.setName(name);
+			cliSettings.remove("Name");
+		}
+		
+		// Override numRuns if specified at command line
+		String numRuns = cliSettings.getProperty("NumRuns");
+		if(numRuns != null)
+		{
+			try
+			{
+				int numRunsI = Integer.parseInt(numRuns);
+				experiment.setNumRuns(numRunsI);
+			}
+			catch(NumberFormatException e)
+			{
+				throw new GridSweeperException("Invalid number of runs specfication " + numRuns + ".");
+			}
+			cliSettings.remove("NumRuns");
+		}
+		
+		// Override rngSeedBits if specified at command line
+		String rngSeedBits = cliSettings.getProperty("RngSeedBits");
+		if(rngSeedBits != null)
+		{
+			try
+			{
+				int rngSeedBitsI = Integer.parseInt(rngSeedBits);
+				experiment.setRngSeedBits(rngSeedBitsI);
+			}
+			catch(NumberFormatException e)
+			{
+				throw new GridSweeperException("Invalid number of rng seed bits " + numRuns + ".");
+			}
+			cliSettings.remove("RngSeedBits");
+		}
+		
 		// Combine settings from command-line arguments and experiment
-		gs.getSettings().putAll(experiment.getSettings());
-		gs.getSettings().putAll(cliSettings);
+		experiment.getSettings().putAll(cliSettings);
+		
+		experiment.getSettings().putAllForClass(
+				adapterSettings,
+				experiment.getSettings().getProperty("AdapterClass"));
+		
+		experiment.getSettings().putAllForClass(
+				fileTransferSettings,
+				experiment.getSettings().getProperty("FileTransferSystemClass"));
+		
+		// Load adapter settings by prepending class prefix
+		for(Object keyObj : adapterSettings.keySet())
+		{
+			String key = (String)keyObj;
+			experiment.getSettings().setProperty(
+					experiment.getSettings().getProperty("AdapterClass")
+					+ "." + key, adapterSettings.getProperty(key));
+		}
+		
 		for(Sweep sweep : cliSweeps)
 		{
 			experiment.getRootSweep().add(sweep);
@@ -128,8 +213,7 @@ public class GridSweeperTool
 	}
 	
 	/**
-	 * <p>Parses command-line arguments. Currently only handles -a (adapter class),
-	 * -e (experiment file path), and -d (whether to perform a dry run).</p>
+	 * <p>Parses command-line arguments.</p>
 	 * 
 	 * <table valign="top">
 	 * 
@@ -142,12 +226,29 @@ public class GridSweeperTool
 	 * <td>-a, --adapter</td>
 	 * <td>
 	 * Adapter class name, e.g., {@code edu.umich.lsa.cscs.gridsweeper.DroneAdapter}.
-	 * Only the first {@code -a} argument will be used. When GridSweeper is run
-	 * using the {@code gdrone} tool, {@code -a} is already provided, and any
-	 * provided by the user will be ignored.
 	 * </td>
 	 * </tr>
 	 *
+	 * <tr>
+	 * <td>-n, --name</td>
+	 * <td>
+	 * Experiment name. This string is used to name the experiment output directory.
+	 * </td>
+	 * </tr>
+	 * 
+	 * <tr>
+	 * <td>-N, --numruns</td>
+	 * <td>
+	 * Number of runs to perform for each parameter assignment.
+	 * </td>
+	 * </tr>
+	 * 
+	 * <tr>
+	 * <td>-b, --rng-seed-bits</td>
+	 * <td>
+	 * Number of bits used to generate random seeds. Positive random seeds will be
+	 * generated between 0 and 2^(number of bits) - 1. Defaults to 16 bits.
+	 * </td>
 	 * <tr>
 	 * <td>-c, --command</td>
 	 * <td>
@@ -196,17 +297,25 @@ public class GridSweeperTool
 	 * </tr>
 	 * 
 	 * <tr>
-	 * <td>-r, --runtype</td>
+	 * <td>-O, --output-only</td>
 	 * <td>
-	 * <p>Run style, either {@code run}, {@code dry}, or {@code norun}.
-	 * Defaults to {@code run}. If {@code dry} is specified, a “dry run”
-	 * is performed, simulating the parameter sweep without actually 
+	 * <p>The same as {@code -o}, except the only thing that will happen
+	 * is the production of an output file. The experiment will not be run,
+	 * not even to generate output directories and case files.</p>
+	 * 
+	 * <p>The no-run behavior of this option can be replaced by a dry run
+	 * by following this option with {@code -d} or {@code --dry}.
+	 * Following {@code -d} or {@code --dry} with this option will
+	 * replace dry-run behavior with no-run behavior.</p>  
+	 * </td>
+	 * </tr>
+	 * 
+	 * <tr>
+	 * <td>-d, --dry</td>
+	 * <td>
+	 * <p>Perform a “dry run”, simulating the parameter sweep without actually
 	 * submitting jobs to the grid to be run. Output directories are created
-	 * and are populated with case files needed to reproduce each case,
-	 * so you can test that all the parameter settings are correct before
-	 * running the experiment for real. If {@code norun} is specified,
-	 * the only effect of this command will be to generate a new experiment
-	 * XML file as provided with the {@code -o} option.
+	 * and populated with control files needed to reproduce cases.</p>
 	 * </td>
 	 * </tr>
 	 * 
@@ -233,7 +342,9 @@ public class GridSweeperTool
 	 * </table>
 	 * @param args Command-line arguments.
 	 */
-	void parseArgs(String[] args, Settings cliSettings, List<Sweep> cliSweeps)
+	void parseArgs(String[] args, Settings cliSettings, 
+			Settings adapterSettings, Settings fileTransferSettings,
+			List<Sweep> cliSweeps)
 		throws GridSweeperException
 	{
 		
@@ -248,17 +359,30 @@ public class GridSweeperTool
 				case START:
 					if(arg.equals("-a") || arg.equals("--adapter"))
 						state = ArgState.ADAPTER;
+					else if(arg.equals("-n") || arg.equals("--name"))
+						state = ArgState.NAME;
+					else if(arg.equals("-N") || arg.equals("--numruns"))
+						state = ArgState.NUM_RUNS;
+					else if(arg.equals("-b") || arg.equals("--rng-seed-bits"))
+						state = ArgState.RNG_SEED_BITS;
 					else if(arg.equals("-c") || arg.equals("--command"))
 						state = ArgState.COMMAND;
 					else if(arg.equals("-i") || arg.equals("--input"))
 						state = ArgState.INPUT;
 					else if(arg.equals("-o") || arg.equals("--output"))
 						state = ArgState.OUTPUT;
-					else if(arg.equals("-r") || arg.equals("--runtype"))
-						state = ArgState.RUNTYPE;
-					else if(arg.equals("--debug"))
+					else if(arg.equals("-O") || arg.equals("--output-only"))
 					{
-						DLogger.addConsoleHandler(Level.ALL);
+						gs.setRunType(RunType.NORUN);
+						state = ArgState.OUTPUT;
+					}
+					else if(arg.equals("-d") || arg.equals("--dry"))
+					{
+						gs.setRunType(RunType.DRY);
+					}
+					else if(arg.equals("-D") || arg.equals("--debug"))
+					{
+						// Do nothing; checked for first thing in main
 					}
 					else
 					{
@@ -268,13 +392,23 @@ public class GridSweeperTool
 					}
 					break;
 				case ADAPTER:
-					if(!cliSettings.contains("AdapterClass"))
-						cliSettings.put("AdapterClass", arg);
+					cliSettings.put("AdapterClass", arg);
+					state = ArgState.START;
+					break;
+				case NAME:
+					cliSettings.put("Name", arg);
+					state = ArgState.START;
+					break;
+				case NUM_RUNS:
+					cliSettings.put("NumRuns", arg);
+					state = ArgState.START;
+					break;
+				case RNG_SEED_BITS:
+					cliSettings.put("RngSeedBits", arg);
 					state = ArgState.START;
 					break;
 				case COMMAND:
-					if(!cliSettings.contains("command"))
-						cliSettings.put("command", arg);
+					adapterSettings.put("command", arg);
 					state = ArgState.START;
 					break;
 				case INPUT:
@@ -283,25 +417,6 @@ public class GridSweeperTool
 					break;
 				case OUTPUT:
 					outputPath = arg;
-					state = ArgState.START;
-					break;
-				case RUNTYPE:
-					if(arg.equalsIgnoreCase("run"))
-					{
-						gs.setRunType(RunType.RUN);
-					}
-					else if(arg.equalsIgnoreCase("dry"))
-					{
-						gs.setRunType(RunType.DRY);
-					}
-					else if(arg.equalsIgnoreCase("norun"))
-					{
-						gs.setRunType(RunType.NORUN);
-					}
-					else
-					{
-						throw new GridSweeperException("Invalid run type " + arg + "specified.");
-					}
 					state = ArgState.START;
 					break;
 			}
@@ -740,16 +855,19 @@ public class GridSweeperTool
 	 */
 	private void loadExperiment() throws GridSweeperException
 	{
+		Settings sharedSettings = Settings.sharedSettings();
+		
 		entering(className, "loadExperiment");
 		
 		if(experimentPath == null)
 		{
-			experiment = new Experiment();
+			experiment = new Experiment(sharedSettings);
 		}
 		
-		try
+		else try
 		{
-			experiment = new Experiment(new java.net.URL("file", "", experimentPath));
+			experiment = new Experiment(sharedSettings,
+					new java.net.URL("file", "", experimentPath));
 		}
 		catch(Exception e)
 		{

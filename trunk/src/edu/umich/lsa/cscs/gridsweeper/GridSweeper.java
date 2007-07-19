@@ -10,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.*;
 import java.util.logging.*;
 import java.util.regex.*;
@@ -48,8 +49,6 @@ public class GridSweeper
 	RunType runType = RunType.RUN;
 	List<ExperimentCase> cases = null;
 	
-	Settings settings;
-	
 	boolean useFileTransfer = false;
 	
 	Calendar cal;
@@ -64,7 +63,6 @@ public class GridSweeper
 	
 	public GridSweeper()
 	{
-		settings = Settings.sharedSettings();
 		cal = new GregorianCalendar(); 
 	}
 	
@@ -104,6 +102,8 @@ public class GridSweeper
 	 */
 	public void runJobs() throws GridSweeperException
 	{
+		Settings settings = experiment.getSettings();
+		
 		if(runType == RunType.NORUN) return;
 		
 		entering(className, "run");
@@ -144,6 +144,11 @@ public class GridSweeper
 			// First set up big directory for the whole experiment
 			// Located in <experimentDir>/<experimentName>/<experimentDate>/<experimentTime>
 			String expName = experiment.getName();
+			if(expName == null)
+			{
+				throw new GridSweeperException("Experiment name must be specified.");
+			}
+			
 			dateStr = getDateString(cal);
 			timeStr = getTimeString(cal);
 			String expSubDir = String.format("%s%s%s%s%s", expName, getFileSeparator(), dateStr, getFileSeparator(), timeStr);
@@ -225,7 +230,7 @@ public class GridSweeper
 		caseDirFile.mkdirs();
 		
 		// For each run, output XML and run the damn thing
-		List<Long> rngSeeds = expCase.getRngSeeds();
+		List<BigInteger> rngSeeds = expCase.getRngSeeds();
 		for(int i = 0; i < rngSeeds.size(); i++)
 		{
 			runCaseRun(expCase, caseDir, caseSubDir, i, rngSeeds.get(i));
@@ -242,11 +247,22 @@ public class GridSweeper
 	 * @throws DrmaaException If a DRMAA error occurs during job submission.
 	 * @throws IOException If the case XML cannot be written out.
 	 */
-	public void runCaseRun(ExperimentCase expCase, String caseDir, String caseSubDir, int i, Long rngSeed) throws DrmaaException, IOException
+	public void runCaseRun(ExperimentCase expCase, String caseDir, String caseSubDir, int i, BigInteger rngSeed) throws DrmaaException, IOException
 	{
-		String caseRunName = experiment.getName() + " - "
+		Settings settings = experiment.getSettings();
+		
+		String caseRunName;
+		if(caseSubDir.equals(""))
+		{
+			caseRunName = experiment.getName() + " - run " + i
+			+ " (" + dateStr + ", " + timeStr + ")";
+		}
+		else
+		{
+			caseRunName = experiment.getName() + " - "
 			+ caseSubDir + " - run " + i
 			+ " (" + dateStr + ", " + timeStr + ")";
+		}
 
 		// Write XML
 		String xmlPath = appendPathComponent(caseDir, "case." + i + ".gsweep");
@@ -254,45 +270,48 @@ public class GridSweeper
 				xmlPath, experiment, expCase, caseRunName, rngSeed);
 		xmlWriter.writeXML();
 		
-		// Write setup file
-		String stdinPath = appendPathComponent(caseDir, ".gsweep_in." + i);
-		RunSetup setup = new RunSetup(settings,
-				experiment.getInputFiles(), caseSubDir, expCase.getParameterMap(),
-				i, rngSeed, experiment.getOutputFiles());
-		ObjectOutputStream stdinStream = new ObjectOutputStream(new FileOutputStream(stdinPath));
-		stdinStream.writeObject(setup);
-		
-		// Generate job template
-		JobTemplate jt = drmaaSession.createJobTemplate();
-		jt.setJobName(caseRunName);
-		jt.setRemoteCommand(appendPathComponent(root, "bin/grunner"));
-		if(!useFileTransfer) jt.setWorkingDirectory(caseDir);
-		jt.setInputPath(":" + stdinPath);
-		jt.setOutputPath(":" + appendPathComponent(caseDir, ".gsweep_out." + i));
-		jt.setErrorPath(":" + appendPathComponent(caseDir, ".gsweep_err." + i));
-		jt.setBlockEmail(true);
-		
-		try
+		if(runType == RunType.RUN)
 		{
-			jt.setTransferFiles(new FileTransferMode(true, true, true));
+			// Write setup file
+			String stdinPath = appendPathComponent(caseDir, ".gsweep_in." + i);
+			RunSetup setup = new RunSetup(settings,
+					experiment.getInputFiles(), caseSubDir, expCase.getParameterMap(),
+					i, rngSeed, experiment.getOutputFiles());
+			ObjectOutputStream stdinStream = new ObjectOutputStream(new FileOutputStream(stdinPath));
+			stdinStream.writeObject(setup);
+			
+			// Generate job template
+			JobTemplate jt = drmaaSession.createJobTemplate();
+			jt.setJobName(caseRunName);
+			jt.setRemoteCommand(appendPathComponent(root, "bin/grunner"));
+			if(!useFileTransfer) jt.setWorkingDirectory(caseDir);
+			jt.setInputPath(":" + stdinPath);
+			jt.setOutputPath(":" + appendPathComponent(caseDir, ".gsweep_out." + i));
+			jt.setErrorPath(":" + appendPathComponent(caseDir, ".gsweep_err." + i));
+			jt.setBlockEmail(true);
+			
+			try
+			{
+				jt.setTransferFiles(new FileTransferMode(true, true, true));
+			}
+			catch(DrmaaException e)
+			{
+				// If setTransferFiles isn't supported, we'll hope that the system defaults to
+				// transfering them. This works for SGE.
+			}
+			
+			Properties environment = new Properties();
+			environment.setProperty("GRIDSWEEPER_ROOT", root);
+			
+			String classpath = System.getenv("CLASSPATH");
+			if(classpath != null) environment.setProperty("CLASSPATH", classpath);
+			jt.setJobEnvironment(environment);
+			
+			String jobId = drmaaSession.runJob(jt);
+			drmaaSession.deleteJobTemplate(jt);
+			
+			// TODO: Record job id so it can be reported back as tied to this case run.
 		}
-		catch(DrmaaException e)
-		{
-			// If setTransferFiles isn't supported, we'll hope that the system defaults to
-			// transfering them. This works for SGE.
-		}
-		
-		Properties environment = new Properties();
-		environment.setProperty("GRIDSWEEPER_ROOT", root);
-		
-		String classpath = System.getenv("CLASSPATH");
-		if(classpath != null) environment.setProperty("CLASSPATH", classpath);
-		jt.setJobEnvironment(environment);
-		
-		String jobId = drmaaSession.runJob(jt);
-		drmaaSession.deleteJobTemplate(jt);
-		
-		// TODO: Record job id so it can be reported back as tied to this case run.
 	}
 	
 	/**
@@ -301,8 +320,6 @@ public class GridSweeper
 	 */
 	public void finish() throws GridSweeperException
 	{
-		if(runType == RunType.NORUN) return;
-		
 		// TODO: wait for all jobs to complete, giving notification
 		// as each one arrives
 		// TODO: provide mechanism to detach this session to the background,
@@ -312,7 +329,7 @@ public class GridSweeper
 		// http://wrapper.tanukisoftware.org/doc/english/prop-daemonize.html
 		// TODO: upon full completion, send an email to the user
 		
-		try
+		if(runType == RunType.RUN) try
 		{
 			drmaaSession.exit();
 		}
@@ -330,11 +347,6 @@ public class GridSweeper
 	public void setRoot(String root)
 	{
 		this.root = root;
-	}
-
-	public Settings getSettings()
-	{
-		return settings;
 	}
 	
 	public void setExperiment(Experiment experiment)

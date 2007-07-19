@@ -24,7 +24,7 @@
 	
 	<target name="jar" depends="compile" description="Build jar">
 		<manifest file="MANIFEST.MF">
-			<attribute name="Main-Class" value="edu.umich.lsa.cscs.gridsweeper.GridSweeper"/>
+			<attribute name="Main-Class" value="edu.umich.lsa.cscs.gridsweeper.GridSweeperTool"/>
 		</manifest>
 
 		<mkdir dir="${classes}"/>
@@ -62,12 +62,8 @@ GS_ROOT/
 		gdrone
 		grunner
 	classes/
-		classes.jar
-			(all classes except those with main methods)
 		GridSweeper.jar
-			(app/tool class)
-		GridSweeperRunner.jar
-			(class to actually run simulations on agents)
+			(all classes)
 	plugins/
 	
 -->
