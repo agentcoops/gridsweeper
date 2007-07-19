@@ -92,7 +92,7 @@ public class GridSweeper
 	 * 
 	 * @throws GridSweeperException
 	 */
-	public void runJobs() throws GridSweeperException
+	public void runExperiment() throws GridSweeperException
 	{
 		Settings settings = experiment.getSettings();
 		
@@ -128,7 +128,7 @@ public class GridSweeper
 		{
 			throw new GridSweeperException("Could not set up file trasfer system", e);
 		}
-			
+		
 		try
 		{
 			String expsDir = expandTildeInPath(settings.getProperty("ExperimentsDirectory"));
@@ -183,6 +183,10 @@ public class GridSweeper
 			
 		try
 		{
+			// Write experiment XML
+			String xmlPath = appendPathComponent(expDir, "experiment.gsexp");
+			experiment.writeToFile(xmlPath, true);
+			
 			if(runType==RunType.RUN)
 			{
 				// Establish DRMAA session

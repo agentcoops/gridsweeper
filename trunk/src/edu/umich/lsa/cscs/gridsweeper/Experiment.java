@@ -1,5 +1,6 @@
 package edu.umich.lsa.cscs.gridsweeper;
 
+import java.io.FileNotFoundException;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -50,7 +51,9 @@ public class Experiment
 		outputFiles = new StringList();
 		rootSweep = new MultiplicativeCombinationSweep();
 		
-		rngSeed = (new Random()).nextLong();
+		// Only 48 bits are used by Random's seed,
+		// hence masking against 2^48 - 1
+		rngSeed = (new Random()).nextLong() & 0xFFFFFFFFFFFFL;
 	}
 	
 	/**
@@ -361,9 +364,10 @@ public class Experiment
 		this.parameterOrder = parameterOrder;
 	}
 
-	public void writeToFile(String path, boolean writeRngSeed)
+	public void writeToFile(String path, boolean writeRngSeed) throws FileNotFoundException
 	{
-		// TODO Auto-generated method stub
+		ExperimentXMLWriter writer = new ExperimentXMLWriter(path, this, writeRngSeed);
+		writer.writeXML();
 	}
 
 	public int getRngSeedBits()

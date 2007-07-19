@@ -204,7 +204,7 @@ public class GridSweeperTool
 		gs.setUpExperiment();
 		
 		// Run jobs
-		gs.runJobs();
+		gs.runExperiment();
 		
 		// Finish running jobs
 		gs.finish();
