@@ -55,7 +55,7 @@ public class ExperimentXMLWriter extends XMLWriter
 		if(writeSeedInfo)
 		{
 			attrs.put("firstSeedRow", "" + experiment.getFirstSeedRow());
-			attrs.put("firstSeedCol", "" + experiment.getSeedCol());
+			attrs.put("seedCol", "" + experiment.getSeedCol());
 		}
 		printTagStart("experiment", attrs, false);
 	}
