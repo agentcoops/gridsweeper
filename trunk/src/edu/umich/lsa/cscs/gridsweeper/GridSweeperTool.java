@@ -182,7 +182,7 @@ public class GridSweeperTool
 		}
 		
 		// Write experiment XML as provided by --output option
-		try
+		if(outputPath != null) try
 		{
 			experiment.writeToFile(outputPath, false);
 		}
