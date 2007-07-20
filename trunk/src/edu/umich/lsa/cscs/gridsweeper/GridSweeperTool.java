@@ -36,6 +36,7 @@ public class GridSweeperTool
 		ADAPTER,
 		NAME,
 		NUM_RUNS,
+		SEED,
 		COMMAND,
 		INPUT,
 		OUTPUT
@@ -156,6 +157,31 @@ public class GridSweeperTool
 			cliSettings.remove("NumRuns");
 		}
 		
+		// Override location in seed table if specified at command line
+		String seedStr = cliSettings.getProperty("Seed");
+		if(seedStr != null)
+		{
+			String[] pieces = seedStr.split(":");
+			if(pieces.length != 2)
+			{
+				throw new GridSweeperException("Invalid seed table location " + seedStr);
+			}
+			String rowStr = pieces[0];
+			String colStr = pieces[1];
+			try
+			{
+				int row = Integer.parseInt(rowStr); 
+				int col = Integer.parseInt(colStr);
+				
+				experiment.setFirstSeedRow(row);
+				experiment.setSeedCol(col);
+			}
+			catch(NumberFormatException e)
+			{
+				throw new GridSweeperException("Invalid seed table location " + seedStr);
+			}
+		}
+		
 		// Combine settings from command-line arguments and experiment
 		experiment.getSettings().putAll(cliSettings);
 		
@@ -234,6 +260,14 @@ public class GridSweeperTool
 	 * <td>-N, --numruns</td>
 	 * <td>
 	 * Number of runs to perform for each parameter assignment.
+	 * </td>
+	 * </tr>
+	 * 
+	 * <tr>
+	 * <td>-S, --seed</td>
+	 * <td>
+	 * The location of the first seed in the seed generation table,
+	 * given as row:col.
 	 * </td>
 	 * </tr>
 	 * 
@@ -352,6 +386,8 @@ public class GridSweeperTool
 						state = ArgState.NAME;
 					else if(arg.equals("-N") || arg.equals("--numruns"))
 						state = ArgState.NUM_RUNS;
+					else if(arg.equals("-S") || arg.equals("--seed"))
+						state = ArgState.SEED;
 					else if(arg.equals("-c") || arg.equals("--command"))
 						state = ArgState.COMMAND;
 					else if(arg.equals("-i") || arg.equals("--input"))
@@ -388,6 +424,10 @@ public class GridSweeperTool
 					break;
 				case NUM_RUNS:
 					cliSettings.put("NumRuns", arg);
+					state = ArgState.START;
+					break;
+				case SEED:
+					cliSettings.put("Seed", arg);
 					state = ArgState.START;
 					break;
 				case COMMAND:
