@@ -46,7 +46,7 @@ public class ParallelCombinationSweep extends CombinationSweep
 	 * @see edu.umich.lsa.cscs.gridsweeper.parameters.CombinationSweep#generateMaps(java.util.Random)
 	 */
 	@Override
-	public List<ParameterMap> generateMaps(Random rng) throws SweepLengthException, DuplicateParameterException
+	public List<ParameterMap> generateMaps() throws SweepLengthException, DuplicateParameterException
 	{
 		int numChildren = children.size();
 		
@@ -57,7 +57,7 @@ public class ParallelCombinationSweep extends CombinationSweep
 		List<List<ParameterMap>> childMapses = new ArrayList<List<ParameterMap>>();
 		for(Sweep child : children)
 		{
-			List<ParameterMap> childMaps = child.generateMaps(rng);
+			List<ParameterMap> childMaps = child.generateMaps();
 			
 			// Verify length
 			if(length == -1) length = childMaps.size();

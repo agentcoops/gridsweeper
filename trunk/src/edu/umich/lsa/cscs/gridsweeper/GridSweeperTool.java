@@ -11,7 +11,6 @@ import java.util.*;
 import java.util.logging.*;
 import java.util.regex.*;
 
-import edu.umich.lsa.cscs.gridsweeper.*;
 import static edu.umich.lsa.cscs.gridsweeper.StringUtils.*;
 import edu.umich.lsa.cscs.gridsweeper.GridSweeper.RunType;
 import edu.umich.lsa.cscs.gridsweeper.parameters.*;
@@ -37,7 +36,6 @@ public class GridSweeperTool
 		ADAPTER,
 		NAME,
 		NUM_RUNS,
-		RNG_SEED_BITS,
 		COMMAND,
 		INPUT,
 		OUTPUT
@@ -158,22 +156,6 @@ public class GridSweeperTool
 			cliSettings.remove("NumRuns");
 		}
 		
-		// Override rngSeedBits if specified at command line
-		String rngSeedBits = cliSettings.getProperty("RngSeedBits");
-		if(rngSeedBits != null)
-		{
-			try
-			{
-				int rngSeedBitsI = Integer.parseInt(rngSeedBits);
-				experiment.setRngSeedBits(rngSeedBitsI);
-			}
-			catch(NumberFormatException e)
-			{
-				throw new GridSweeperException("Invalid number of rng seed bits " + numRuns + ".");
-			}
-			cliSettings.remove("RngSeedBits");
-		}
-		
 		// Combine settings from command-line arguments and experiment
 		experiment.getSettings().putAll(cliSettings);
 		
@@ -255,12 +237,6 @@ public class GridSweeperTool
 	 * </td>
 	 * </tr>
 	 * 
-	 * <tr>
-	 * <td>-b, --rng-seed-bits</td>
-	 * <td>
-	 * Number of bits used to generate random seeds. Positive random seeds will be
-	 * generated between 0 and 2^(number of bits) - 1. Defaults to 16 bits.
-	 * </td>
 	 * <tr>
 	 * <td>-c, --command</td>
 	 * <td>
@@ -376,8 +352,6 @@ public class GridSweeperTool
 						state = ArgState.NAME;
 					else if(arg.equals("-N") || arg.equals("--numruns"))
 						state = ArgState.NUM_RUNS;
-					else if(arg.equals("-b") || arg.equals("--rng-seed-bits"))
-						state = ArgState.RNG_SEED_BITS;
 					else if(arg.equals("-c") || arg.equals("--command"))
 						state = ArgState.COMMAND;
 					else if(arg.equals("-i") || arg.equals("--input"))
@@ -416,10 +390,6 @@ public class GridSweeperTool
 					cliSettings.put("NumRuns", arg);
 					state = ArgState.START;
 					break;
-				case RNG_SEED_BITS:
-					cliSettings.put("RngSeedBits", arg);
-					state = ArgState.START;
-					break;
 				case COMMAND:
 					adapterSettings.put("command", arg);
 					state = ArgState.START;
@@ -448,7 +418,6 @@ public class GridSweeperTool
 	 * <li>Single values: <br/>{@code r=0.1}</li>
 	 * <li>List sweeps: <br/>{@code r=0.1, 0.2, 0.3}</li>
 	 * <li>Range sweeps: <br/>{@code r=0.1:0.1:1.0}</li>
-	 * <li>Stochastic sweeps: <br/>{@code r=uniform:0.1:1.0:0.1}</li>
 	 * <li>
 	 *     Parallel lists with multiple parameters:<br/>
 	 *     {@code r s = 0.1 1.1, 0.2 1.2, 0.3 1.3}<br/>
@@ -588,7 +557,7 @@ public class GridSweeperTool
 		for(Sweep rangeSweep : sweep.getChildren())
 		{
 			int numVals = 0;
-			try { numVals = rangeSweep.generateMaps(null).size(); }
+			try { numVals = rangeSweep.generateMaps().size(); }
 			catch(Exception e){assert(false);}
 			
 			if(first)
@@ -739,41 +708,8 @@ public class GridSweeperTool
 		assert(rhsColonPieces.length > 0);
 		if(rhsColonPieces.length > 1)
 		{
-			// Parse as a range sweep or as a stochastic sweep
-			
-			// Reject if any pieces are the empty string
-			// Also reject if any component after the first one is non-numeric
-			for(int i = 0; i < rhsColonPieces.length; i++)
-			{
-				if(rhsColonPieces[i].equals(""))
-				{
-					parseFail(arg);
-				}
-				
-				if(i > 0)
-				{
-					numMatcher.reset(rhsColonPieces[i]);
-					if(!numMatcher.matches())
-					{
-						parseFail(arg);
-					}
-				}
-			}
-			
-			// Check first piece for word vs. non-word
-			String firstPiece = rhsColonPieces[0];
-			numMatcher.reset(firstPiece);
-			if(numMatcher.matches())
-			{
-				// Parse as a range sweep
-				return parseRangeSweep(arg, name, rhsColonPieces);
-			}
-			else
-			{
-				// Parse as a stochastic sweep
-				return parseStochasticSweep(arg, name, rhsColonPieces);
-			}
-			
+			// Parse as a range sweep
+			return parseRangeSweep(arg, name, rhsColonPieces);
 		}
 		else
 		{
@@ -796,9 +732,25 @@ public class GridSweeperTool
 
 	Sweep parseRangeSweep(String arg, String name, String[] rhsColonPieces) throws GridSweeperException
 	{
+		// Must have exactly three pieces
 		if(rhsColonPieces.length != 3)
 		{
 			parseFail(arg);
+		}
+		
+		// Reject if any pieces are the empty string or non-numeric
+		for(int i = 0; i < rhsColonPieces.length; i++)
+		{
+			if(rhsColonPieces[i].equals(""))
+			{
+				parseFail(arg);
+			}
+			
+			numMatcher.reset(rhsColonPieces[i]);
+			if(!numMatcher.matches())
+			{
+				parseFail(arg);
+			}
 		}
 		
 		BigDecimal start = new BigDecimal(rhsColonPieces[0]);
@@ -806,34 +758,6 @@ public class GridSweeperTool
 		BigDecimal end = new BigDecimal(rhsColonPieces[2]);
 		
 		return new RangeListSweep(name, start, end, incr);
-	}
-
-	Sweep parseStochasticSweep(String arg, String name, String[] rhsColonPieces) throws GridSweeperException
-	{
-		String distName = rhsColonPieces[0];
-		
-		if(distName.equals("uniform"))
-		{
-			if(rhsColonPieces.length != 4)
-			{
-				parseFail(arg);
-			}
-			try
-			{
-				double start = Double.parseDouble(rhsColonPieces[1]);
-				double end = Double.parseDouble(rhsColonPieces[2]);
-				int count = Integer.parseInt(rhsColonPieces[3]);
-				
-				return new UniformDoubleSweep(name, start, end, count);
-			}
-			catch(NumberFormatException e)
-			{
-				parseFail(arg);
-			}
-		}
-		
-		parseFail(arg);
-		return null;
 	}
 
 	Sweep parseListSweep(String arg, String name, String[] values) throws GridSweeperException

@@ -1,10 +1,13 @@
 package edu.umich.lsa.cscs.gridsweeper;
 
 import java.io.FileNotFoundException;
-import java.math.BigInteger;
 import java.util.*;
+import static edu.umich.lsa.cscs.gridsweeper.StringUtils.*;
 
 import javax.xml.parsers.*;
+
+import cern.jet.random.*;
+import cern.jet.random.engine.*;
 
 import edu.umich.lsa.cscs.gridsweeper.parameters.*;
 
@@ -32,8 +35,8 @@ public class Experiment
 	private StringList parameterOrder;
 	
 	private int numRuns;
-	private long rngSeed;
-	private int rngSeedBits = 16;
+	private int firstSeedRow; // Row in RandomSeedTable to start using seeds from
+	private int seedCol;      // Column in RandomSeedTable to use seeds from
 	
 	/**
 	 * The default constructor. Initializes {@code numRuns} to 1, and 
@@ -51,9 +54,10 @@ public class Experiment
 		outputFiles = new StringList();
 		rootSweep = new MultiplicativeCombinationSweep();
 		
-		// Only 48 bits are used by Random's seed,
-		// hence masking against 2^48 - 1
-		rngSeed = (new Random()).nextLong() & 0xFFFFFFFFFFFFL;
+		Uniform uniform = new Uniform(new MersenneTwister(new Date()));
+		
+		firstSeedRow = uniform.nextIntFromTo(0, Integer.MAX_VALUE);
+		seedCol = uniform.nextIntFromTo(0, RandomSeedTable.COLUMNS);
 	}
 	
 	/**
@@ -71,6 +75,11 @@ public class Experiment
 			ExperimentXMLHandler handler = new ExperimentXMLHandler(this);
 			
 			parser.parse(experimentURL.toString(), handler);
+			
+			if(name == null)
+			{
+				setName(lastPathComponent(experimentURL.getPath()));
+			}
 		}
 		catch(Exception e)
 		{
@@ -89,20 +98,20 @@ public class Experiment
 	{
 		List<ExperimentCase> cases = new ArrayList<ExperimentCase>();
 		
-		Random rng = new Random(rngSeed);
+		RandomSeedGenerator seedGen = new RandomSeedGenerator(firstSeedRow, seedCol);
 		
 		// Generate the list of parameter values
 		try
 		{
-			List<ParameterMap> parameterMaps = rootSweep.generateMaps(rng);
+			List<ParameterMap> parameterMaps = rootSweep.generateMaps();
 			
 			// Generate the experiment cases
 			for(ParameterMap parameterMap : parameterMaps)
 			{
-				List<BigInteger> rngSeeds = new ArrayList<BigInteger>(numRuns);
+				List<Integer> rngSeeds = new ArrayList<Integer>(numRuns);
 				for(int i = 0; i < numRuns; i++)
 				{
-					rngSeeds.add(new BigInteger(rngSeedBits, rng));
+					rngSeeds.add(seedGen.nextSeed());
 				}
 				
 				cases.add(new ExperimentCase(parameterMap, rngSeeds));
@@ -171,24 +180,24 @@ public class Experiment
 		this.numRuns = numRuns;
 	}
 
-	/**
-	 * Getter for the random seed. This seed is used as a starting point for calculating
-	 * the random seeds for runs as well as for stochastic sweeps. 
-	 * @return The seed for the random number generator.
-	 */
-	public long getRngSeed()
+	public int getFirstSeedRow()
 	{
-		return rngSeed;
+		return firstSeedRow;
+	}
+	
+	public int getSeedCol()
+	{
+		return seedCol;
 	}
 
-	/**
-	 * Setter for the random seed. This seed is used as a starting point for calculating
-	 * the random seeds for runs as well as for stochastic sweeps.
-	 * @param rngSeed The random seed to use. 
-	 */
-	public void setRngSeed(long rngSeed)
+	public void setFirstSeedRow(int firstSeedRow)
 	{
-		this.rngSeed = rngSeed;
+		this.firstSeedRow = firstSeedRow;
+	}
+	
+	public void setSeedCol(int seedCol)
+	{
+		this.seedCol = seedCol;
 	}
 
 	/**
@@ -368,15 +377,5 @@ public class Experiment
 	{
 		ExperimentXMLWriter writer = new ExperimentXMLWriter(path, this, writeRngSeed);
 		writer.writeXML();
-	}
-
-	public int getRngSeedBits()
-	{
-		return rngSeedBits;
-	}
-	
-	public void setRngSeedBits(int rngSeedBits)
-	{
-		this.rngSeedBits = rngSeedBits;
 	}
 }

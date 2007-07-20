@@ -18,7 +18,7 @@ public class ParallelCombinationSweepTest
 	@Test
 	public void emptySweep() throws SweepLengthException, DuplicateParameterException
 	{
-		List<ParameterMap> maps = sweep.generateMaps(null);
+		List<ParameterMap> maps = sweep.generateMaps();
 		assertEquals(maps.size(), 0);
 	}
 	
@@ -27,7 +27,7 @@ public class ParallelCombinationSweepTest
 	{
 		ListSweep listSweep = new ListSweep("param");
 		sweep.add(listSweep);
-		List<ParameterMap> maps = sweep.generateMaps(null);
+		List<ParameterMap> maps = sweep.generateMaps();
 		assertEquals(maps.size(), 0);
 	}
 	
@@ -39,7 +39,7 @@ public class ParallelCombinationSweepTest
 		listSweep.add("there");
 		sweep.add(listSweep);
 		
-		List<ParameterMap> maps = sweep.generateMaps(null);
+		List<ParameterMap> maps = sweep.generateMaps();
 		assertEquals(maps.size(), 2);
 		assertEquals(maps.get(0).get("param"), "hello");
 		assertEquals(maps.get(1).get("param"), "there");
@@ -58,7 +58,7 @@ public class ParallelCombinationSweepTest
 		listSweep2.add("0.4");
 		sweep.add(listSweep2);
 		
-		List<ParameterMap> maps = sweep.generateMaps(null);
+		List<ParameterMap> maps = sweep.generateMaps();
 		assertEquals(2, maps.size());
 		assertEquals(maps.get(0).get("beta"), "0.1");
 		assertEquals(maps.get(1).get("beta"), "0.2");
@@ -77,7 +77,7 @@ public class ParallelCombinationSweepTest
 		try
 		{
 			@SuppressWarnings("unused")
-			List<ParameterMap> maps = sweep.generateMaps(null);
+			List<ParameterMap> maps = sweep.generateMaps();
 			fail();
 		}
 		catch(DuplicateParameterException e) {}
@@ -98,7 +98,7 @@ public class ParallelCombinationSweepTest
 		try
 		{
 			@SuppressWarnings("unused")
-			List<ParameterMap> maps = sweep.generateMaps(null);
+			List<ParameterMap> maps = sweep.generateMaps();
 			fail();
 		}
 		catch(SweepLengthException e) {}

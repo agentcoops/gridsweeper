@@ -5,8 +5,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 
-import edu.umich.lsa.cscs.gridsweeper.parameters.ParameterMap;
-
 public class XMLWriter
 {
 	private static String xmlDeclaration = "<?xml version=\"1.0\"?>";

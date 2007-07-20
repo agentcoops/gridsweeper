@@ -2,18 +2,13 @@ package edu.umich.lsa.cscs.gridsweeper;
 
 import org.ggf.drmaa.*;
 
-import edu.umich.lsa.cscs.gridsweeper.parameters.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.*;
-import java.util.logging.*;
-import java.util.regex.*;
 
 import static edu.umich.lsa.cscs.gridsweeper.StringUtils.*;
 import static edu.umich.lsa.cscs.gridsweeper.DateUtils.*;
@@ -244,7 +239,7 @@ public class GridSweeper
 		xmlWriter.writeXML();
 		
 		// Run each individual run on the grid
-		List<BigInteger> rngSeeds = expCase.getRngSeeds();
+		List<Integer> rngSeeds = expCase.getRngSeeds();
 		for(int i = 0; i < rngSeeds.size(); i++)
 		{
 			runCaseRun(expCase, caseDir, caseSubDir, i, rngSeeds.get(i));
@@ -261,7 +256,7 @@ public class GridSweeper
 	 * @throws DrmaaException If a DRMAA error occurs during job submission.
 	 * @throws IOException If the case XML cannot be written out.
 	 */
-	public void runCaseRun(ExperimentCase expCase, String caseDir, String caseSubDir, int i, BigInteger rngSeed) throws DrmaaException, IOException
+	public void runCaseRun(ExperimentCase expCase, String caseDir, String caseSubDir, int i, int rngSeed) throws DrmaaException, IOException
 	{
 		Settings settings = experiment.getSettings();
 		

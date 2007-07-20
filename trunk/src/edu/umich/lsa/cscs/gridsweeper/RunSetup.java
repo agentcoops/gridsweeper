@@ -1,7 +1,6 @@
 package edu.umich.lsa.cscs.gridsweeper;
 
 import java.io.*;
-import java.math.BigInteger;
 import java.util.*;
 
 import edu.umich.lsa.cscs.gridsweeper.parameters.ParameterMap;
@@ -21,10 +20,10 @@ public class RunSetup implements Serializable
 	private String fileTransferSubpath;
 	private ParameterMap parameters;
 	private int runNumber;
-	private BigInteger rngSeed;
+	private int rngSeed;
 	private StringList outputFiles;
 	
-	public RunSetup(Settings settings, StringMap inputFiles, String fileTransferSubpath, ParameterMap parameters, int runNumber, BigInteger rngSeed, StringList outputFiles)
+	public RunSetup(Settings settings, StringMap inputFiles, String fileTransferSubpath, ParameterMap parameters, int runNumber, int rngSeed, StringList outputFiles)
 	{
 		this.settings = settings;
 		this.inputFiles = inputFiles;
@@ -40,7 +39,7 @@ public class RunSetup implements Serializable
 		return settings;
 	}
 	
-	public BigInteger getRngSeed()
+	public int getRngSeed()
 	{
 		return rngSeed;
 	}

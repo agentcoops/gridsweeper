@@ -34,7 +34,7 @@ public abstract class CombinationSweep implements Sweep
 		this.children = new ArrayList<Sweep>();
 	}
 	
-	public abstract List<ParameterMap> generateMaps(Random rng) throws SweepLengthException, DuplicateParameterException;
+	public abstract List<ParameterMap> generateMaps() throws SweepLengthException, DuplicateParameterException;
 	
 	/**
 	 * Generates the standard order in which parameters should be presented to the user
@@ -52,7 +52,7 @@ public abstract class CombinationSweep implements Sweep
 		
 		for(Sweep sweep : children)
 		{
-			if(sweep instanceof SingleValueSweep || sweep instanceof StochasticSweep)
+			if(sweep instanceof SingleValueSweep)
 			{
 				// Don't include it
 			}

@@ -82,30 +82,6 @@ public class GridSweeperToolTest
 	}
 	
 	@Test
-	public void parseUniform() throws GridSweeperException
-	{
-		GridSweeperTool tool = new GridSweeperTool();
-		UniformDoubleSweep sweep = (UniformDoubleSweep)tool.parseSweepArg("r=uniform:0.1:1.0:10");
-		assertTrue(sweep instanceof UniformDoubleSweep);
-		assertEquals("r", sweep.getName());
-		assertEquals(0.1, sweep.getStart());
-		assertEquals(1.0, sweep.getEnd());
-		assertEquals(10, sweep.getCount());
-	}
-	
-	@Test
-	public void parseUniformWS() throws GridSweeperException
-	{
-		GridSweeperTool tool = new GridSweeperTool();
-		UniformDoubleSweep sweep = (UniformDoubleSweep)tool.parseSweepArg("r = uniform: 0.1 : 1.0 : 10");
-		assertTrue(sweep instanceof UniformDoubleSweep);
-		assertEquals("r", sweep.getName());
-		assertEquals(0.1, sweep.getStart());
-		assertEquals(1.0, sweep.getEnd());
-		assertEquals(10, sweep.getCount());
-	}
-	
-	@Test
 	public void parseParallelRange() throws GridSweeperException
 	{
 		GridSweeperTool tool = new GridSweeperTool();
@@ -188,10 +164,5 @@ public class GridSweeperToolTest
 		assertEquals("0.4", values1.get(1));
 		assertEquals("0.5", values1.get(2));
 		assertEquals("0.6", values1.get(3));
-	}
-	
-	private String getPath(String testName)
-	{
-		return StringUtils.unescape(getClass().getResource("GridSweeperTest_" + testName + ".gsweep").getPath());
 	}
 }

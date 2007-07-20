@@ -35,7 +35,7 @@ public class SingleValueSweep extends SingleSweep
 	 * @return The one-item list of a one-entry map.
 	 */
 	@Override
-	public List<ParameterMap> generateMaps(Random rng)
+	public List<ParameterMap> generateMaps()
 	{
 		List<ParameterMap> maps = new ArrayList<ParameterMap>();
 		maps.add(new ParameterMap(name, value));

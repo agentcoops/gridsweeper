@@ -1,7 +1,6 @@
 package edu.umich.lsa.cscs.gridsweeper.parameters;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * An abstract class representing a sweep that deals with a single parameter.
@@ -24,7 +23,7 @@ public abstract class SingleSweep implements Sweep
 		this.name = name;
 	}
 
-	public abstract List<ParameterMap> generateMaps(Random rng);
+	public abstract List<ParameterMap> generateMaps();
 
 	/**
 	 * Returns the parameter name used by this sweep.

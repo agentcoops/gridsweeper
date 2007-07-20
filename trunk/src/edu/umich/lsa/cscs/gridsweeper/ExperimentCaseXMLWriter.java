@@ -1,7 +1,6 @@
 package edu.umich.lsa.cscs.gridsweeper;
 
 import java.io.*;
-import java.math.BigInteger;
 import java.util.*;
 import edu.umich.lsa.cscs.gridsweeper.parameters.ParameterMap;
 
@@ -92,7 +91,7 @@ public class ExperimentCaseXMLWriter extends XMLWriter
 	 */
 	private void printRuns()
 	{
-		List<BigInteger> rngSeeds = expCase.getRngSeeds();
+		List<Integer> rngSeeds = expCase.getRngSeeds();
 		for(int i = 0; i < rngSeeds.size(); i++)
 		{
 			StringMap attrs = new StringMap();

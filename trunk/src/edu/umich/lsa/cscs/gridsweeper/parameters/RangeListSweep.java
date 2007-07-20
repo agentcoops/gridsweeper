@@ -58,7 +58,7 @@ public class RangeListSweep extends SingleSweep
 	 * of the parameter to a value in the range. 
 	 */
 	@Override
-	public List<ParameterMap> generateMaps(Random rng)
+	public List<ParameterMap> generateMaps()
 	{
 		List<ParameterMap> maps = new ArrayList<ParameterMap>();
 		

@@ -1,6 +1,5 @@
 package edu.umich.lsa.cscs.gridsweeper;
 
-import java.math.BigInteger;
 import java.util.*;
 
 import edu.umich.lsa.cscs.gridsweeper.parameters.*;
@@ -14,14 +13,14 @@ import edu.umich.lsa.cscs.gridsweeper.parameters.*;
 public class ExperimentCase
 {
 	ParameterMap parameterMap;
-	List<BigInteger> rngSeeds;
+	List<Integer> rngSeeds;
 	
 	/**
 	 * Initializes the experiment case with the parameter settings and random seeds.
 	 * @param parameterMap The parameter assignments.
 	 * @param rngSeeds The random seeds.
 	 */
-	public ExperimentCase(ParameterMap parameterMap, List<BigInteger> rngSeeds)
+	public ExperimentCase(ParameterMap parameterMap, List<Integer> rngSeeds)
 	{
 		this.parameterMap = parameterMap;
 		this.rngSeeds = rngSeeds;
@@ -40,7 +39,7 @@ public class ExperimentCase
 	 * Getter for the list of random seeds.
 	 * @return The list of random seeds.
 	 */
-	public List<BigInteger> getRngSeeds()
+	public List<Integer> getRngSeeds()
 	{
 		return rngSeeds;
 	}

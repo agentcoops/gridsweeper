@@ -1,7 +1,5 @@
 package edu.umich.lsa.cscs.gridsweeper;
 
-import java.math.BigInteger;
-
 import edu.umich.lsa.cscs.gridsweeper.parameters.ParameterMap;
 
 /**
@@ -27,5 +25,5 @@ public interface Adapter
 	 * and standard error.
 	 * @throws AdapterException For any reason defined by the implementing class.
 	 */
-	public RunResults run(ParameterMap parameterMap, int runNumber, BigInteger rngSeed) throws AdapterException;
+	public RunResults run(ParameterMap parameterMap, int runNumber, int rngSeed) throws AdapterException;
 }

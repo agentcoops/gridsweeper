@@ -1,27 +1,26 @@
 package edu.umich.lsa.cscs.gridsweeper;
 
 import java.io.FileNotFoundException;
-import java.math.BigInteger;
 
 import edu.umich.lsa.cscs.gridsweeper.parameters.*;
 
 public class ExperimentXMLWriter extends XMLWriter
 {
 	private Experiment experiment;
-	private boolean writeRngSeed;
+	private boolean writeSeedInfo;
 	
 	/**
 	 * Constructor for {@code ExperimentXMLWriter}.
 	 * @param path The output path for the XML.
 	 * @param experiment The experiment object.
-	 * @param writeRngSeed Whether or not to write the experiment's RNG seed.
+	 * @param writeSeedInfo Whether or not to write the experiment's RNG seed.
 	 * @throws FileNotFoundException If the output file cannot be opened.
 	 */
-	public ExperimentXMLWriter(String path, Experiment experiment, boolean writeRngSeed) throws FileNotFoundException
+	public ExperimentXMLWriter(String path, Experiment experiment, boolean writeSeedInfo) throws FileNotFoundException
 	{
 		super(path);
 		this.experiment = experiment;
-		this.writeRngSeed = writeRngSeed;
+		this.writeSeedInfo = writeSeedInfo;
 	}
 	
 	/**
@@ -53,8 +52,11 @@ public class ExperimentXMLWriter extends XMLWriter
 		StringMap attrs = new StringMap();
 		attrs.put("name", experiment.getName());
 		attrs.put("numRuns", "" + experiment.getNumRuns());
-		attrs.put("rngSeedBits", "" + experiment.getRngSeedBits());
-		if(writeRngSeed) attrs.put("rngSeed", "" + experiment.getRngSeed());
+		if(writeSeedInfo)
+		{
+			attrs.put("firstSeedRow", "" + experiment.getFirstSeedRow());
+			attrs.put("firstSeedCol", "" + experiment.getSeedCol());
+		}
 		printTagStart("experiment", attrs, false);
 	}
 	

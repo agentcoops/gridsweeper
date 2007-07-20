@@ -18,7 +18,7 @@ public class RangeListSweepTest
 		
 		RangeListSweep sweep = new RangeListSweep("param", start, end, increment);
 		
-		List<ParameterMap> maps = sweep.generateMaps(null);
+		List<ParameterMap> maps = sweep.generateMaps();
 		assertEquals(maps.size(), 1);
 		assertEquals(maps.get(0).get("param"), start); 
 	}
@@ -32,7 +32,7 @@ public class RangeListSweepTest
 		
 		RangeListSweep sweep = new RangeListSweep("param", start, end, increment);
 		
-		List<ParameterMap> maps = sweep.generateMaps(null);
+		List<ParameterMap> maps = sweep.generateMaps();
 		assertEquals(maps.size(), 1);
 		assertEquals(maps.get(0).get("param"), start); 
 	}
@@ -46,7 +46,7 @@ public class RangeListSweepTest
 		
 		RangeListSweep sweep = new RangeListSweep("param", start, end, increment);
 		
-		List<ParameterMap> maps = sweep.generateMaps(null);
+		List<ParameterMap> maps = sweep.generateMaps();
 		assertEquals(maps.size(), 2);
 		assertEquals(maps.get(0).get("param"), start);
 		assertEquals(maps.get(1).get("param"), end);
@@ -61,7 +61,7 @@ public class RangeListSweepTest
 		
 		RangeListSweep sweep = new RangeListSweep("param", start, end, increment);
 		
-		List<ParameterMap> maps = sweep.generateMaps(null);
+		List<ParameterMap> maps = sweep.generateMaps();
 		assertEquals(maps.size(), 3);
 		assertEquals(maps.get(0).get("param"), start);
 		assertEquals(maps.get(1).get("param"), new BigDecimal("0.2"));
@@ -77,7 +77,7 @@ public class RangeListSweepTest
 		
 		RangeListSweep sweep = new RangeListSweep("param", start, end, increment);
 		
-		List<ParameterMap> maps = sweep.generateMaps(null);
+		List<ParameterMap> maps = sweep.generateMaps();
 		assertEquals(maps.size(), 3);
 		assertEquals(maps.get(0).get("param"), start);
 		assertEquals(maps.get(1).get("param"), new BigDecimal("0.2"));
@@ -93,7 +93,7 @@ public class RangeListSweepTest
 		
 		RangeListSweep sweep = new RangeListSweep("param", start, end, increment);
 		
-		List<ParameterMap> maps = sweep.generateMaps(null);
+		List<ParameterMap> maps = sweep.generateMaps();
 		assertEquals(maps.size(), 3);
 		assertEquals(maps.get(0).get("param"), start);
 		assertEquals(maps.get(1).get("param"), new BigDecimal("0.2"));
@@ -109,7 +109,7 @@ public class RangeListSweepTest
 		
 		RangeListSweep sweep = new RangeListSweep("param", start, end, increment);
 		
-		List<ParameterMap> maps = sweep.generateMaps(null);
+		List<ParameterMap> maps = sweep.generateMaps();
 		assertEquals(maps.size(), 3);
 		assertEquals(maps.get(0).get("param"), start);
 		assertEquals(maps.get(1).get("param"), new BigDecimal("0.25"));

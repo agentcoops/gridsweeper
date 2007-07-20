@@ -1,7 +1,6 @@
 package edu.umich.lsa.cscs.gridsweeper;
 
 import java.io.*;
-import java.math.BigInteger;
 
 import static edu.umich.lsa.cscs.gridsweeper.StringUtils.*;
 
@@ -68,7 +67,7 @@ public class GridSweeperRunner
 			// Run!
 			ParameterMap parameters = setup.getParameters();
 			int runNumber = setup.getRunNumber();
-			BigInteger rngSeed = setup.getRngSeed();
+			int rngSeed = setup.getRngSeed();
 			results = adapter.run(parameters, runNumber, rngSeed);
 			
 			// Stage files listed in run properties back to server (if asked for)

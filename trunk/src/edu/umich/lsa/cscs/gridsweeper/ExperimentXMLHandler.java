@@ -98,16 +98,16 @@ public class ExperimentXMLHandler extends DefaultHandler
 					experiment.setNumRuns(Integer.parseInt(numRunsStr));
 				}
 				
-				String rngSeedStr = attrMap.get("rngSeed");
-				if(rngSeedStr != null)
+				String firstSeedRowStr = attrMap.get("firstSeedRow");
+				if(firstSeedRowStr != null)
 				{
-					experiment.setRngSeed(Long.parseLong(rngSeedStr));
+					experiment.setFirstSeedRow(Integer.parseInt(firstSeedRowStr));
 				}
 				
-				String rngSeedBitsStr = attrMap.get("rngSeedBits");
-				if(rngSeedBitsStr != null)
+				String seedColStr = attrMap.get("seedCol");
+				if(seedColStr != null)
 				{
-					experiment.setRngSeedBits(Integer.parseInt(rngSeedBitsStr));
+					experiment.setSeedCol(Integer.parseInt(seedColStr));
 				}
 				
 				push(experiment);
@@ -203,10 +203,6 @@ public class ExperimentXMLHandler extends DefaultHandler
 			{
 				startSweepElement(qName, attrMap);
 			}
-			else if(qName.equals("uniform"))
-			{
-				startSweepElement(qName, attrMap);
-			}
 			else if(qName.equals("multiplicative"))
 			{
 				startSweepElement(qName, attrMap);
@@ -287,11 +283,6 @@ public class ExperimentXMLHandler extends DefaultHandler
 			{
 				if(!(top instanceof RangeListSweep))
 					throw new SAXException("mismatched range end tag");
-			}
-			else if(qName.equals("uniform"))
-			{
-				if(!(top instanceof UniformDoubleSweep))
-					throw new SAXException("mismatched uniform end tag");
 			}
 			else if(qName.equals("multiplicative"))
 			{
@@ -397,10 +388,6 @@ public class ExperimentXMLHandler extends DefaultHandler
 		{
 			startRangeElement(parent, attrMap);
 		}
-		else if(qName.equals("uniform"))
-		{
-			startUniformElement(parent, attrMap);
-		}
 		else if(qName.equals("multiplicative"))
 		{
 			startMultiplicativeElement(parent, attrMap);
@@ -477,49 +464,6 @@ public class ExperimentXMLHandler extends DefaultHandler
 		catch(NumberFormatException e)
 		{
 			throw new SAXException("badly formatted number in range tag");
-		}
-	}
-	
-	/**
-	 * Parses the start tag of a uniform distribution sweep.
-	 * @param parent The sweep's parent.
-	 * @param attrMap The sweep's attributes.
-	 * @throws SAXException If any of the required attributes is missing.
-	 */
-	private void startUniformElement(CombinationSweep parent, StringMap attrMap) throws SAXException
-	{
-		String param = attrMap.get("param");
-		String type = attrMap.get("type");
-		String start = attrMap.get("start");
-		String end = attrMap.get("end");
-		String count = attrMap.get("count");
-		
-		if(param == null)
-			throw new SAXException("param attribute missing from uniform tag");
-		if(type == null)
-			throw new SAXException("type attribute missing from uniform tag");
-		if(start == null)
-			throw new SAXException("start attribute missing from uniform tag");
-		if(end == null)
-			throw new SAXException("end attribute missing from uniform tag");
-		if(count == null)
-			throw new SAXException("count attribute missing from uniform tag");
-		
-		try
-		{
-			if(type.equals("double"))
-			{
-				UniformDoubleSweep sweep =new UniformDoubleSweep(param,
-						Double.parseDouble(start), Double.parseDouble(end), Integer.parseInt(count)); 
-				parent.add(sweep);
-				push(sweep);
-			}
-			else
-				throw new SAXException("unsupported type " + type + "in uniform tag");
-		}
-		catch(NumberFormatException e)
-		{
-			throw new SAXException("badly formatted number in uniform tag");
 		}
 	}
 	

@@ -10,6 +10,7 @@
 	<property name="classes" location="${dist}/classes"/>
 	<property name="jarfile" location="${classes}/GridSweeper.jar"/>
 	<property name="distbin" location="${dist}/bin"/>
+	<property name="distman" location="${dist}/man/man1"/>
 	
 	<target name="dist" depends="jar">
 		<copy file="gsweep" tofile="${distbin}/gsweep" />
@@ -20,6 +21,8 @@
 		
 		<copy file="grunner" tofile="${distbin}/grunner" />
 		<chmod file="${distbin}/grunner" perm="755"/>
+		
+		<copy file="gsweep.1" tofile="${distman}/gsweep.1" />
 	</target>
 	
 	<target name="jar" depends="compile" description="Build jar">
