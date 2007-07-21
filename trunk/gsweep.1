@@ -27,36 +27,67 @@ gsweep \- submits a GridSweeper experiment
 ] [
 .B -d
 ] [
-.I sweep1 sweep2 ...
+\fIparam1\fP=\fIvalue1\fP \fIparam2\fP=\fIvalue2\fP ...
+] [
+.I sweep1 sweep2
+ ...
 ]
 .SH DESCRIPTION
 .B gsweep
 is the command-line interface for GridSweeper.
 .B gsweep
 constructs a GridSweeper experiment and submits it to the grid. An experiment is
-defined by the model being run, by a set of different parameter-value
-combinations to apply to the model, and by the number of times the model is run
-with different random seeds for each parameter-value combination.
-Parameter-value combinations are defined by fixed parameters values and by
-parameter sweeps, which specify a range of values to be applied to one or more
-parameters.
+defined by the model being run and by a set of different parameter-value
+combinations to apply to the model. Additionally, the model can be run a number
+of times for each parameter-value combination, each run having a different 
+random number seed.
 
-<Description of exactly what happens during an experiment run>
+When \fBgsweep\fP is run, the following things happen:
 
-<Description of each kind of command-line parameter setting here>
+.IP "1."
+Command-line options and parameter sweep arguments are parsed.
 
-Internally, the set of parameter-value combinations is represented by a single
-top-level ``multiplicative combination sweep'', which contains a set of child
-sweeps of various types: single parameter-value assignments, list sweeps,
-range list sweeps, parallel combination sweeps, and multiplicative
-combination sweeps. Sweeps specified via command-line arguments provide access
-to the most commonly used subset of capabilities provided by these different
-kinds of sweeps, and the full power of combining sweeps in arbitrary, recursive
-ways can be accessed in XML experiment files.
+.IP "2."
+Experiment settings are loaded, first from \fI~/.gridsweeper\fP, then from an
+experiment file provided using \fB-i\fP, overriding any in \fI~/.gridsweeper\fP,
+and finally from command-line options and parameter sweep arguments, overriding
+the first two sources.
 
-Experiment settings provided by command-line options override options provided
-in an input file (if provided), which in turn override options set in the
-~/.gridsweeper file.
+.IP "3."
+If an output path was specified using \fB-o\fP or \fB-O\fP, the complete set of
+experiment settings is written out to that path in the GridSweeper XML
+experiment format, minus the information needed to reproduce the same sequence
+of random seeds that will be used for this run. If \fB-O\fP was specified,
+nothing else happens.
+
+.IP "4."
+If \fB-O\fP was not specified, the process continues by constructing an output
+sub-sub-directory in the user's experiment results directory (usually
+\fI~/Experiments\fP), named with the current date and time in the format
+\fIYYYY-MM-DD/hh-mm-ss\fP. An experiment XML file is written to
+\fIexperiment.gsexp\fP in this directory, which is identical to one specified
+by \fB-o\fP or \fB-O\fP except that it does contain the information needed to
+reproduce the experiment exactly, using the same random seed for every run.
+
+.IP "5."
+Additionally, a subdirectory is created in the output directory for every single
+combination of parameters. The names of these subdirectories are given by
+the parameter values, in the format \fIp1=v1-p2=v2-p3=v3...\fP Values that stay
+the same for all runs are omitted in directory names. Inside this subdirectory
+is another XML file, named \fIcase.gscase\fP, containing the list of random
+seeds used for runs. If the \fB-d\fP option was specified, the process stops
+here.
+
+.IP "6."
+Provided \fB-d\fP was not specified, jobs are finally submitted via DRMAA (the
+Distributed Resource Management Application API) to the local grid system. Once
+a job has been assigned to a machine to be run, a GridSweeper wrapper tool uses
+the setup data provided by the \fBgsweep\fP to instantiate an adapter, which
+finally runs the model executable. The default adapter is capable of running
+models that conform to the target program requirements for the Drone batch
+system, described here:
+
+.I http://www.cscs.umich.edu/Software/Drone/doc/drone.html
 
 .SH OPTIONS
 .IP "\fB-a\fP, \fB--adapter \fIadapter-class-name\fP"
@@ -109,8 +140,54 @@ populated with control files needed to reproduce runs, but the runs do not
 actually happen. If this option appears after \fB-O\fP in the argument list,
 it overrides the no-run behavior caused by that option.
 
+.SH PARAMETER SWEEP ARGUMENTS
+
+Several different types of parameter sweeps can be specified at the command
+line, as described in this section.
+
+.IP "\fIparam\fP=\fIvalue\fP"
+Sets the value \fIvalue\fP of a single parameter \fIparam\fP.
+
+.IP "\fIparam\fP=\fIvalue1\fP,\fIvalue2\fP,..."
+Sweeps parameter \fIparam\fP through a sequence of values \fIvalue1\fP,
+\fIvalue2\fP, etc.
+
+.IP "\fIparam\fP=\fIstart\fP:\fIincrement\fP:\fIend\fP"
+Sweeps parameter \fIparam\fP through a sequence of values defined by the range
+starting at \fIstart\fP, \fIstart\fP+\fIincrement\fP,
+\fIstart\fP+2*\fIincrement\fP, and so on for all values less than or equal to
+\fIend\fP. All three values \fIstart\fP, \fIincrement\fP, and \fIend\fP must be
+real numbers.
+
+.IP "\fIp1 p2\fP ... = \fIp1v1\fP,...,\fIp1vn\fP \fIp2v1\fP,...\fIp2vn\fP ...
+Sweeps parameters \fIp1\fP, \fIp2\fP, etc. in parallel, combining
+\fIp1\fP=\fIp1v1\fP with \fIp2\fP=\fIp2v1\fP, \fIp1\fP=\fIp1v2\fP with
+\fIp2\fP=\fIp2v2\fP, and so on. Each value list must have the same number of
+items.
+
+.IP "\fIp1 p2\fP ... = \fIp1v1 p2v1 ...\fP, \fIp1v2 p2v2 ...\fP, ...
+An alternate notation for the previous type of sweep.
+
+.IP "\fIp1 p2\fP ... = \fIs1\fP:\fIi1\fP:\fIe1\fP, \fIs2\fP:\fIi2\fP:\fIe2\fP, ..."
+Sweeps parameters \fIp1\fP, \fIp2\fP, etc. in parallel, combining corresponding
+assignments within the ranges specified by starting values \fIs1\fP, etc.,
+increments \fIi1\fP, etc., and ending values \fIe1\fP, etc. The value lists
+generated by these ranges must all have the same number of items.
+
+.PP
+Because of the use of spaces as a delimiter, the last three types of sweeps
+must be surrounded by quotes when typing commands in a shell.
 
 .SH SWEEP TYPES
+
+Internally, the set of parameter-value combinations is represented by a single
+top-level ``multiplicative combination sweep'', which contains a set of child
+sweeps of various types: single parameter-value assignments, list sweeps,
+range list sweeps, parallel combination sweeps, and multiplicative
+combination sweeps. Sweeps specified via command-line arguments provide access
+to the most commonly used subset of capabilities provided by these different
+kinds of sweeps, and the full power of combining sweeps in arbitrary, recursive
+ways can be accessed in XML experiment files.
 
 .IP "\fBList Sweeps\fP"
 List sweeps are used to enumerate a list of values assigned to a single
