@@ -243,17 +243,17 @@ tag:
 .fi
 
 All attributes are optional. The
-.I name
+.B name
 attribute is used to name experiment directories in the filesystem and in
 naming strings submitted to the grid. The
-.I numRuns
+.B numRuns
 attribute specifies how many runs with different random seeds should be
 completed for each combination of parameter-value assignments.
 
 The attributes
-.I firstSeedRow
+.B firstSeedRow
 and
-.I seedCol
+.B seedCol
 uniquely specify the sequence of random seeds that will be assigned to runs.
 Random seeds are generated using the
 .B RandomSeedGenerator
@@ -261,9 +261,9 @@ class from the CERN Colt scientific computing library, whose sole purpose is to
 decorrelate seeds from any uniform random number generator. Seeds are selected
 deterministically, in sequence from one of two columns, 0 or 1, in a virtual
 seed table. The range of rows is 0 to 2^32 - 1. If
-.I firstSeedRow
+.B firstSeedRow
 or
-.I seedCol
+.B seedCol
 are missing, they are chosen at random. Unless you are trying to reproduce a
 prior experiment, there is no reason to specify these attributes, but they will
 appear in the experiment file generated in the experiment results directory. You
@@ -391,6 +391,34 @@ of parameter-value combinations, six each in this example:
 			<item value="10000000"/>
 		</list>
 	</parallel>
+.fi
+
+.SH CASE FILE FORMAT
+Case files are also written out as XML. The format is very simple, consisting of
+a single \fB<case>\fP element containing a number of \fB<run>\fP elements.
+
+The \fB<case>\fP element includes a single attribute, \fBname\fP, which is
+intended for  human readability only and is constructed by GridSweeper from the
+experiment name, the parameter settings, and the date. Each \fB<run>\fP element
+includes two attributes, \fBrngSeed\fP and \fBnumber\fP.
+
+An example:
+
+.nf
+<?xml version="1.0" encoding="UTF-8"?>
+<case name="echo - r=0.4 (2007-07-20, 16-29-39)">
+	<value value="0.4" param="r"/>
+	<run rngSeed="526374054" number="0"/>
+	<run rngSeed="1986201165" number="1"/>
+	<run rngSeed="1585196345" number="2"/>
+	<run rngSeed="1619001183" number="3"/>
+	<run rngSeed="2137463870" number="4"/>
+	<run rngSeed="549727158" number="5"/>
+	<run rngSeed="1322681018" number="6"/>
+	<run rngSeed="296371489" number="7"/>
+	<run rngSeed="1066118686" number="8"/>
+	<run rngSeed="1141036221" number="9"/>
+</case>
 .fi
 
 .SH BUILT-IN GRIDSWEEPER SETTINGS
