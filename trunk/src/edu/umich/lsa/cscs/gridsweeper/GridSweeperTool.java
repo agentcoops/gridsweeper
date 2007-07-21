@@ -301,7 +301,7 @@ public class GridSweeperTool
 	 * <p>Path at which experiment XML should be written. The outputted file
 	 * will contain all the settings needed to re-run the experiment using
 	 * <br/><br/>
-	 * {@code gsweep -e <experimentXMLPath>}
+	 * {@code gsweep -i <experimentXMLPath>}
 	 * <br/><br/>
 	 * and nothing else. This will <em>not</em> be an exact replica of this
 	 * run, because the seed for GridSweeper’s random number generator will

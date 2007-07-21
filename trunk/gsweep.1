@@ -1,0 +1,410 @@
+.TH GSWEEP 1 "JULY 2007" GridSweeper "GridSweeper Manual"
+.SH NAME
+gsweep \- submits a GridSweeper experiment
+.SH SYNOPSIS
+.B gsweep
+[
+.B -a 
+.I adapter-class-name
+] [
+.B -n
+.I experiment-name
+] [
+.B -N
+.I num-runs
+] [
+.B -S
+.I seed-location
+] [
+.B -c
+.I command
+] [
+.B -i
+.I input-file
+] [
+.B -o | -O
+.I output-file
+] [
+.B -d
+] [
+.I sweep1 sweep2 ...
+]
+.SH DESCRIPTION
+.B gsweep
+is the command-line interface for GridSweeper.
+.B gsweep
+constructs a GridSweeper experiment and submits it to the grid. An experiment is
+defined by the model being run, by a set of different parameter-value
+combinations to apply to the model, and by the number of times the model is run
+with different random seeds for each parameter-value combination.
+Parameter-value combinations are defined by fixed parameters values and by
+parameter sweeps, which specify a range of values to be applied to one or more
+parameters.
+
+<Description of exactly what happens during an experiment run>
+
+<Description of each kind of command-line parameter setting here>
+
+Internally, the set of parameter-value combinations is represented by a single
+top-level ``multiplicative combination sweep'', which contains a set of child
+sweeps of various types: single parameter-value assignments, list sweeps,
+range list sweeps, parallel combination sweeps, and multiplicative
+combination sweeps. Sweeps specified via command-line arguments provide access
+to the most commonly used subset of capabilities provided by these different
+kinds of sweeps, and the full power of combining sweeps in arbitrary, recursive
+ways can be accessed in XML experiment files.
+
+Experiment settings provided by command-line options override options provided
+in an input file (if provided), which in turn override options set in the
+~/.gridsweeper file.
+
+.SH OPTIONS
+.IP "\fB-a\fP, \fB--adapter \fIadapter-class-name\fP"
+Name of the adapter class that interfaces with model executables,
+e.g., \fIedu.umich.lsa.cscs.gridsweeper.DroneAdapter\fP.
+
+.IP "\fB-n\fP, \fB--name \fIexperiment-name\fP"
+Experiment name. This string is used to name the experiment output directory and
+to identify submitted jobs in the grid system.
+
+.IP "\fB-N\fP, \fB--numruns \fInum-runs\fP"
+Number of runs to perform for each combination of parameter-value assignments.
+
+.IP "\fB-S\fP, \fB--seed \fIseed-location\fP"
+The location of the first seed in the seed generation table, given as
+\fIrow\fB:\fIcol\fP. See the full description of seed generation in the
+\fIEXPERIMENT FILE FORMAT\fP section.
+
+.IP "\fB-c\fP, \fB--command \fIcommand\fP"
+Command (model executable path) to run. In effect, this sets the
+.I command
+setting in the adapter domain, e.g.,
+\fIedu.umich.lsa.cscs.gridsweeper.Drone.command\fP,
+so if the adapter class does not support this setting, this option has no
+effect.
+
+.IP "\fB-i\fP, \fB--input \fI input-file\fP"
+Path to experiment XML input file. Any settings or options provided at the
+command line will override anything in the input file, regardless of the
+position of this option in the argument list.
+
+.IP "\fB-o\fP, \fB--output \fI output-file\fP"
+Path at which a generated experiment XML file should be written. The generated
+file will contain all the settings needed to re-run the experiment with a new
+sequence of random seeds, including settings set by the user's
+.I ~/.gridsweeper
+file, settings in an input experiment XML file, and settings set at the command
+line.
+
+.IP "\fB-O\fP, \fB--output-only \fI output-file\fP"
+The same as \fB-o\fP, but additionally causes the experiment not to be run at
+this time. This option is useful for generating experiment XML files quickly
+from the command line for later editing. If this option appears after \fB-d\fP
+in the argument list, dry run behavior is overriden by no-run behavior.
+
+.IP "\fB-d\fP, \fB--dry\fP"
+Perform a ``dry run'', simulating the parameter sweep without actually
+submitting jobs to the grid to be run. Output directories are created and
+populated with control files needed to reproduce runs, but the runs do not
+actually happen. If this option appears after \fB-O\fP in the argument list,
+it overrides the no-run behavior caused by that option.
+
+
+.SH SWEEP TYPES
+
+.IP "\fBList Sweeps\fP"
+List sweeps are used to enumerate a list of values assigned to a single
+parameter. Any string can be provided as a value, but, in order to support
+characters reserved by the syntax, strings are interpreted as being
+percent-escaped, as defined in IETF RFC 3986.
+
+.IP "\fBRange List Sweeps\fP"
+Range list sweeps represent a shorthand for value lists. Values are enumerated
+from a starting value by adding a fixed increment until the calculated value
+is greater than a final value. Thus, the final value is included in the list
+if and only if it is greater than the starting value by exactly an integer
+multiple of the increment (say that three times fast). So, 0.1:0.1:0.5 will
+include the values 0.1, 0.2, 0.3, 0.4, and 0.5, but 0.1:0.1:0.49 will only
+include 0.1, 0.2, 0.3, and 0.4. Rounding errors are not a problem, because
+GridSweeper uses an arbitrary-precision decimal number representation to 
+calculate these lists.
+
+.IP "\fBParallel Combination Sweeps\fP"
+Parallel combination sweeps can be used to combine other sweeps that generate
+exactly the same number of parameter combinations. A new set of combinations is
+created by combining the parameter-value assignments from combinations in
+different sweeps that have the same position in the enumerated list.
+For example, two value lists, 
+.B r = 0.1, 0.2, 0.3
+and 
+.B s = 1, 2, 3
+can be combined to create
+.B r s = 0.1 1, 0.2 2, 0.3 3
+, which has the same number of parameter combinations (3) as each of the sweeps
+individually.
+
+.IP "\fBMultiplicative Combination Sweeps\fP"
+Multiplicative combination sweeps generate all the possible combinations
+generated by its sub-sweeps, in effect ``multiplying'' the sweeps together.
+For example, combining the same two value lists together would yield a
+new sweep with nine different parameter-value assignments,
+.B r s = 0.1 1, 0.1 2, 0.1 3, 0.2 1, 0.2 2, 0.2 3, 0.3 1, 0.3 2, 0.3 3
+, rather than just the three generated by the parallel combination.
+
+.SH EXPERIMENT FILE FORMAT
+Experiment files are written in XML with a simple set of tags. At the top level
+is the
+.B <experiment>
+tag:
+
+.nf
+<?xml version="1.0" encoding="UTF-8"?>
+<experiment name="My Experiment" numRuns="10"
+	firstSeedRow="0" seedCol="0">
+	<!-- ... -->
+</experiment>
+.fi
+
+All attributes are optional. The
+.I name
+attribute is used to name experiment directories in the filesystem and in
+naming strings submitted to the grid. The
+.I numRuns
+attribute specifies how many runs with different random seeds should be
+completed for each combination of parameter-value assignments.
+
+The attributes
+.I firstSeedRow
+and
+.I seedCol
+uniquely specify the sequence of random seeds that will be assigned to runs.
+Random seeds are generated using the
+.B RandomSeedGenerator
+class from the CERN Colt scientific computing library, whose sole purpose is to
+decorrelate seeds from any uniform random number generator. Seeds are selected
+deterministically, in sequence from one of two columns, 0 or 1, in a virtual
+seed table. The range of rows is 0 to 2^32 - 1. If
+.I firstSeedRow
+or
+.I seedCol
+are missing, they are chosen at random. Unless you are trying to reproduce a
+prior experiment, there is no reason to specify these attributes, but they will
+appear in the experiment file generated in the experiment results directory. You
+can read more in the Colt API documentation:
+
+.I http://dsd.lbl.gov/~hoschek/colt/api/index.html
+
+Tags that can appear within \fB<experiment>\fP are described below.
+
+.IP "\fB<setting>\fP"
+
+Typically, the 
+.B <experiment>
+tag will contain one or more
+.B <setting>
+tags, which look like this:
+
+.nf
+	<setting key="key" value="value"/>
+.fi
+
+Settings are either built-in GridSweeper settings, which are a single word,
+or settings for adapter classes, which are prefixed by the fully-qualified
+Java class name and an additional `.', e.g.,
+
+.nf
+	<setting
+	 key="edu.umich.lsa.cscs.gridsweeper.DroneAdapter.command"
+	 value="/bin/echo"
+	/>
+.fi
+
+Supported settings are described in ``Built-In GridSweeper Settings'' and
+``Drone Adapter Settings'', below.
+
+.IP "\fB<abbrev>\fP"
+The
+.B <abbrev>
+tag lets you specify abbreviations for parameter names that are used
+when naming output directories. The full parameter name is always passed
+onto the adapter for the purpose of running the model, but using abbreviations
+can make it much easier to navigate your experiment's output. These tags take
+the following form:
+
+.nf
+	<abbrev param="param" abbrev="abbrev"/>
+.fi
+
+.IP "\fB<value>\fP"
+The
+.B <value>
+tag is used to assign single values to parameters. It takes the form
+
+.nf
+	<value param="param" value="value"/>
+.fi
+Parameter values can be any string. In order to support special characters,
+values are interpreted as being percent-escaped, as described in IETF RFC 3986.
+
+.IP "\fB<list>\fP"
+The
+.B <list>
+tag is used to define a list sweep for a particular parameter. It contains
+.B <item>
+elements to specify parameter values, as shown here:
+
+.nf
+	<list param="param">
+		<item value="value1"/>
+		<item value="value2"/>
+		<!-- ... -->
+	</list>
+.fi
+
+.IP "\fB<range>\fP"
+The
+.B <range>
+tag is used to define a range list sweep for a particular parameter.
+In addition to the parameter name, it supports and requires three attributes,
+for the start value, end value, and increment:
+
+.nf
+	<range 
+	 param="param"
+	 start="0.0"
+	 end="1.0"
+	 increment="0.1"
+	/>
+.fi
+
+.IP "\fB<multiplicative>\fP"
+The
+.B <multiplicatve>
+tag is used to define a multiplicative combination sweep. This tag is strictly
+a container:
+
+.nf
+	<multiplicative>
+		<range param="param1"
+		 start="0.0" end="1.0" increment="0.1"/>
+		<range param="param2"
+		 start="0" end="100" increment="5"/>
+	</multiplicative>
+.fi
+
+.IP "\fB<parallel>\fP"
+The
+.B <parallel>
+tag is used to define a parallel combination sweep. This is also just a
+container, whose children must all generate the exact same number
+of parameter-value combinations, six each in this example:
+
+.nf
+	<parallel>
+		<range param="param1"
+		 start="0.0" end="1.0" increment="0.2"/>
+		<range param="param2"
+		 start="0" end="100" increment="20"/>
+		<list param="param3">
+			<item value="25"/>
+			<item value="399"/>
+			<item value="4096"/>
+			<item value="33333"/>
+			<item value="1677216"/>
+			<item value="10000000"/>
+		</list>
+	</parallel>
+.fi
+
+.SH BUILT-IN GRIDSWEEPER SETTINGS
+
+GridSweeper supports two settings by default:
+
+.IP "\fIExperimentsDirectory\fP"
+The user's experiment results directory,
+.I ~/Experiments
+by default.
+
+.IP "\fIAdapterClass\fP"
+The Java adapter class used to run models on grid agents,
+.I edu.umich.lsa.cscs.gridsweeper.DroneAdapter
+by default.
+
+.SH DRONE ADAPTER SETTINGS
+The built-in
+.B DroneAdapter
+class supports the following settings:
+
+.I command
+.RS
+The path to the model executable. Required.
+.RE
+
+.I setParamOption
+.RS
+The command-line option for parameter assignments 
+.I param
+=
+.I value
+(default: 
+.B -D
+)
+.RE
+
+.I runNumOption
+.RS
+The command-line option for specifying the run number 
+(default: 
+.B -N
+).
+.RE
+
+.I runNumPrefix
+.RS
+A prefix to add before the run number.
+.RE
+
+.I rngSeedOption
+.RS
+The command-line option for specifying the random seed
+(default: 
+.B -S
+).
+.RE
+
+.I useInputFile
+.RS
+Whether or not to provide an input file. Interpreted as true
+if and only if the value is equal, ignoring case, to the string
+.I true
+(default: 
+.I true
+, but ignored unless a path is provided).
+.RE
+
+.I inputFileOption
+.RS
+The command-line option for specifying the input file.
+.RE
+
+.I inputFilePath
+.RS
+The path to the input file.
+.RE
+
+.I miscOptions
+.RS
+Additional command-line options to supply to the executable.
+.RE
+
+.SH FILES
+.IP "\fI~/.gridsweeper\fP"
+Contains per-user settings in the Java Properties ASCII format.
+
+.SH ENVIRONMENT
+.IP "\fBGRIDSWEEPER_ROOT\fP"
+The GridSweeper root directory, typically something like
+\fI/usr/local/gridsweeper\fP.
+
+.SH AUTHOR
+Ed Baskerville <software at edbaskerville dot com>

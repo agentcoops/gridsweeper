@@ -39,7 +39,7 @@ import edu.umich.lsa.cscs.gridsweeper.parameters.ParameterMap;
  * </tr>
  * 
  * <tr>
- * <td>{@code rngSeedOption}</td>   <td>The command-line option for specifying specify the random seed.</td>
+ * <td>{@code rngSeedOption}</td>   <td>The command-line option for specifying the random seed.</td>
  * <td>{@code -S}</td>
  * </tr>
  * 

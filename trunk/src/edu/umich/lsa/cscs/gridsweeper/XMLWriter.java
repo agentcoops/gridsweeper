@@ -7,7 +7,7 @@ import java.io.PrintStream;
 
 public class XMLWriter
 {
-	private static String xmlDeclaration = "<?xml version=\"1.0\"?>";
+	private static String xmlDeclaration = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
 	private PrintStream xmlStream;
 	private int level = 0;
 	
