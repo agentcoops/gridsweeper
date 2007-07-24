@@ -31,6 +31,22 @@ public class GridSweeper
 		NORUN
 	}
 	
+	class CaseRun
+	{
+		ExperimentCase expCase;
+		String caseId;
+		int runNum;
+		int rngSeed;
+		
+		public CaseRun(ExperimentCase expCase, String caseId, int runNum, int rngSeed)
+		{
+			this.expCase = expCase;
+			this.caseId = caseId;
+			this.runNum = runNum;
+			this.rngSeed = rngSeed;
+		}
+	}
+	
 	static String className;
 	
 	static
@@ -55,6 +71,8 @@ public class GridSweeper
 	String fileTransferSubpath;
 	
 	Session drmaaSession;
+	Map<String, String> caseIdToJobIdMap;
+	Map<String, CaseRun> jobIdToRunMap;
 	
 	public GridSweeper()
 	{
@@ -292,16 +310,21 @@ public class GridSweeper
 				xmlPath, expCase, caseName);
 		xmlWriter.writeXML();
 		
-		// Run each individual run on the grid
-		List<Integer> rngSeeds = expCase.getRngSeeds();
-		for(int i = 0; i < rngSeeds.size(); i++)
-		{
-			runCaseRun(expCase, caseDir, caseSubDir, i, rngSeeds.get(i));
-		}
-		
 		if(!caseSubDir.equals(""))
 		{
 			System.err.println(caseSubDir);
+		}
+		
+		// Run each individual run on the grid
+		caseIdToJobIdMap = new StringMap();
+		jobIdToRunMap = new HashMap<String, CaseRun>();
+		List<Integer> rngSeeds = expCase.getRngSeeds();
+		for(int i = 0; i < rngSeeds.size(); i++)
+		{
+			CaseRun run = new CaseRun(expCase, caseSubDir, i, rngSeeds.get(i));
+			runCaseRun(run);
+			
+			String jobId = caseIdToJobIdMap.get(caseSubDir + "." + i);
 		}
 	}
 	
@@ -315,30 +338,37 @@ public class GridSweeper
 	 * @throws DrmaaException If a DRMAA error occurs during job submission.
 	 * @throws IOException If the case XML cannot be written out.
 	 */
-	public void runCaseRun(ExperimentCase expCase, String caseDir, String caseSubDir, int i, int rngSeed) throws DrmaaException, IOException
+	public void runCaseRun(CaseRun run) throws DrmaaException, IOException
 	{
+		ExperimentCase expCase = run.expCase;
+		String caseId = run.caseId;
+		int runNum = run.runNum;
+		int rngSeed = run.rngSeed;
+		
+		String caseDir = appendPathComponent(expDir, caseId);
+		
 		Settings settings = experiment.getSettings();
 		
 		String caseRunName;
-		if(caseSubDir.equals(""))
+		if(caseId.equals(""))
 		{
-			caseRunName = experiment.getName() + " - run " + i
+			caseRunName = experiment.getName() + " - run " + runNum
 			+ " (" + dateStr + ", " + timeStr + ")";
 		}
 		else
 		{
 			caseRunName = experiment.getName() + " - "
-			+ caseSubDir + " - run " + i
+			+ caseId + " - run " + runNum
 			+ " (" + dateStr + ", " + timeStr + ")";
 		}
 		
 		if(runType == RunType.RUN)
 		{
 			// Write setup file
-			String stdinPath = appendPathComponent(caseDir, ".gsweep_in." + i);
+			String stdinPath = appendPathComponent(caseDir, ".gsweep_in." + runNum);
 			RunSetup setup = new RunSetup(settings,
-					experiment.getInputFiles(), caseSubDir, expCase.getParameterMap(),
-					i, rngSeed, experiment.getOutputFiles());
+					experiment.getInputFiles(), caseId, expCase.getParameterMap(),
+					runNum, rngSeed, experiment.getOutputFiles());
 			ObjectOutputStream stdinStream = new ObjectOutputStream(new FileOutputStream(stdinPath));
 			stdinStream.writeObject(setup);
 			
@@ -348,8 +378,8 @@ public class GridSweeper
 			jt.setRemoteCommand(appendPathComponent(root, "bin/grunner"));
 			if(!useFileTransfer) jt.setWorkingDirectory(caseDir);
 			jt.setInputPath(":" + stdinPath);
-			jt.setOutputPath(":" + appendPathComponent(caseDir, ".gsweep_out." + i));
-			jt.setErrorPath(":" + appendPathComponent(caseDir, ".gsweep_err." + i));
+			jt.setOutputPath(":" + appendPathComponent(caseDir, ".gsweep_out." + runNum));
+			jt.setErrorPath(":" + appendPathComponent(caseDir, ".gsweep_err." + runNum));
 			jt.setBlockEmail(true);
 			
 			try
@@ -370,9 +400,19 @@ public class GridSweeper
 			jt.setJobEnvironment(environment);
 			
 			String jobId = drmaaSession.runJob(jt);
+			
+			caseIdToJobIdMap.put(caseId + "." + runNum, jobId);
+			jobIdToRunMap.put(jobId, run);
+			
 			drmaaSession.deleteJobTemplate(jt);
 			
-			// TODO: Record job id so it can be reported back as tied to this case run.
+			System.err.println("  Submitted run " + runNum
+				+ " (DRMAA job ID " + jobId + ")");
+		}
+		else
+		{
+			System.err.println("  Not submitting run " + runNum
+				+ " (dry run)");
 		}
 	}
 	
@@ -391,8 +431,36 @@ public class GridSweeper
 		// http://wrapper.tanukisoftware.org/doc/english/prop-daemonize.html
 		// TODO: upon full completion, send an email to the user
 		
-		if(runType == RunType.RUN) try
+		if(runType != RunType.RUN) return;
+		
+		try
 		{
+			System.err.println("TODO: detach from console...");
+			
+			int incompleteRuns = jobIdToRunMap.size();
+			
+			while(incompleteRuns != 0)
+			{
+				JobInfo info = drmaaSession.wait(
+					Session.JOB_IDS_SESSION_ANY, Session.TIMEOUT_WAIT_FOREVER);
+				
+				String jobId = info.getJobId();
+				CaseRun run = jobIdToRunMap.get(jobId);
+				
+				String caseId = run.caseId;
+				int runNum = run.runNum;
+				
+				System.err.println("Completed " + caseId + ", run " + runNum
+					+ " (DRMAA job ID " + jobId + ")");
+				
+				incompleteRuns--;
+			}
+			
+			System.err.println("All jobs completed.");
+			
+			System.err.println("TODO: send email");
+			
+			// Finish it up
 			drmaaSession.exit();
 		}
 		catch(DrmaaException e)

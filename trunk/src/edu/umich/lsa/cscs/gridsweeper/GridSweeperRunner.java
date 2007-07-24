@@ -64,7 +64,7 @@ public class GridSweeperRunner
 			Settings adapterSettings = settings.getSettingsForClass(adapterClassName);
 			Adapter adapter = AdapterFactory.createAdapter(adapterClassName, adapterSettings);
 			
-			// Run!
+			// CaseRun!
 			ParameterMap parameters = setup.getParameters();
 			int runNumber = setup.getRunNumber();
 			int rngSeed = setup.getRngSeed();
