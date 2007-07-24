@@ -62,68 +62,85 @@ public class GridSweeper
 	}
 	
 	/**
-	 * Generates experiment cases in preparation for running the experiment.
-	 * @throws GridSweeperException If case generation fails.
+	 * Generates experiment cases and sets up in preparation for grid submission.
+	 * Experiment results are collated in a master experiment directory,
+	 * specified in the user settings, in a subdirectory tagged with the experiment name
+	 * and date/time ({@code <name>/YYYY-MM-DD/hh-mm-ss}). If a shared filesystem is not
+	 * available, files are first staged to the experiment results directory on the
+	 * file transfer system.
+	 * Finally, a DRMAA session is established, and each case is submitted.
+	 * @throws GridSweeperException
 	 */
-	public void setUpExperiment() throws GridSweeperException
+	public void submitExperiment() throws GridSweeperException
 	{
-		if(runType != RunType.NORUN) try
+		if(runType == RunType.NORUN) return;
+		
+		String expName = experiment.getName();
+		if(runType == RunType.DRY)
 		{
-			// Assemble cases
+			System.err.println("Performing dry run for experiment \""
+					+ expName + "\"...");
+		}
+		else
+		{
+			System.err.println("Running experiment \""
+					+ experiment.getName() + "\"...");	
+		}
+		
+		Settings settings = experiment.getSettings();
+
+		// Assemble cases
+		try
+		{
 			cases = experiment.generateCases();
 		}
 		catch (ExperimentException e)
 		{
+			// TODO: use ExperimentException to create better error information
 			throw new GridSweeperException("Could not generate experiment cases", e);
 		}
-	}
-	
-	/**
-	 * Runs the experiment. Experiment results are collated in a master experiment directory,
-	 * specified in the user settings, in a subdirectory tagged with the experiment name
-	 * and date/time ({@code <name>/YYYY-MM-DD/hh-mm-ss}). If a shared filesystem is not
-	 * available, files are first staged to the experiment results directory on the
-	 * file transfer system. Then a DRMAA session is established, and each case is submitted.
-	 * 
-	 * @throws GridSweeperException
-	 */
-	public void runExperiment() throws GridSweeperException
-	{
-		Settings settings = experiment.getSettings();
 		
-		if(runType == RunType.NORUN) return;
-		
-		entering(className, "run");
-		
-		useFileTransfer = settings.getBooleanProperty("UseFileTransfer");
+		// Set up main experiment directory
+		setUpExperimentDirectory(settings);
 
-		FileTransferSystem fts = null;
+		// Set up directory & input files on file transfer system if asked for
+		if(runType == RunType.RUN && 
+				settings.getBooleanProperty("UseFileTransfer"))
+		{
+			setUpFileTransfer(settings);
+		}
+		
+		// Create experiment XML in output directory
+		String xmlPath = appendPathComponent(expDir, "experiment.gsexp");
 		try
 		{
-			finer("settings: " + settings);
-			
-			// Set up file transfer system if asked for
-			if(runType==RunType.RUN && useFileTransfer)
-			{
-				String className = settings.getSetting("FileTransferSystemClassName");
-				Settings ftsSettings = settings.getSettingsForClass(className);
-				fts = FileTransferSystemFactory.getFactory().getFileTransferSystem(className, ftsSettings);
-				fts.connect();
-				
-				boolean alreadyExists;
-				do
-				{
-					fileTransferSubpath = UUID.randomUUID().toString();
-					alreadyExists = fts.fileExists(fileTransferSubpath);
-				}
-				while(alreadyExists);
-			}
+			experiment.writeToFile(xmlPath, true);
 		}
 		catch(Exception e)
 		{
-			throw new GridSweeperException("Could not set up file trasfer system", e);
+			throw new GridSweeperException("Could not write experiment XML to"
+					+ xmlPath, e);
 		}
 		
+		// Enumerate and submit cases
+		submitCases();
+		
+		// Finally, 
+		switch(runType)
+		{
+			case DRY:
+				System.err.println("Dry run complete.");
+				break;
+			case RUN:
+				System.err.println("Experiment submitted.");
+				break;
+		}
+		
+	}
+	
+	private void setUpExperimentDirectory(Settings settings)
+		throws GridSweeperException
+	{
 		try
 		{
 			String expsDir = expandTildeInPath(settings.getProperty("ExperimentsDirectory"));
@@ -142,65 +159,102 @@ public class GridSweeper
 			
 			expDir = appendPathComponent(expsDir, expSubDir);
 			finer("Experiment subdirectory: " + expDir);
-			
+
 			File expDirFile = new File(expDir);
 			expDirFile.mkdirs();
+			
+			System.err.println("Created experiment directory \""
+					+ expDir + "\".");
 		}
 		catch(Exception e)
 		{
-			throw new GridSweeperException("Could not set up local dirs", e);
+			throw new GridSweeperException("Could not create experiment directory "
+					+ expDir, e);
 		}
-		
+	}
+	
+	private void setUpFileTransfer(Settings settings)
+		throws GridSweeperException
+	{
+		FileTransferSystem fts = null;
 		try
 		{
+			System.err.println("Setting up file transfer system...");
+			
+			String className = settings.getSetting("FileTransferSystemClassName");
+			Settings ftsSettings = settings.getSettingsForClass(className);
+			fts = FileTransferSystemFactory.getFactory().getFileTransferSystem(className, ftsSettings);
+			fts.connect();
+			
+			boolean alreadyExists;
+			do
+			{
+				fileTransferSubpath = UUID.randomUUID().toString();
+				alreadyExists = fts.fileExists(fileTransferSubpath);
+			}
+			while(alreadyExists);
+			
+			System.err.println("Done setting up file transfer.");
+			
 			// If file transfer is on, make the directory
 			// and upload input files
-			if(runType==RunType.RUN && useFileTransfer)
+			StringMap inputFiles = experiment.getInputFiles();
+			
+			if(inputFiles.size() > 0)
 			{
+				System.err.println("Uploading input files...");
+				
 				String inputDir = appendPathComponent(fileTransferSubpath, "input");
 				fts.makeDirectory(inputDir);
 				
-				StringMap inputFiles = experiment.getInputFiles();
 				for(String localPath : inputFiles.keySet())
 				{
 					String remotePath = appendPathComponent(inputDir, inputFiles.get(localPath));
+					System.err.println("Uploading file \"" + localPath
+							+ "\" to \"" + remotePath + "\"");
 					
 					fts.uploadFile(localPath, remotePath);
 				}
 				
-				fts.disconnect();
+				System.err.println("Done uploading input files.");
 			}
+			
+			fts.disconnect();
 		}
 		catch(Exception e)
 		{
-			throw new GridSweeperException("Could not create remote dirs", e);
+			throw new GridSweeperException("Could not set up file trasfer system", e);
 		}
-			
+	}
+	
+	public void submitCases() throws GridSweeperException
+	{
+		if(runType == RunType.NORUN) return;
+		
 		try
 		{
-			// Write experiment XML
-			String xmlPath = appendPathComponent(expDir, "experiment.gsexp");
-			experiment.writeToFile(xmlPath, true);
-			
-			if(runType==RunType.RUN)
+			// Establish DRMAA session, unless this is a dry run
+			if(runType == RunType.RUN)
 			{
-				// Establish DRMAA session
+				System.err.println("Establishing grid session");
 				drmaaSession = SessionFactory.getFactory().getSession();
 				drmaaSession.init(null);
 			}
 			
 			// Set up and run each case
+			if(cases.size() > 1)
+				System.err.println("Submitting cases:");
 			for(ExperimentCase expCase : cases)
 			{
 				runCase(expCase);
 			}
+			if(cases.size() > 1)
+				System.err.println("All cases submitted.");
 		}
 		catch(Exception e)
 		{
-			throw new GridSweeperException("Could not run experiments", e);
+			throw new GridSweeperException("Could not run experiment", e);	
 		}
-		
-		exiting(className, "prepare");
 	}
 	
 	/**
@@ -243,6 +297,11 @@ public class GridSweeper
 		for(int i = 0; i < rngSeeds.size(); i++)
 		{
 			runCaseRun(expCase, caseDir, caseSubDir, i, rngSeeds.get(i));
+		}
+		
+		if(!caseSubDir.equals(""))
+		{
+			System.err.println(caseSubDir);
 		}
 	}
 	
