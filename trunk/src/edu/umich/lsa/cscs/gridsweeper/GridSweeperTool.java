@@ -105,7 +105,7 @@ public class GridSweeperTool
 	public void run(String[] args) throws GridSweeperException
 	{
 		// Set up logging to /tmp/gridsweeper.log
-		DLogger.addFileHandler(Level.ALL, "%t/gridsweeper.log");
+		//DLogger.addFileHandler(Level.ALL, "%t/gridsweeper.log");
 		
 		String root = System.getenv("GRIDSWEEPER_ROOT");
 		if(root == null)

@@ -323,8 +323,6 @@ public class GridSweeper
 		{
 			CaseRun run = new CaseRun(expCase, caseSubDir, i, rngSeeds.get(i));
 			runCaseRun(run);
-			
-			String jobId = caseIdToJobIdMap.get(caseSubDir + "." + i);
 		}
 	}
 	
@@ -437,6 +435,8 @@ public class GridSweeper
 		{
 			System.err.println("TODO: detach from console...");
 			
+			System.err.println("Waiting for jobs to complete...");
+			
 			int incompleteRuns = jobIdToRunMap.size();
 			
 			while(incompleteRuns != 0)
@@ -445,7 +445,9 @@ public class GridSweeper
 					Session.JOB_IDS_SESSION_ANY, Session.TIMEOUT_WAIT_FOREVER);
 				
 				String jobId = info.getJobId();
+				fine("got wait for job ID " + jobId);
 				CaseRun run = jobIdToRunMap.get(jobId);
+				fine("run: " + run);
 				
 				String caseId = run.caseId;
 				int runNum = run.runNum;
