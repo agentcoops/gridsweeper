@@ -71,7 +71,7 @@ public class GridSweeper
 	String fileTransferSubpath;
 	
 	Session drmaaSession;
-	Map<String, String> caseIdToJobIdMap;
+	StringMap caseIdToJobIdMap;
 	Map<String, CaseRun> jobIdToRunMap;
 	
 	public GridSweeper()
@@ -260,6 +260,9 @@ public class GridSweeper
 			}
 			
 			// Set up and run each case
+			caseIdToJobIdMap = new StringMap();
+			jobIdToRunMap = new HashMap<String, CaseRun>();
+			
 			if(cases.size() > 1)
 				System.err.println("Submitting cases:");
 			for(ExperimentCase expCase : cases)
@@ -316,8 +319,6 @@ public class GridSweeper
 		}
 		
 		// Run each individual run on the grid
-		caseIdToJobIdMap = new StringMap();
-		jobIdToRunMap = new HashMap<String, CaseRun>();
 		List<Integer> rngSeeds = expCase.getRngSeeds();
 		for(int i = 0; i < rngSeeds.size(); i++)
 		{
@@ -405,6 +406,7 @@ public class GridSweeper
 			
 			caseIdToJobIdMap.put(caseId + "." + runNum, jobId);
 			jobIdToRunMap.put(jobId, run);
+			fine("run in runmap: " + jobIdToRunMap.get(jobId));
 			
 			drmaaSession.deleteJobTemplate(jt);
 			
@@ -425,8 +427,6 @@ public class GridSweeper
 	 */
 	public void finish() throws GridSweeperException
 	{
-		// TODO: wait for all jobs to complete, giving notification
-		// as each one arrives
 		// TODO: provide mechanism to detach this session to the background,
 		// in some way that works even if the user logs out
 		// This is a bit like a daemon, so cf:
@@ -451,6 +451,7 @@ public class GridSweeper
 				
 				String jobId = info.getJobId();
 				fine("got wait for job ID " + jobId);
+				fine("jobIdToRunMap: " + jobIdToRunMap.toString());
 				CaseRun run = jobIdToRunMap.get(jobId);
 				fine("run: " + run);
 				
