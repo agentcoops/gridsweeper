@@ -44,6 +44,11 @@ public class GridSweeper
 	RunType runType = RunType.RUN;
 	List<ExperimentCase> cases = null;
 	
+	// ivars used for experiment-reproduce mode
+	boolean reproduceMode = false;
+	String caseName;
+	List<Integer> runs;
+	
 	boolean useFileTransfer = false;
 	
 	Calendar cal;
@@ -355,5 +360,35 @@ public class GridSweeper
 	public void setExperiment(Experiment experiment)
 	{
 		this.experiment = experiment;
+	}
+
+	public boolean isReproduceMode()
+	{
+		return reproduceMode;
+	}
+
+	public void setReproduceMode(boolean reproduceMode)
+	{
+		this.reproduceMode = reproduceMode;
+	}
+
+	public String getCaseName()
+	{
+		return caseName;
+	}
+
+	public void setCaseName(String caseName)
+	{
+		this.caseName = caseName;
+	}
+
+	public List<Integer> getRuns()
+	{
+		return runs;
+	}
+
+	public void setRuns(List<Integer> runs)
+	{
+		this.runs = runs;
 	}
 }

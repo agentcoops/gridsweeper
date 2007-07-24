@@ -395,29 +395,51 @@ of parameter-value combinations, six each in this example:
 
 .SH CASE FILE FORMAT
 Case files are also written out as XML. The format is very simple, consisting of
-a single \fB<case>\fP element containing a number of \fB<run>\fP elements.
+a single \fB<case>\fP element that in turn contains a number of \fB<value>\fP
+and \fB<run>\fP elements.
 
 The \fB<case>\fP element includes a single attribute, \fBname\fP, which is
 intended for  human readability only and is constructed by GridSweeper from the
-experiment name, the parameter settings, and the date. Each \fB<run>\fP element
-includes two attributes, \fBrngSeed\fP and \fBnumber\fP.
+experiment name, the parameter settings, and the date. For example:
 
-An example:
+.nf
+<case name="echo - r=0.4-s=0.9 (2007-07-20, 16-29-39)">
+	<!-- ... -->
+</case>
+.fi
+
+The \fB<value>\fP elements are the same as in experiment XML files, and are the
+only type of parameter specification allowed in case XML files. They specify the
+parameter name with the \fBparam\fP attribute, and the value with the
+\fBvalue\fP attribute, as in
+
+.nf
+	<value param="r" value="0.4"/>
+.fi
+
+Each \fB<run>\fP element
+includes two attributes, \fBnumber\fP and \fBrngSeed\fP:
+.nf
+	<run number="1" rngSeed="1986201165"/>
+.fi
+
+Here is a complete example of a case file:
 
 .nf
 <?xml version="1.0" encoding="UTF-8"?>
-<case name="echo - r=0.4 (2007-07-20, 16-29-39)">
-	<value value="0.4" param="r"/>
-	<run rngSeed="526374054" number="0"/>
-	<run rngSeed="1986201165" number="1"/>
-	<run rngSeed="1585196345" number="2"/>
-	<run rngSeed="1619001183" number="3"/>
-	<run rngSeed="2137463870" number="4"/>
-	<run rngSeed="549727158" number="5"/>
-	<run rngSeed="1322681018" number="6"/>
-	<run rngSeed="296371489" number="7"/>
-	<run rngSeed="1066118686" number="8"/>
-	<run rngSeed="1141036221" number="9"/>
+<case name="echo - r=0.4-s=0.9 (2007-07-20, 16-29-39)">
+	<value param="r" value="0.4"/>
+	<value param="s" value="0.9"/>
+	<run number="0" rngSeed="526374054"/>
+	<run number="1" rngSeed="1986201165"/>
+	<run number="2" rngSeed="1585196345"/>
+	<run number="3" rngSeed="1619001183"/>
+	<run number="4" rngSeed="2137463870"/>
+	<run number="5" rngSeed="549727158"/>
+	<run number="6" rngSeed="1322681018"/>
+	<run number="7" rngSeed="296371489"/>
+	<run number="8" rngSeed="1066118686"/>
+	<run number="9" rngSeed="1141036221"/>
 </case>
 .fi
 

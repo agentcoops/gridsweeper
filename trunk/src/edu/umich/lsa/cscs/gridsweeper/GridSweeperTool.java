@@ -25,11 +25,6 @@ import edu.umich.lsa.cscs.gridsweeper.parameters.*;
  */
 public class GridSweeperTool
 {
-	/**
-	 * A state enum for the argument-parsing state machine.
-	 * @author Ed Baskerville
-	 *
-	 */
 	enum ArgState
 	{
 		START,
@@ -42,6 +37,14 @@ public class GridSweeperTool
 		OUTPUT
 	}
 	
+	enum RepArgState
+	{
+		START,
+		EXPERIMENT,
+		CASENAME,
+		RUNS,
+		END
+	}
 	
 	static String className;
 	
@@ -121,14 +124,168 @@ public class GridSweeperTool
 		String root = System.getenv("GRIDSWEEPER_ROOT");
 		if(root == null)
 			throw new GridSweeperException("GRIDSWEEPER_ROOT environment variable not set.");
-		gs.setRoot(root);
+		gs.setRoot(root); 
 		
-		// Parse args
+		// If the first argument is -r or --reproduce,
+		// or if the first argument is --debug and the second
+		// argument is -r or --reproduce, we're in reproduce mode.
+		if((args.length >= 1 &&
+				(args[0].equals("-r") || args[0].equals("--reproduce"))))
+		{
+			gs.setReproduceMode(true);
+		}
+		
+		// Load experiment from file & args for appropriate mode
+		if(gs.isReproduceMode())
+		{
+			loadForReproduceMode(args);
+		}
+		else
+		{
+			loadForNormalMode(args);
+		}
+		
+		gs.setExperiment(experiment);
+		
+		// Generate experiment cases, etc.
+		gs.setUpExperiment();
+		
+		// Run jobs
+		gs.runExperiment();
+		
+		// Finish running jobs
+		gs.finish();
+		
+		exiting(className, "main");
+	}
+	
+	private void loadForReproduceMode(String[] args) throws GridSweeperException
+	{
+		parseArgsForReproduceMode(args);
+		loadExperiment();
+	}
+	
+	private void parseArgsForReproduceMode(String[] args) throws GridSweeperException
+	{
+		boolean useExistingDir = false;
+		String caseName = null;
+		List<Integer> runs = null;
+		
+		RepArgState state = RepArgState.START;
+		
+		for(String arg : args)
+		{
+			finer("parsing argument: " + arg);
+			
+			if(arg.equals("--debug")) continue;
+			if(arg.equals("-e") || arg.equals("--use-existing-dir"))
+			{
+				useExistingDir = true;
+			}
+			
+			switch(state)
+			{
+				case START:
+					if(arg.equals("-r") || arg.equals("--reproduce"))
+					{
+						state = RepArgState.EXPERIMENT;
+					}
+					else
+					{
+						assert(false); // This method shouldn't have been called
+					}
+					break;
+				case EXPERIMENT:
+					experimentPath = arg;
+					state = RepArgState.CASENAME;
+					break;
+				case CASENAME:
+					caseName = arg;
+					state = RepArgState.RUNS;
+					break;
+				case RUNS:
+					runs = parseRunList(arg);
+					state = RepArgState.END;
+					break;
+				case END:
+					throw new GridSweeperException("Invalid argument " + arg);
+			}
+		}
+	}
+	
+	private List<Integer> parseRunList(String runList) throws GridSweeperException
+	{
+		List<Integer> runs = null;
+		
+		String[] colonPieces = runList.split("\\s*:\\s*");
+		
+		// If no colons, parse as a comma-delimited list
+		if(colonPieces.length == 1)
+		{
+			String[] commaPieces = runList.split("\\s*,\\s*");
+			runs = new ArrayList<Integer>(commaPieces.length);
+			for(String runNumStr : commaPieces)
+			{
+				try
+				{
+					int runNum = Integer.parseInt(runNumStr);
+					if(runNum < 0)
+					{
+						throw new GridSweeperException("Invalid run number "
+								+ runNumStr);
+					}
+					
+					runs.add(runNum);
+				}
+				catch(NumberFormatException e)
+				{
+					throw new GridSweeperException("Invalid run number " + 
+							runNumStr, e);
+				}
+			}
+		}
+		// If two colons present (three pieces), parse as a range
+		else if(colonPieces.length == 2)
+		{
+			try
+			{
+				int start = Integer.parseInt(colonPieces[0]);
+				int end = Integer.parseInt(colonPieces[1]);
+				
+				if(start < 0 || start > end)
+				{
+					throw new GridSweeperException("Invalid run range " +
+							runList);
+				}
+				
+				runs = new ArrayList<Integer>(end - start + 1);
+				for(int i = start; i <= end; i++)
+				{
+					runs.add(i);
+				}
+			}
+			catch(NumberFormatException e)
+			{
+				throw new GridSweeperException("Invalid run list " + 
+						runList, e);
+			}
+		}
+		// Otherwise reject
+		else
+		{
+			throw new GridSweeperException("Invalid run list " + runList);
+		}
+		
+		return runs;
+	}
+
+	private void loadForNormalMode(String[] args) throws GridSweeperException
+	{
 		Settings cliSettings = new Settings();
 		Settings adapterSettings = new Settings();
 		Settings fileTransferSettings = new Settings();
 		List<Sweep> cliSweeps = new ArrayList<Sweep>();
-		parseArgs(args, cliSettings, adapterSettings, fileTransferSettings, cliSweeps);
+		parseArgsForNormalMode(args, cliSettings, adapterSettings, fileTransferSettings, cliSweeps);
 		
 		// Load experiment file
 		loadExperiment();
@@ -161,7 +318,7 @@ public class GridSweeperTool
 		String seedStr = cliSettings.getProperty("Seed");
 		if(seedStr != null)
 		{
-			String[] pieces = seedStr.split(":");
+			String[] pieces = seedStr.split("\\s*:\\s*");
 			if(pieces.length != 2)
 			{
 				throw new GridSweeperException("Invalid seed table location " + seedStr);
@@ -216,155 +373,24 @@ public class GridSweeperTool
 		{
 			throw new GridSweeperException(
 					"Could not write to output path " + outputPath + ".", e);
-		}
-		
-		gs.setExperiment(experiment);
-		
-		// Generate experiment cases, etc.
-		gs.setUpExperiment();
-		
-		// Run jobs
-		gs.runExperiment();
-		
-		// Finish running jobs
-		gs.finish();
-		
-		exiting(className, "main");
+		}		
 	}
 	
 	/**
 	 * <p>Parses command-line arguments.</p>
 	 * 
-	 * <table valign="top">
+	 * <p>Normally, this allows for a wide range of arguments to be provided,
+	 * as documented in the manpage.</p>
 	 * 
-	 * <tr>
-	 * <td><b>Switch</b></td>
-	 * <td><b>Description</b></td>
-	 * </tr>
-	 * 
-	 * <tr>
-	 * <td>-a, --adapter</td>
-	 * <td>
-	 * Adapter class name, e.g., {@code edu.umich.lsa.cscs.gridsweeper.DroneAdapter}.
-	 * </td>
-	 * </tr>
-	 *
-	 * <tr>
-	 * <td>-n, --name</td>
-	 * <td>
-	 * Experiment name. This string is used to name the experiment output directory.
-	 * </td>
-	 * </tr>
-	 * 
-	 * <tr>
-	 * <td>-N, --numruns</td>
-	 * <td>
-	 * Number of runs to perform for each parameter assignment.
-	 * </td>
-	 * </tr>
-	 * 
-	 * <tr>
-	 * <td>-S, --seed</td>
-	 * <td>
-	 * The location of the first seed in the seed generation table,
-	 * given as row:col.
-	 * </td>
-	 * </tr>
-	 * 
-	 * <tr>
-	 * <td>-c, --command</td>
-	 * <td>
-	 * Command (model executable path) to run. In effect, this sets the "command"
-	 * setting in the adapter domain, e.g.,
-	 * {@code edu.umich.lsa.cscs.gridsweeper.Drone.command}, so if the adapter class
-	 * does not support the "command" setting, this argument has no effect.
-	 * </td>
-	 * </tr>
-	 * 
-	 * <tr>
-	 * <td>-i, --input</td>
-	 * <td>
-	 * Path to experiment XML input file. This is usually required,
-	 * but can theoretically be left out if all the necessary experiment
-	 * information is provided with other command-line switches—for the
-	 * Drone adapter, this would mean that {@code -c} and {@code -n}
-	 * would be required, among others. Note that command-line settings
-	 * override any settings made in the experiment XML file, which
-	 * in turn override any settings in the user’s {@code ~/.gridsweeper}
-	 * configuration file.
-	 * </td>
-	 * </tr>
-	 * 
-	 * <tr>
-	 * <td>-o, --output</td>
-	 * <td>
-	 * <p>Path at which experiment XML should be written. The outputted file
-	 * will contain all the settings needed to re-run the experiment using
-	 * <br/><br/>
-	 * {@code gsweep -i <experimentXMLPath>}
-	 * <br/><br/>
-	 * and nothing else. This will <em>not</em> be an exact replica of this
-	 * run, because the seed for GridSweeper’s random number generator will
-	 * be generated at runtime. A file that will be able to produce an
-	 * <em>exact</em> reproduction of this experiment will be generated
-	 * in the experiment results directory.</p>
-	 * <p>
-	 * All settings will be written out to this file, including those
-	 * set in the user’s {@code ~/.gridsweeper} configuration file,
-	 * in the input experiment file, and those set at the command line,
-	 * so that the above command should re-run the experiment as before
-	 * unless some setting in the {@code ~/.gridsweeper} changes the behavior. 
-	 * </p>
-	 * </td>
-	 * </tr>
-	 * 
-	 * <tr>
-	 * <td>-O, --output-only</td>
-	 * <td>
-	 * <p>The same as {@code -o}, except the only thing that will happen
-	 * is the production of an output file. The experiment will not be run,
-	 * not even to generate output directories and case files.</p>
-	 * 
-	 * <p>The no-run behavior of this option can be replaced by a dry run
-	 * by following this option with {@code -d} or {@code --dry}.
-	 * Following {@code -d} or {@code --dry} with this option will
-	 * replace dry-run behavior with no-run behavior.</p>  
-	 * </td>
-	 * </tr>
-	 * 
-	 * <tr>
-	 * <td>-d, --dry</td>
-	 * <td>
-	 * <p>Perform a “dry run”, simulating the parameter sweep without actually
-	 * submitting jobs to the grid to be run. Output directories are created
-	 * and populated with control files needed to reproduce cases.</p>
-	 * </td>
-	 * </tr>
-	 * 
-	 * <tr>
-	 * <td><em>param</em>=<em>value</em></td>
-	 * <td>
-	 * Sets a fixed parameter <em>param</em> to value <em>value</em>,
-	 * valid for all runs of the model.
-	 * </td>
-	 * </tr>
-	 * 
-	 * <tr>
-	 * <td><em>param</em>=<em>start</em>:<em>incr</em>:<em>end</em></td>
-	 * <td>
-	 * Sweeps parameter <em>param</em>, starting at value <em>start</em>
-	 * and incrementing by <em>incr</em> until the value is greater than
-	 * <em>end</em>. The value <em>end</em> is only used, then, if it is
-	 * exactly a multiple of <em>incr</em> greater than <em>start</em>.
-	 * (Rounding error is not a problem, because an infinite-precision
-	 * decimal number representation is used.)   
-	 * </td>
-	 * </tr>
-	 * 
-	 * </table>
+	 * <p>If the first argument is {@code -r} or
+	 * {@code --reproduce}, the program is put into reproduce mode, and
+	 * accepts only the experiment file, optionally followed by the case name,
+	 * and if the case name is provided, optionally followed by 
+	 * the run numbers to reproduce, as a comma-separated list or as a range
+	 * list of the form start:increment:end.</p>
 	 * @param args Command-line arguments.
 	 */
-	void parseArgs(String[] args, Settings cliSettings, 
+	void parseArgsForNormalMode(String[] args, Settings cliSettings, 
 			Settings adapterSettings, Settings fileTransferSettings,
 			List<Sweep> cliSweeps)
 		throws GridSweeperException
