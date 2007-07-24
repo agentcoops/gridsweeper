@@ -124,26 +124,9 @@ public class GridSweeperTool
 		String root = System.getenv("GRIDSWEEPER_ROOT");
 		if(root == null)
 			throw new GridSweeperException("GRIDSWEEPER_ROOT environment variable not set.");
-		gs.setRoot(root); 
+		gs.setRoot(root);
 		
-		// If the first argument is -r or --reproduce,
-		// or if the first argument is --debug and the second
-		// argument is -r or --reproduce, we're in reproduce mode.
-		if((args.length >= 1 &&
-				(args[0].equals("-r") || args[0].equals("--reproduce"))))
-		{
-			gs.setReproduceMode(true);
-		}
-		
-		// Load experiment from file & args for appropriate mode
-		if(gs.isReproduceMode())
-		{
-			loadForReproduceMode(args);
-		}
-		else
-		{
-			loadForNormalMode(args);
-		}
+		loadExperiment(args);
 		
 		gs.setExperiment(experiment);
 		
@@ -158,137 +141,17 @@ public class GridSweeperTool
 		
 		exiting(className, "main");
 	}
-	
-	private void loadForReproduceMode(String[] args) throws GridSweeperException
-	{
-		parseArgsForReproduceMode(args);
-		loadExperiment();
-	}
-	
-	private void parseArgsForReproduceMode(String[] args) throws GridSweeperException
-	{
-		boolean useExistingDir = false;
-		String caseName = null;
-		List<Integer> runs = null;
-		
-		RepArgState state = RepArgState.START;
-		
-		for(String arg : args)
-		{
-			finer("parsing argument: " + arg);
-			
-			if(arg.equals("--debug")) continue;
-			if(arg.equals("-e") || arg.equals("--use-existing-dir"))
-			{
-				useExistingDir = true;
-			}
-			
-			switch(state)
-			{
-				case START:
-					if(arg.equals("-r") || arg.equals("--reproduce"))
-					{
-						state = RepArgState.EXPERIMENT;
-					}
-					else
-					{
-						assert(false); // This method shouldn't have been called
-					}
-					break;
-				case EXPERIMENT:
-					experimentPath = arg;
-					state = RepArgState.CASENAME;
-					break;
-				case CASENAME:
-					caseName = arg;
-					state = RepArgState.RUNS;
-					break;
-				case RUNS:
-					runs = parseRunList(arg);
-					state = RepArgState.END;
-					break;
-				case END:
-					throw new GridSweeperException("Invalid argument " + arg);
-			}
-		}
-	}
-	
-	private List<Integer> parseRunList(String runList) throws GridSweeperException
-	{
-		List<Integer> runs = null;
-		
-		String[] colonPieces = runList.split("\\s*:\\s*");
-		
-		// If no colons, parse as a comma-delimited list
-		if(colonPieces.length == 1)
-		{
-			String[] commaPieces = runList.split("\\s*,\\s*");
-			runs = new ArrayList<Integer>(commaPieces.length);
-			for(String runNumStr : commaPieces)
-			{
-				try
-				{
-					int runNum = Integer.parseInt(runNumStr);
-					if(runNum < 0)
-					{
-						throw new GridSweeperException("Invalid run number "
-								+ runNumStr);
-					}
-					
-					runs.add(runNum);
-				}
-				catch(NumberFormatException e)
-				{
-					throw new GridSweeperException("Invalid run number " + 
-							runNumStr, e);
-				}
-			}
-		}
-		// If two colons present (three pieces), parse as a range
-		else if(colonPieces.length == 2)
-		{
-			try
-			{
-				int start = Integer.parseInt(colonPieces[0]);
-				int end = Integer.parseInt(colonPieces[1]);
-				
-				if(start < 0 || start > end)
-				{
-					throw new GridSweeperException("Invalid run range " +
-							runList);
-				}
-				
-				runs = new ArrayList<Integer>(end - start + 1);
-				for(int i = start; i <= end; i++)
-				{
-					runs.add(i);
-				}
-			}
-			catch(NumberFormatException e)
-			{
-				throw new GridSweeperException("Invalid run list " + 
-						runList, e);
-			}
-		}
-		// Otherwise reject
-		else
-		{
-			throw new GridSweeperException("Invalid run list " + runList);
-		}
-		
-		return runs;
-	}
 
-	private void loadForNormalMode(String[] args) throws GridSweeperException
+	private void loadExperiment(String[] args) throws GridSweeperException
 	{
 		Settings cliSettings = new Settings();
 		Settings adapterSettings = new Settings();
 		Settings fileTransferSettings = new Settings();
 		List<Sweep> cliSweeps = new ArrayList<Sweep>();
-		parseArgsForNormalMode(args, cliSettings, adapterSettings, fileTransferSettings, cliSweeps);
+		parseArgs(args, cliSettings, adapterSettings, fileTransferSettings, cliSweeps);
 		
 		// Load experiment file
-		loadExperiment();
+		loadExperimentFile();
 		
 		// Override name if specified at command line
 		String name = cliSettings.getProperty("Name");
@@ -390,7 +253,7 @@ public class GridSweeperTool
 	 * list of the form start:increment:end.</p>
 	 * @param args Command-line arguments.
 	 */
-	void parseArgsForNormalMode(String[] args, Settings cliSettings, 
+	void parseArgs(String[] args, Settings cliSettings, 
 			Settings adapterSettings, Settings fileTransferSettings,
 			List<Sweep> cliSweeps)
 		throws GridSweeperException
@@ -856,11 +719,11 @@ public class GridSweeperTool
 	 * @throws GridSweeperException If the experiment path is not provided,
 	 * or if the file cannot be loaded or parsed.
 	 */
-	private void loadExperiment() throws GridSweeperException
+	private void loadExperimentFile() throws GridSweeperException
 	{
 		Settings sharedSettings = Settings.sharedSettings();
 		
-		entering(className, "loadExperiment");
+		entering(className, "loadExperimentFile");
 		
 		if(experimentPath == null)
 		{
@@ -877,6 +740,6 @@ public class GridSweeperTool
 			throw new GridSweeperException("Could not load experiment file.", e);
 		}
 		
-		exiting(className, "loadExperiment");
+		exiting(className, "loadExperimentFile");
 	}
 }
