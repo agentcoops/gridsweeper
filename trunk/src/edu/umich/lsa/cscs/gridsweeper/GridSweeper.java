@@ -343,7 +343,11 @@ public class GridSweeper
 		int runNum = run.runNum;
 		int rngSeed = run.rngSeed;
 		
-		String caseDir = appendPathComponent(expDir, caseId);
+		String caseDir;
+		if(caseId.equals(""))
+			caseDir = expDir;
+		else
+			caseDir = appendPathComponent(expDir, caseId);
 		
 		Settings settings = experiment.getSettings();
 		
@@ -412,6 +416,7 @@ public class GridSweeper
 			System.err.println("  Not submitting run " + runNum
 				+ " (dry run)");
 		}
+		fine("run: " + run);
 	}
 	
 	/**
@@ -452,8 +457,16 @@ public class GridSweeper
 				String caseId = run.caseId;
 				int runNum = run.runNum;
 				
-				System.err.println("Completed " + caseId + ", run " + runNum
+				if(caseId.equals(""))
+				{
+					System.err.println("Completed run " + runNum
+						+ " (DRMAA job ID " + jobId + ")");
+				}
+				else
+				{
+					System.err.println("Completed " + caseId + ", run " + runNum
 					+ " (DRMAA job ID " + jobId + ")");
+				}
 				
 				incompleteRuns--;
 			}
