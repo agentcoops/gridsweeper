@@ -489,6 +489,7 @@ public class GridSweeper
 			System.err.println("Email address not set. Using username.");
 			email = System.getProperty("user.name");
 		}
+		fine("email address: " + email);
 		
 		String subject = "GridSweeper experiment complete: "
 			+ experiment.getName();
@@ -511,11 +512,11 @@ public class GridSweeper
 		
 		String command = appendPathComponent(root, "bin/gsmail");
 		
-		String[] args = {subject, email, messagePath};
+		String[] commandAndArgs = {command, subject, email, messagePath};
 		
 		try
 		{
-			Runtime.getRuntime().exec(command, args);
+			Runtime.getRuntime().exec(commandAndArgs);
 		}
 		catch (IOException e)
 		{
