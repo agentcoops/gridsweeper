@@ -520,8 +520,8 @@ public class GridSweeper
 			}
 			catch(Exception e)
 			{
-				System.err.println("  (Warning: an exception occurred loading the" +
-					" run results for this run:");
+				System.err.print("  (Warning: an exception occurred loading the" +
+					" run results for this run: ");
 				e.printStackTrace(System.err);
 				System.err.println("  .)");
 				gsErrorList.add(jobId);
@@ -643,7 +643,7 @@ public class GridSweeper
 					Exception exception = results.getException();
 					if(exception != null)
 					{
-						message.append("  A Java exception occurred:\n\n");
+						message.append("  A Java exception occurred:\n  ");
 						
 						StringWriter sw = new StringWriter();
 						PrintWriter pw = new PrintWriter(sw);
