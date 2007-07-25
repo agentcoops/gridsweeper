@@ -4,6 +4,7 @@ import org.ggf.drmaa.*;
 
 
 import java.io.*;
+import java.text.DateFormat;
 import java.util.*;
 
 import static edu.umich.lsa.cscs.gridsweeper.StringUtils.*;
@@ -12,7 +13,8 @@ import static edu.umich.lsa.cscs.gridsweeper.DLogger.*;
 
 /**
  * The GridSweeper command-line tool for job submission. Takes a .gsexp
- * XML experiment file and submits it to the grid for execution via DRMAA.
+ * XML experiment file and/or a bunch of command line options and submits
+ * the resulting experiment to the grid via DRMAA.
  * Warning: begun on a houseboat in Paris. May still contain strange French bugs.
  * 
  * @author Ed Baskerville
@@ -72,7 +74,7 @@ public class GridSweeper
 	
 	public GridSweeper()
 	{
-		cal = new GregorianCalendar(); 
+		cal = Calendar.getInstance(); 
 	}
 	
 	/**
@@ -491,14 +493,34 @@ public class GridSweeper
 		}
 		fine("email address: " + email);
 		
-		String subject = "GridSweeper experiment complete: "
-			+ experiment.getName();
+		String expName = experiment.getName();
 		
+		String subject = expName + " complete (GridSweeper)";
 		
 		// Construct and write out message
 		String messagePath = appendPathComponent(expDir, ".gsweep_email");
 		StringBuffer message = new StringBuffer();
-		message.append("Your experiment is done.\n");
+		
+		message.append("Your GridSweeper experiment, ");
+		message.append("\"" + expName + "\"");
+		
+		message.append(", submitted on ");
+		DateFormat format = DateFormat.getDateTimeInstance();
+		message.append(format.format(new Date(cal.getTimeInMillis())));
+		
+		message.append(", has finished.\n\n");
+		
+		message.append("Elapsed time: ");
+		long elapsedMilli = (new Date()).getTime() - cal.getTimeInMillis();
+		elapsedMilli /= 1000;
+		long seconds = elapsedMilli % 60;
+		elapsedMilli /= 60;
+		long minutes = elapsedMilli % 60;
+		elapsedMilli /= 60;
+		long hours = elapsedMilli;
+		message.append("" + hours + ":" + minutes + ":" + seconds);
+		message.append("\n\n");
+		
 		try
 		{
 			FileWriter fw = new FileWriter(messagePath);
