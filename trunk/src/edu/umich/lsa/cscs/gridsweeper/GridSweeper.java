@@ -3,11 +3,7 @@ package edu.umich.lsa.cscs.gridsweeper;
 import org.ggf.drmaa.*;
 
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.util.*;
 
 import static edu.umich.lsa.cscs.gridsweeper.StringUtils.*;
@@ -502,6 +498,16 @@ public class GridSweeper
 		String messagePath = appendPathComponent(expDir, ".gsweep_email");
 		StringBuffer message = new StringBuffer();
 		message.append("Your experiment is done.\n");
+		try
+		{
+			FileWriter fw = new FileWriter(messagePath);
+			fw.write(message.toString());
+			fw.close();
+		}
+		catch(IOException e)
+		{
+			throw new GridSweeperException("Could not write email file.");
+		}
 		
 		String command = appendPathComponent(root, "bin/gsmail");
 		
