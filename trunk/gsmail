@@ -1,0 +1,8 @@
+#!/bin/sh
+
+MAIL=/bin/mail
+SUBJECT="$1"
+EMAIL="$2"; if ! "$EMAIL"; then $EMAIL=`whoami`; fi
+CONTENTS="$3"
+
+${MAIL} -s "${SUBJECT}" "${EMAIL}" < "${CONTENTS}"

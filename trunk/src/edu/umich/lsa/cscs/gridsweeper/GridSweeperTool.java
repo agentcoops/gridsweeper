@@ -31,7 +31,8 @@ public class GridSweeperTool
 		SEED,
 		COMMAND,
 		INPUT,
-		OUTPUT
+		OUTPUT,
+		EMAIL
 	}
 	
 	static String className;
@@ -272,6 +273,10 @@ public class GridSweeperTool
 						gs.setRunType(RunType.NORUN);
 						state = ArgState.OUTPUT;
 					}
+					else if(arg.equals("-m") || arg.equals("--email-address"))
+					{
+						state = ArgState.EMAIL;
+					}
 					else if(arg.equals("-d") || arg.equals("--dry"))
 					{
 						gs.setRunType(RunType.DRY);
@@ -313,6 +318,10 @@ public class GridSweeperTool
 					break;
 				case OUTPUT:
 					outputPath = arg;
+					state = ArgState.START;
+					break;
+				case EMAIL:
+					cliSettings.put("EmailAddress", arg);
 					state = ArgState.START;
 					break;
 			}

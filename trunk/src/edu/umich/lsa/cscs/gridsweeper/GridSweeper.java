@@ -432,7 +432,6 @@ public class GridSweeper
 		// This is a bit like a daemon, so cf:
 		// http://pezra.barelyenough.org/blog/2005/03/java-daemon/
 		// http://wrapper.tanukisoftware.org/doc/english/prop-daemonize.html
-		// TODO: upon full completion, send an email to the user
 		
 		if(runType != RunType.RUN) return;
 		
@@ -474,7 +473,7 @@ public class GridSweeper
 			
 			System.err.println("All jobs completed.");
 			
-			System.err.println("TODO: send email");
+			sendEmail();
 			
 			// Finish it up
 			drmaaSession.exit();
@@ -482,6 +481,39 @@ public class GridSweeper
 		catch(DrmaaException e)
 		{
 			throw new GridSweeperException("Received exception ending DRMAA session", e);
+		}
+	}
+	
+	private void sendEmail() throws GridSweeperException
+	{
+		String email = experiment.getSettings().getSetting("EmailAddress");
+		
+		if(email == null)
+		{
+			System.err.println("Email address not set. Using username.");
+			email = System.getProperty("user.name");
+		}
+		
+		String subject = "GridSweeper experiment complete: "
+			+ experiment.getName();
+		
+		
+		// Construct and write out message
+		String messagePath = appendPathComponent(expDir, ".gsweep_email");
+		StringBuffer message = new StringBuffer();
+		message.append("Your experiment is done.\n");
+		
+		String command = appendPathComponent(root, "bin/gsmail");
+		
+		String[] args = {subject, email, messagePath};
+		
+		try
+		{
+			Runtime.getRuntime().exec(command, args);
+		}
+		catch (IOException e)
+		{
+			throw new GridSweeperException("Could not send email.", e);
 		}
 	}
 
