@@ -464,7 +464,7 @@ public class GridSweeper
 					System.err.println("Completed " + caseId + ", run " + runNum
 						+ " (DRMAA job ID " + jobId + ")");
 				}
-				System.err.format("%d of %d complete (%.1lf%%).\n",
+				System.err.format("%d of %d complete (%.1f%%).\n",
 						i + 1, runCount, (double)(i + 1)/runCount);
 			}
 			
