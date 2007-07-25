@@ -501,16 +501,14 @@ public class GridSweeper
 		String messagePath = appendPathComponent(expDir, ".gsweep_email");
 		StringBuffer message = new StringBuffer();
 		
-		message.append("Your GridSweeper experiment, ");
-		message.append("\"" + expName + "\"");
+		message.append("   Experiment name: " + expName + "\n");
 		
-		message.append(", submitted on ");
+		message.append("      Submitted at: ");
 		DateFormat format = DateFormat.getDateTimeInstance();
 		message.append(format.format(new Date(cal.getTimeInMillis())));
+		message.append("\n");
 		
-		message.append(", has finished.\n\n");
-		
-		message.append("Elapsed time: ");
+		message.append("      Elapsed time: ");
 		long elapsedMilli = (new Date()).getTime() - cal.getTimeInMillis();
 		elapsedMilli /= 1000;
 		long seconds = elapsedMilli % 60;
@@ -518,8 +516,8 @@ public class GridSweeper
 		long minutes = elapsedMilli % 60;
 		elapsedMilli /= 60;
 		long hours = elapsedMilli;
-		message.append("" + hours + ":" + minutes + ":" + seconds);
-		message.append("\n\n");
+		message.append("" + hours + "h" + minutes + "m" + seconds + "s");
+		message.append("\n");
 		
 		try
 		{
