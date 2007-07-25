@@ -480,7 +480,7 @@ public class GridSweeper
 			String runStr = run.getRunString();
 			
 			System.err.println("Completed run " + runStr
-				+ "(DRMAA job ID " + jobId + ")");
+				+ " (DRMAA job ID " + jobId + ")");
 			
 			// Check for DRMAA errors
 			if(info.hasCoreDump() || info.hasSignaled() || info.wasAborted()
@@ -495,7 +495,9 @@ public class GridSweeper
 			{
 				String caseDir = appendPathComponent(expDir, caseId);
 				String stdoutPath =
-					appendPathComponent(caseDir, ".gsweep_out" + runNum);
+					appendPathComponent(caseDir, ".gsweep_out." + runNum);
+				
+				fine("Loading RunResults from " + stdoutPath);
 				
 				FileInputStream fileStream = new FileInputStream(stdoutPath);
 				ObjectInputStream objStream = new ObjectInputStream(fileStream);
@@ -506,7 +508,7 @@ public class GridSweeper
 				if(runResults == null || runResults.getException() != null)
 				{
 					gsErrorList.add(jobId);
-					System.err.println("  (Warning: a GridSweeper error occurred" +
+					System.err.println("  (Warning: a GridSweeper exception occurred" +
 							"while performing this run.)"); 
 				}
 				else if(runResults.getStatus() != 0)
@@ -518,6 +520,10 @@ public class GridSweeper
 			}
 			catch(Exception e)
 			{
+				System.err.println("  (Warning: an exception occurred loading the" +
+					" run results for this run:");
+				e.printStackTrace(System.err);
+				System.err.println("  .)");
 				gsErrorList.add(jobId);
 			}
 			
