@@ -439,9 +439,8 @@ public class GridSweeper
 			
 			System.err.println("Waiting for jobs to complete...");
 			
-			int incompleteRuns = jobIdToRunMap.size();
-			
-			while(incompleteRuns != 0)
+			int runCount = jobIdToRunMap.size();
+			for(int i = 0; i < runCount; i++)
 			{
 				JobInfo info = drmaaSession.wait(
 					Session.JOB_IDS_SESSION_ANY, Session.TIMEOUT_WAIT_FOREVER);
@@ -462,11 +461,9 @@ public class GridSweeper
 				}
 				else
 				{
-					System.err.println("Completed " + caseId + ", run " + runNum
-					+ " (DRMAA job ID " + jobId + ")");
+					System.err.format("%d of %d complete (%.1lf%%).",
+						i + 1, runCount, (double)(i + 1)/runCount);
 				}
-				
-				incompleteRuns--;
 			}
 			
 			System.err.println("All jobs completed.");
@@ -495,11 +492,13 @@ public class GridSweeper
 		
 		String expName = experiment.getName();
 		
-		String subject = expName + " complete (GridSweeper)";
+		String subject = expName + " complete";
 		
 		// Construct and write out message
 		String messagePath = appendPathComponent(expDir, ".gsweep_email");
 		StringBuffer message = new StringBuffer();
+		
+		message.append("GridSweeper experiment complete.\n\n");
 		
 		message.append("   Experiment name: " + expName + "\n");
 		
