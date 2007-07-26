@@ -1,6 +1,7 @@
 package edu.umich.lsa.cscs.gridsweeper;
 
 import java.util.logging.*;
+import java.io.*;
 
 /**
  * A utility class wrapping the standard Java logging system with static methods.
@@ -10,6 +11,7 @@ import java.util.logging.*;
 public class DLogger
 {
 	private static Logger logger;
+	private static StreamHandler streamHandler;
 	private static ConsoleHandler consoleHandler;
 	private static FileHandler fileHandler;
 	
@@ -18,6 +20,7 @@ public class DLogger
 		logger = java.util.logging.Logger.getLogger("edu.umich.lsa.cscs.gridsweeper");
 		logger.setLevel(Level.ALL);
 		
+		streamHandler = null;
 		consoleHandler = null;
 		fileHandler = null;
 	}
@@ -213,6 +216,40 @@ public class DLogger
 		{
 			logger.removeHandler(fileHandler);
 			fileHandler =  null;
+		}
+	}
+	
+	/**
+	 * Creates a logging handler that outputs to a stream, and sets its logging level.
+	 * If one already exists, this method replaces the existing one.
+	 * @param pattern A pattern for the filename, as described in the {@code java.util.logging.Logger} documentation.
+	 */
+	public static void addStreamHandler(Level level, OutputStream stream)
+	{
+		if(streamHandler != null)
+		{
+			logger.removeHandler(streamHandler);
+			streamHandler = null;
+		}
+		try
+		{
+			streamHandler = new StreamHandler(stream, new SimpleFormatter());
+			streamHandler.setLevel(level);
+			logger.addHandler(streamHandler);
+		}
+		catch(Exception e)
+		{
+			streamHandler = null;
+			e.printStackTrace();
+		}
+	}
+	
+	public static void removeStreamHandler()
+	{
+		if(streamHandler != null)
+		{
+			logger.removeHandler(streamHandler);
+			streamHandler =  null;
 		}
 	}
 }

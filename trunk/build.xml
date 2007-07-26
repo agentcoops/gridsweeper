@@ -22,6 +22,9 @@
 		<copy file="gsmail" tofile="${distbin}/gsmail" />
 		<chmod file="${distbin}/gsmail" perm="755"/>
 		
+		<copy file="gsgetpid" tofile="${distbin}/gsgetpid" />
+		<chmod file="${distbin}/gsgetpid" perm="755"/>
+		
 		<copy file="grunner" tofile="${distbin}/grunner" />
 		<chmod file="${distbin}/grunner" perm="755"/>
 		

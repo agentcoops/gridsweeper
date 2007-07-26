@@ -78,15 +78,50 @@ public class GridSweeper
 	String timeStr;
 	String expDir;
 	
+	String email;
+	
 	String fileTransferSubpath;
 	
 	Session drmaaSession;
 	StringMap caseIdToJobIdMap;
 	Map<String, CaseRun> jobIdToRunMap;
 	
-	public GridSweeper()
+	PrintStream msgOut;
+	
+	public GridSweeper() throws GridSweeperException
 	{
-		cal = Calendar.getInstance(); 
+		root = System.getenv("GRIDSWEEPER_ROOT");
+		if(root == null)
+			throw new GridSweeperException("GRIDSWEEPER_ROOT environment variable not set.");
+		
+		cal = Calendar.getInstance();
+		
+		msgOut = System.err;
+	}
+	
+	private String getPid() throws GridSweeperException
+	{
+		String pid;
+		try
+		{
+			String getPidPath = appendPathComponent(root, "bin/gsgetpid");
+			Process pidProc = Runtime.getRuntime().exec(getPidPath);
+			
+			BufferedReader getPidReader =
+				new BufferedReader(new InputStreamReader(pidProc.getInputStream()));
+			pid = getPidReader.readLine();
+		}
+		catch(Exception e)
+		{
+			throw new GridSweeperException("Could not get pid.");
+		}
+		
+		if(pid == null)
+		{
+			throw new GridSweeperException("Could not get pid.");
+		}
+		
+		return pid;
 	}
 	
 	/**
@@ -103,15 +138,22 @@ public class GridSweeper
 	{
 		if(runType == RunType.NORUN) return;
 		
+		email = experiment.getSettings().getSetting("EmailAddress");
+		if(email == null)
+		{
+			throw new GridSweeperException("No email address provided." +
+					" A notification email address must be specified.");
+		}
+		
 		String expName = experiment.getName();
 		if(runType == RunType.DRY)
 		{
-			System.err.println("Performing dry run for experiment \""
+			msgOut.println("Performing dry run for experiment \""
 					+ expName + "\"...");
 		}
 		else
 		{
-			System.err.println("Running experiment \""
+			msgOut.println("Running experiment \""
 					+ experiment.getName() + "\"...");	
 		}
 		
@@ -157,10 +199,10 @@ public class GridSweeper
 		switch(runType)
 		{
 			case DRY:
-				System.err.println("Dry run complete.");
+				msgOut.println("Dry run complete.");
 				break;
 			case RUN:
-				System.err.println("Experiment submitted.");
+				msgOut.println("Experiment submitted.");
 				break;
 		}
 		
@@ -191,7 +233,7 @@ public class GridSweeper
 			File expDirFile = new File(expDir);
 			expDirFile.mkdirs();
 			
-			System.err.println("Created experiment directory \""
+			msgOut.println("Created experiment directory \""
 					+ expDir + "\".");
 		}
 		catch(Exception e)
@@ -207,7 +249,7 @@ public class GridSweeper
 		FileTransferSystem fts = null;
 		try
 		{
-			System.err.println("Setting up file transfer system...");
+			msgOut.println("Setting up file transfer system...");
 			
 			String className = settings.getSetting("FileTransferSystemClassName");
 			Settings ftsSettings = settings.getSettingsForClass(className);
@@ -222,7 +264,7 @@ public class GridSweeper
 			}
 			while(alreadyExists);
 			
-			System.err.println("Done setting up file transfer.");
+			msgOut.println("Done setting up file transfer.");
 			
 			// If file transfer is on, make the directory
 			// and upload input files
@@ -230,7 +272,7 @@ public class GridSweeper
 			
 			if(inputFiles.size() > 0)
 			{
-				System.err.println("Uploading input files...");
+				msgOut.println("Uploading input files...");
 				
 				String inputDir = appendPathComponent(fileTransferSubpath, "input");
 				fts.makeDirectory(inputDir);
@@ -238,13 +280,13 @@ public class GridSweeper
 				for(String localPath : inputFiles.keySet())
 				{
 					String remotePath = appendPathComponent(inputDir, inputFiles.get(localPath));
-					System.err.println("Uploading file \"" + localPath
+					msgOut.println("Uploading file \"" + localPath
 							+ "\" to \"" + remotePath + "\"");
 					
 					fts.uploadFile(localPath, remotePath);
 				}
 				
-				System.err.println("Done uploading input files.");
+				msgOut.println("Done uploading input files.");
 			}
 			
 			fts.disconnect();
@@ -264,7 +306,7 @@ public class GridSweeper
 			// Establish DRMAA session, unless this is a dry run
 			if(runType == RunType.RUN)
 			{
-				System.err.println("Establishing grid session");
+				msgOut.println("Establishing grid session");
 				drmaaSession = SessionFactory.getFactory().getSession();
 				drmaaSession.init(null);
 			}
@@ -274,13 +316,13 @@ public class GridSweeper
 			jobIdToRunMap = new HashMap<String, CaseRun>();
 			
 			if(cases.size() > 1)
-				System.err.println("Submitting cases:");
+				msgOut.println("Submitting cases:");
 			for(ExperimentCase expCase : cases)
 			{
 				runCase(expCase);
 			}
 			if(cases.size() > 1)
-				System.err.println("All cases submitted.");
+				msgOut.println("All cases submitted.");
 		}
 		catch(Exception e)
 		{
@@ -325,7 +367,7 @@ public class GridSweeper
 		
 		if(!caseSubDir.equals(""))
 		{
-			System.err.println(caseSubDir);
+			msgOut.println(caseSubDir);
 		}
 		
 		// Run each individual run on the grid
@@ -420,15 +462,45 @@ public class GridSweeper
 			
 			drmaaSession.deleteJobTemplate(jt);
 			
-			System.err.println("  Submitted run " + runNum
+			msgOut.println("  Submitted run " + runNum
 				+ " (DRMAA job ID " + jobId + ")");
 		}
 		else
 		{
-			System.err.println("  Not submitting run " + runNum
+			msgOut.println("  Not submitting run " + runNum
 				+ " (dry run)");
 		}
 		fine("run: " + run);
+	}
+	
+	public void daemonize() throws GridSweeperException
+	{
+		try
+		{
+			// Open PrintStream to status.log in experiment directory
+			String logPath = appendPathComponent(expDir, "status.log"); 
+			PrintStream logOut = new PrintStream(new FileOutputStream(logPath));
+			
+			msgOut.println("Detaching from console " +
+				"(monitoring process id: " + getPid() + ")...");
+			msgOut.println("Status output will be written to:");
+			msgOut.println("  " + logPath);
+			msgOut.println("and an email will be sent to " + email + 
+				" upon experiment completion.");
+			msgOut.println("You may now close this console or log out" +
+					" without disturbing the experiment.");
+			
+			msgOut = logOut;
+			System.out.close();
+			System.err.close();
+			
+			msgOut.println("Job monitoring process ID: " + getPid());
+		}
+		catch(Exception e)
+		{
+			throw new GridSweeperException("An error occurred trying to "
+				+ "detach from the console.");
+		}
 	}
 	
 	/**
@@ -437,17 +509,9 @@ public class GridSweeper
 	 */
 	public void finish() throws GridSweeperException
 	{
-		// TODO: provide mechanism to detach this session to the background,
-		// in some way that works even if the user logs out
-		// This is a bit like a daemon, so cf:
-		// http://pezra.barelyenough.org/blog/2005/03/java-daemon/
-		// http://wrapper.tanukisoftware.org/doc/english/prop-daemonize.html
-		
 		if(runType != RunType.RUN) return;
 		
-		System.err.println("TODO: detach from console...");
-		
-		System.err.println("Waiting for jobs to complete...");
+		msgOut.println("Waiting for jobs to complete...");
 		
 		StringList drmaaErrorList = new StringList();
 		StringList gsErrorList = new StringList();
@@ -479,7 +543,7 @@ public class GridSweeper
 			
 			String runStr = run.getRunString();
 			
-			System.err.println("Completed run " + runStr
+			msgOut.println("Completed run " + runStr
 				+ " (DRMAA job ID " + jobId + ")");
 			
 			// Check for DRMAA errors
@@ -487,7 +551,7 @@ public class GridSweeper
 				|| info.getExitStatus() != 0)
 			{
 				drmaaErrorList.add(jobId);
-				System.err.println("  (Warning: DRMAA reports that the run did not" +
+				msgOut.println("  (Warning: DRMAA reports that the run did not" +
 						"complete normally.)");
 			}
 			// Load RunResults from disk
@@ -508,30 +572,30 @@ public class GridSweeper
 				if(runResults == null || runResults.getException() != null)
 				{
 					gsErrorList.add(jobId);
-					System.err.println("  (Warning: a GridSweeper exception occurred" +
-							"while performing this run.)"); 
+					msgOut.println("  (Warning: a GridSweeper exception occurred" +
+							" while performing this run.)"); 
 				}
 				else if(runResults.getStatus() != 0)
 				{
 					execErrorList.add(jobId);
-					System.err.println("  (Warning: this run exited with an" +
+					msgOut.println("  (Warning: this run exited with an" +
 							"error code.)");
 				}
 			}
 			catch(Exception e)
 			{
-				System.err.print("  (Warning: an exception occurred loading the" +
+				msgOut.print("  (Warning: an exception occurred loading the" +
 					" run results for this run: ");
-				e.printStackTrace(System.err);
-				System.err.println("  .)");
+				e.printStackTrace(msgOut);
+				msgOut.println("  .)");
 				gsErrorList.add(jobId);
 			}
 			
-			System.err.format("%d of %d complete (%.1f%%).\n",
+			msgOut.format("%d of %d complete (%.1f%%).\n",
 					i + 1, runCount, (double)(i + 1)/runCount * 100);
 		}
 		
-		System.err.println("All jobs completed.");
+		msgOut.println("All jobs completed.");
 		
 		sendEmail(drmaaErrorList, gsErrorList, execErrorList);
 		
@@ -550,15 +614,6 @@ public class GridSweeper
 		StringList gsErrorList, StringList execErrorList) 
 		throws GridSweeperException
 	{
-		String email = experiment.getSettings().getSetting("EmailAddress");
-		
-		if(email == null)
-		{
-			System.err.println("Email address not set. Using username.");
-			email = System.getProperty("user.name");
-		}
-		fine("email address: " + email);
-		
 		String expName = experiment.getName();
 		
 		String subject = expName + " complete";
@@ -587,6 +642,7 @@ public class GridSweeper
 		message.append("" + hours + "h" + minutes + "m" + seconds + "s");
 		message.append("\n\n");
 		
+		// Print error messages, if present
 		if(drmaaErrorList.size() == 0 && gsErrorList.size() == 0
 			&& execErrorList.size() == 0)
 		{
@@ -596,6 +652,7 @@ public class GridSweeper
 		{
 			message.append("Some errors occurred during the experiment...\n\n");
 			
+			// Start with DRMAA-detected errors
 			for(String jobId : drmaaErrorList)
 			{
 				CaseRun run = jobIdToRunMap.get(jobId);
@@ -625,6 +682,7 @@ public class GridSweeper
 				message.append("\n");
 			}
 			
+			// And then GridSweeper errors...
 			for(String jobId : gsErrorList)
 			{
 				CaseRun run = jobIdToRunMap.get(jobId);
@@ -660,6 +718,7 @@ public class GridSweeper
 				message.append("\n");
 			}
 			
+			// And finally nonzero status from the executable itself...
 			for(String jobId : execErrorList)
 			{
 				CaseRun run = jobIdToRunMap.get(jobId);
@@ -696,17 +755,12 @@ public class GridSweeper
 			throw new GridSweeperException("Could not send email.", e);
 		}
 		
-		System.err.println("Sent notification email to " + email + ".");
+		msgOut.println("Sent notification email to " + email + ".");
 	}
 
 	public void setRunType(RunType runType)
 	{
 		this.runType = runType;
-	}
-	
-	public void setRoot(String root)
-	{
-		this.root = root;
 	}
 	
 	public void setExperiment(Experiment experiment)

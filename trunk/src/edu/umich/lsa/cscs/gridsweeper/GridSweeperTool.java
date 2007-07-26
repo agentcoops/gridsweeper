@@ -62,35 +62,18 @@ public class GridSweeperTool
 
 	public static void main(String[] args)
 	{
-		boolean debug = false;
-		
-		for(String arg : args)
-		{
-			if(arg.equals("-D") || arg.equals("--debug"))
-			{
-				DLogger.addConsoleHandler(Level.ALL);
-				debug = true;
-			}
-		}
-		
-		GridSweeperTool tool = new GridSweeperTool();
-		
 		try
 		{
+			GridSweeperTool tool = new GridSweeperTool();
 			tool.run(args);
 		}
 		catch(GridSweeperException e)
 		{
-			System.err.println(e.getMessage());
-			
-			if(debug)
-			{
-				e.printStackTrace();
-			}
+			System.err.println("Could not run GridSweeper. " + e.getMessage());
 		}
 	}
 	
-	public GridSweeperTool()
+	public GridSweeperTool() throws GridSweeperException
 	{
 		gs = new GridSweeper();
 	}
@@ -103,25 +86,49 @@ public class GridSweeperTool
 	 * is not set, or if parsing, loading, setup, running, or monitoring jobs
 	 * generate any other uncaught exceptions.
 	 */
-	public void run(String[] args) throws GridSweeperException
+	public void run(String[] args)
 	{
-		// Set up logging to /tmp/gridsweeper.log
-		//DLogger.addFileHandler(Level.ALL, "%t/gridsweeper.log");
+		boolean debug = false;
+		for(String arg : args)
+		{
+			if(arg.equals("-D") || arg.equals("--debug"))
+			{
+				DLogger.addConsoleHandler(Level.ALL);
+				debug = true;
+			}
+		}
 		
-		String root = System.getenv("GRIDSWEEPER_ROOT");
-		if(root == null)
-			throw new GridSweeperException("GRIDSWEEPER_ROOT environment variable not set.");
-		gs.setRoot(root);
-		
-		loadExperiment(args);
-		
-		gs.setExperiment(experiment);
-		
-		// Set up and submit experiment
-		gs.submitExperiment();
-		
-		// Finish running jobs
-		gs.finish();
+		try
+		{
+			System.err.println("");
+			
+			loadExperiment(args);
+			
+			gs.setExperiment(experiment);
+			
+			// Set up and submit experiment
+			gs.submitExperiment();
+			
+			// Detach stdout and stderr so logout is possible
+			if(debug)
+			{
+				DLogger.removeConsoleHandler();
+				DLogger.addStreamHandler(Level.ALL, gs.msgOut);
+			}
+			gs.daemonize();
+			
+			// Finish running jobs
+			gs.finish();
+		}
+		catch(GridSweeperException e)
+		{
+			gs.msgOut.println(e.getMessage());
+			
+			if(debug)
+			{
+				e.printStackTrace(gs.msgOut);
+			}	
+		}
 	}
 
 	private void loadExperiment(String[] args) throws GridSweeperException
