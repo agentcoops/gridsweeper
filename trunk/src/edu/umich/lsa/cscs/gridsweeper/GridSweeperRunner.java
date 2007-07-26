@@ -28,8 +28,18 @@ public class GridSweeperRunner
 		try
 		{
 			// Load RunSetup object
-			ObjectInputStream stdinStream = new ObjectInputStream(System.in);
-			RunSetup setup = (RunSetup)stdinStream.readObject();
+			RunSetup setup;
+			try
+			{
+				ObjectInputStream stdinStream = new ObjectInputStream(System.in);
+				setup = (RunSetup)stdinStream.readObject();
+			}
+			catch(Exception e)
+			{
+				ObjectInputStream stdinFileStream =
+					new ObjectInputStream(new FileInputStream(".gsweep_in.0"));
+				setup = (RunSetup)stdinFileStream.readObject();
+			}
 			
 			// Get GridSweeper settings
 			Settings settings = setup.getSettings();
