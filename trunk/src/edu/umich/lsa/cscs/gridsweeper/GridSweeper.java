@@ -144,8 +144,9 @@ public class GridSweeper
 		email = experiment.getSettings().getSetting("EmailAddress");
 		if(email == null)
 		{
-			throw new GridSweeperException("No email address provided." +
-					" A notification email address must be specified.");
+			msgOut.println("Warning: no email address provided; "
+				+ " using local user account.");
+			email = System.getProperty("user.name");
 		}
 		
 		String expName = experiment.getName();
