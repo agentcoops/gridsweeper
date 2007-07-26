@@ -14,7 +14,7 @@ import edu.umich.lsa.cscs.gridsweeper.parameters.ParameterMap;
  */
 public class RunSetup implements Serializable
 {
-	private static final long serialVersionUID = 2L;
+	private static final long serialVersionUID = 1L;
 	private Settings settings;
 	private StringMap inputFiles;
 	private String fileTransferSubpath;

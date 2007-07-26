@@ -430,6 +430,7 @@ public class GridSweeper
 					runNum, rngSeed, experiment.getOutputFiles());
 			ObjectOutputStream stdinStream = new ObjectOutputStream(new FileOutputStream(stdinPath));
 			stdinStream.writeObject(setup);
+			stdinStream.close();
 			
 			// Generate job template
 			JobTemplate jt = drmaaSession.createJobTemplate();
