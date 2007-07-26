@@ -16,8 +16,8 @@
 		<copy file="gsweep" tofile="${distbin}/gsweep" />
 		<chmod file="${distbin}/gsweep" perm="755"/>
 		
-		<copy file="gdrone" tofile="${distbin}/gdrone" />
-		<chmod file="${distbin}/gdrone" perm="755"/>
+		<copy file="gsdrone" tofile="${distbin}/gsdrone" />
+		<chmod file="${distbin}/gsdrone" perm="755"/>
 		
 		<copy file="gsmail" tofile="${distbin}/gsmail" />
 		<chmod file="${distbin}/gsmail" perm="755"/>
@@ -25,8 +25,8 @@
 		<copy file="gsgetpid" tofile="${distbin}/gsgetpid" />
 		<chmod file="${distbin}/gsgetpid" perm="755"/>
 		
-		<copy file="grunner" tofile="${distbin}/grunner" />
-		<chmod file="${distbin}/grunner" perm="755"/>
+		<copy file="gsrunner" tofile="${distbin}/gsrunner" />
+		<chmod file="${distbin}/gsrunner" perm="755"/>
 		
 		<copy file="gsweep.1" tofile="${distman}/gsweep.1" />
 	</target>
@@ -62,17 +62,3 @@
 	</target>
 	
 </project>
-
-<!--
-
-GS_ROOT/
-	bin/
-		gsweep
-		gdrone
-		grunner
-	classes/
-		GridSweeper.jar
-			(all classes)
-	plugins/
-	
--->

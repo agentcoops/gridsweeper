@@ -434,7 +434,7 @@ public class GridSweeper
 			// Generate job template
 			JobTemplate jt = drmaaSession.createJobTemplate();
 			jt.setJobName(caseRunName);
-			jt.setRemoteCommand(appendPathComponent(root, "bin/grunner"));
+			jt.setRemoteCommand(appendPathComponent(root, "bin/gsrunner"));
 			if(!useFileTransfer) jt.setWorkingDirectory(caseDir);
 			jt.setInputPath(":" + stdinPath);
 			jt.setOutputPath(":" + appendPathComponent(caseDir, ".gsweep_out." + runNum));
