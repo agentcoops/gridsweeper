@@ -65,6 +65,7 @@ public class GridSweeper
 	}
 	
 	String root;
+	String pid;
 	
 	Experiment experiment;
 	RunType runType = RunType.RUN;
@@ -93,6 +94,8 @@ public class GridSweeper
 		root = System.getenv("GRIDSWEEPER_ROOT");
 		if(root == null)
 			throw new GridSweeperException("GRIDSWEEPER_ROOT environment variable not set.");
+		
+		pid = getPid();
 		
 		cal = Calendar.getInstance();
 		
@@ -482,7 +485,7 @@ public class GridSweeper
 			PrintStream logOut = new PrintStream(new FileOutputStream(logPath));
 			
 			msgOut.println("Detaching from console " +
-				"(monitoring process id: " + getPid() + ")...");
+				"(monitoring process id: " + pid + ")...");
 			msgOut.println("Status output will be written to:");
 			msgOut.println("  " + logPath);
 			msgOut.println("and an email will be sent to " + email + 
@@ -494,7 +497,7 @@ public class GridSweeper
 			System.out.close();
 			System.err.close();
 			
-			msgOut.println("Job monitoring process ID: " + getPid());
+			msgOut.println("Job monitoring process ID: " + pid);
 		}
 		catch(Exception e)
 		{
