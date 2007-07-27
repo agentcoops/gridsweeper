@@ -44,6 +44,11 @@ public class Experiment
 	 * and the root parameter sweep. 
 	 *
 	 */
+	public Experiment()
+	{
+		this(null);
+	}
+	
 	public Experiment(Settings settings)
 	{
 		numRuns = 1;
