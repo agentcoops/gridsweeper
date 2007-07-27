@@ -480,6 +480,8 @@ public class GridSweeper
 	
 	public void daemonize() throws GridSweeperException
 	{
+		if(runType != RunType.RUN) return;
+		
 		try
 		{
 			// Open PrintStream to status.log in experiment directory
@@ -514,104 +516,111 @@ public class GridSweeper
 	 */
 	public void finish() throws GridSweeperException
 	{
-		if(runType != RunType.RUN) return;
+		if(runType == RunType.NORUN) return;
 		
-		msgOut.println("Waiting for jobs to complete...");
-		
-		StringList drmaaErrorList = new StringList();
-		StringList gsErrorList = new StringList();
-		StringList execErrorList = new StringList();
-		
-		int runCount = jobIdToRunMap.size();
-		for(int i = 0; i < runCount; i++)
+		if(runType == RunType.RUN)
 		{
-			JobInfo info;
+			msgOut.println("Waiting for jobs to complete...");
+			
+			StringList drmaaErrorList = new StringList();
+			StringList gsErrorList = new StringList();
+			StringList execErrorList = new StringList();
+			
+			int runCount = jobIdToRunMap.size();
+			for(int i = 0; i < runCount; i++)
+			{
+				JobInfo info;
+				try
+				{
+					info = drmaaSession.wait(
+						Session.JOB_IDS_SESSION_ANY, Session.TIMEOUT_WAIT_FOREVER);
+				}
+				catch(DrmaaException e)
+				{
+					throw new GridSweeperException("Waiting for job completion failed.", e);
+				}
+				
+				String jobId = info.getJobId();
+				fine("got wait for job ID " + jobId);
+				fine("jobIdToRunMap: " + jobIdToRunMap.toString());
+				CaseRun run = jobIdToRunMap.get(jobId);
+				fine("run: " + run);
+				run.jobInfo = info;
+				
+				String caseId = run.caseId;
+				int runNum = run.runNum;
+				
+				String runStr = run.getRunString();
+				
+				msgOut.println("Completed run " + runStr
+					+ " (DRMAA job ID " + jobId + ")");
+				
+				// Check for DRMAA errors
+				if(info.hasCoreDump() || info.hasSignaled() || info.wasAborted()
+					|| info.getExitStatus() != 0)
+				{
+					drmaaErrorList.add(jobId);
+					msgOut.println("  (Warning: DRMAA reports that the run did not" +
+							"complete normally.)");
+				}
+				// Load RunResults from disk
+				else try
+				{
+					String caseDir = appendPathComponent(expDir, caseId);
+					String stdoutPath =
+						appendPathComponent(caseDir, ".gsweep_out." + runNum);
+					
+					fine("Loading RunResults from " + stdoutPath);
+					
+					FileInputStream fileStream = new FileInputStream(stdoutPath);
+					ObjectInputStream objStream = new ObjectInputStream(fileStream);
+					
+					RunResults runResults = (RunResults)objStream.readObject();
+					run.runResults = runResults;
+					
+					if(runResults == null || runResults.getException() != null)
+					{
+						gsErrorList.add(jobId);
+						msgOut.println("  (Warning: a GridSweeper exception occurred" +
+								" while performing this run.)"); 
+					}
+					else if(runResults.getStatus() != 0)
+					{
+						execErrorList.add(jobId);
+						msgOut.println("  (Warning: this run exited with an" +
+								"error code.)");
+					}
+				}
+				catch(Exception e)
+				{
+					msgOut.print("  (Warning: an exception occurred loading the" +
+						" run results for this run: ");
+					e.printStackTrace(msgOut);
+					msgOut.println("  .)");
+					gsErrorList.add(jobId);
+				}
+				
+				msgOut.format("%d of %d complete (%.1f%%).\n",
+						i + 1, runCount, (double)(i + 1)/runCount * 100);
+			}
+			
+			msgOut.println("All jobs completed.");
+			
+			sendEmail(drmaaErrorList, gsErrorList, execErrorList);
+			
 			try
 			{
-				info = drmaaSession.wait(
-					Session.JOB_IDS_SESSION_ANY, Session.TIMEOUT_WAIT_FOREVER);
+				// Finish it up
+				drmaaSession.exit();
 			}
 			catch(DrmaaException e)
 			{
-				throw new GridSweeperException("Waiting for job completion failed.", e);
+				throw new GridSweeperException("Received exception ending DRMAA session", e);
 			}
-			
-			String jobId = info.getJobId();
-			fine("got wait for job ID " + jobId);
-			fine("jobIdToRunMap: " + jobIdToRunMap.toString());
-			CaseRun run = jobIdToRunMap.get(jobId);
-			fine("run: " + run);
-			run.jobInfo = info;
-			
-			String caseId = run.caseId;
-			int runNum = run.runNum;
-			
-			String runStr = run.getRunString();
-			
-			msgOut.println("Completed run " + runStr
-				+ " (DRMAA job ID " + jobId + ")");
-			
-			// Check for DRMAA errors
-			if(info.hasCoreDump() || info.hasSignaled() || info.wasAborted()
-				|| info.getExitStatus() != 0)
-			{
-				drmaaErrorList.add(jobId);
-				msgOut.println("  (Warning: DRMAA reports that the run did not" +
-						"complete normally.)");
-			}
-			// Load RunResults from disk
-			else try
-			{
-				String caseDir = appendPathComponent(expDir, caseId);
-				String stdoutPath =
-					appendPathComponent(caseDir, ".gsweep_out." + runNum);
-				
-				fine("Loading RunResults from " + stdoutPath);
-				
-				FileInputStream fileStream = new FileInputStream(stdoutPath);
-				ObjectInputStream objStream = new ObjectInputStream(fileStream);
-				
-				RunResults runResults = (RunResults)objStream.readObject();
-				run.runResults = runResults;
-				
-				if(runResults == null || runResults.getException() != null)
-				{
-					gsErrorList.add(jobId);
-					msgOut.println("  (Warning: a GridSweeper exception occurred" +
-							" while performing this run.)"); 
-				}
-				else if(runResults.getStatus() != 0)
-				{
-					execErrorList.add(jobId);
-					msgOut.println("  (Warning: this run exited with an" +
-							"error code.)");
-				}
-			}
-			catch(Exception e)
-			{
-				msgOut.print("  (Warning: an exception occurred loading the" +
-					" run results for this run: ");
-				e.printStackTrace(msgOut);
-				msgOut.println("  .)");
-				gsErrorList.add(jobId);
-			}
-			
-			msgOut.format("%d of %d complete (%.1f%%).\n",
-					i + 1, runCount, (double)(i + 1)/runCount * 100);
 		}
-		
-		msgOut.println("All jobs completed.");
-		
-		sendEmail(drmaaErrorList, gsErrorList, execErrorList);
-		
-		try
+		else
 		{
-			// Finish it up
-			drmaaSession.exit();
-		}
-		catch(DrmaaException e)
-		{
-			throw new GridSweeperException("Received exception ending DRMAA session", e);
+			sendEmail(null, null, null);
 		}
 	}
 	
@@ -627,7 +636,10 @@ public class GridSweeper
 		String messagePath = appendPathComponent(expDir, ".gsweep_email");
 		StringBuffer message = new StringBuffer();
 		
-		message.append("GridSweeper experiment complete.\n\n");
+		if(runType == RunType.RUN)
+			message.append("GridSweeper experiment run complete.\n\n");
+		else
+			message.append("GridSweeper experiment dry run complete.\n\n");
 		
 		message.append("   Experiment name: " + expName + "\n");
 		
@@ -647,92 +659,95 @@ public class GridSweeper
 		message.append("" + hours + "h" + minutes + "m" + seconds + "s");
 		message.append("\n\n");
 		
-		// Print error messages, if present
-		if(drmaaErrorList.size() == 0 && gsErrorList.size() == 0
-			&& execErrorList.size() == 0)
+		if(runType == RunType.RUN)
 		{
-			message.append("No errors occurred.\n");
-		}
-		else
-		{
-			message.append("Some errors occurred during the experiment...\n\n");
-			
-			// Start with DRMAA-detected errors
-			for(String jobId : drmaaErrorList)
+			// Print error messages, if present
+			if(drmaaErrorList.size() == 0 && gsErrorList.size() == 0
+				&& execErrorList.size() == 0)
 			{
-				CaseRun run = jobIdToRunMap.get(jobId);
-				JobInfo info = run.jobInfo;
-				
-				String runStr = run.getRunString();
-				
-				message.append("DRMAA returned an error for " + runStr + ":\n");
-				if(info.hasCoreDump())
-				{
-					message.append("  A core dump occurred.\n");
-				}
-				if(info.hasSignaled())
-				{
-					message.append("  The job ended with signal "
-						+ info.getTerminatingSignal() + ".\n");
-				}
-				if(info.wasAborted())
-				{
-					message.append("  The job was aborted.\n");
-				}
-				if(info.hasExited() && info.getExitStatus() != 0)
-				{
-					message.append("  The job exited with status " 
-						+ info.getExitStatus() + ".\n");
-				}
-				message.append("\n");
+				message.append("No errors occurred.\n");
 			}
-			
-			// And then GridSweeper errors...
-			for(String jobId : gsErrorList)
+			else
 			{
-				CaseRun run = jobIdToRunMap.get(jobId);
-				RunResults results = run.runResults;
+				message.append("Some errors occurred during the experiment...\n\n");
 				
-				String runStr = run.getRunString();
-
-				message.append("An internal error occurred in GridSweeper for "
-					+ runStr + ": \n");
-				if(results == null)
+				// Start with DRMAA-detected errors
+				for(String jobId : drmaaErrorList)
 				{
-					message.append("  The run results object could not be loaded.\n");
-				}
-				else
-				{
-					Exception exception = results.getException();
-					if(exception != null)
+					CaseRun run = jobIdToRunMap.get(jobId);
+					JobInfo info = run.jobInfo;
+					
+					String runStr = run.getRunString();
+					
+					message.append("DRMAA returned an error for " + runStr + ":\n");
+					if(info.hasCoreDump())
 					{
-						message.append("  A Java exception occurred:\n  ");
-						
-						StringWriter sw = new StringWriter();
-						PrintWriter pw = new PrintWriter(sw);
-						exception.printStackTrace(pw);
-						
-						String stackStr = sw.getBuffer().toString();
-						message.append(stackStr);
+						message.append("  A core dump occurred.\n");
+					}
+					if(info.hasSignaled())
+					{
+						message.append("  The job ended with signal "
+							+ info.getTerminatingSignal() + ".\n");
+					}
+					if(info.wasAborted())
+					{
+						message.append("  The job was aborted.\n");
+					}
+					if(info.hasExited() && info.getExitStatus() != 0)
+					{
+						message.append("  The job exited with status " 
+							+ info.getExitStatus() + ".\n");
+					}
+					message.append("\n");
+				}
+				
+				// And then GridSweeper errors...
+				for(String jobId : gsErrorList)
+				{
+					CaseRun run = jobIdToRunMap.get(jobId);
+					RunResults results = run.runResults;
+					
+					String runStr = run.getRunString();
+	
+					message.append("An internal error occurred in GridSweeper for "
+						+ runStr + ": \n");
+					if(results == null)
+					{
+						message.append("  The run results object could not be loaded.\n");
 					}
 					else
 					{
-						message.append("  An unknown error occurred.\n");
+						Exception exception = results.getException();
+						if(exception != null)
+						{
+							message.append("  A Java exception occurred:\n  ");
+							
+							StringWriter sw = new StringWriter();
+							PrintWriter pw = new PrintWriter(sw);
+							exception.printStackTrace(pw);
+							
+							String stackStr = sw.getBuffer().toString();
+							message.append(stackStr);
+						}
+						else
+						{
+							message.append("  An unknown error occurred.\n");
+						}
 					}
+					message.append("\n");
 				}
-				message.append("\n");
-			}
-			
-			// And finally nonzero status from the executable itself...
-			for(String jobId : execErrorList)
-			{
-				CaseRun run = jobIdToRunMap.get(jobId);
-				RunResults results = run.runResults;
 				
-				String runStr = run.getRunString();
-				
-				message.append("The " + runStr + " exited with status " +
-					results.getStatus() + ".\n\n");
+				// And finally nonzero status from the executable itself...
+				for(String jobId : execErrorList)
+				{
+					CaseRun run = jobIdToRunMap.get(jobId);
+					RunResults results = run.runResults;
+					
+					String runStr = run.getRunString();
+					
+					message.append("The " + runStr + " exited with status " +
+						results.getStatus() + ".\n\n");
+				}
 			}
 		}
 		
