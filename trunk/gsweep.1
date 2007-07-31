@@ -16,8 +16,8 @@ gsweep \- submits a GridSweeper experiment
 .B -S
 .I seed-location
 ] [
-.B -c
-.I command
+.B -m
+.I model
 ] [
 .B -i
 .I input-file
@@ -38,9 +38,8 @@ is the command-line interface for GridSweeper.
 .B gsweep
 constructs a GridSweeper experiment and submits it to the grid. An experiment is
 defined by the model being run and by a set of different parameter-value
-combinations to apply to the model. Additionally, the model can be run a number
-of times for each parameter-value combination, each run having a different 
-random number seed.
+combinations--\fBcases\fP--to apply to the model. Additionally, each case can be
+run a number of different times, each run having a different random number seed.
 
 When \fBgsweep\fP is run, the following things happen:
 
@@ -48,32 +47,34 @@ When \fBgsweep\fP is run, the following things happen:
 Command-line options and parameter sweep arguments are parsed.
 
 .IP "2."
-Experiment settings are loaded, first from \fI~/.gridsweeper\fP, then from an
-experiment file provided using \fB-i\fP, overriding any in \fI~/.gridsweeper\fP,
-and finally from command-line options and parameter sweep arguments, overriding
-the first two sources.
+Experiment settings are loaded from an experiment XML file, if provided, and
+then from command-line options and parameter sweep arguments, overriding any
+provided in the experiment file.
 
 .IP "3."
-If an output path was specified using \fB-o\fP or \fB-O\fP, the complete set of
-experiment settings is written out to that path in the GridSweeper XML
-experiment format, minus the information needed to reproduce the same sequence
-of random seeds that will be used for this run. If \fB-O\fP was specified,
-nothing else happens.
+If an output directory was specified using \fB-o\fP or \fB-O\fP, the complete
+set of experiment settings is written out to that directory in the GridSweeper
+XML experiment format, minus the information needed to reproduce the same
+sequence of random seeds that will be used for this run. If \fB-O\fP was
+specified, the process stops here.
 
 .IP "4."
-If \fB-O\fP was not specified, the process continues by constructing an output
-sub-sub-directory in the user's experiment results directory (usually
-\fI~/Experiments\fP), named with the current date and time in the format
-\fIYYYY-MM-DD/hh-mm-ss\fP. An experiment XML file is written to
-\fIexperiment.gsexp\fP in this directory, which is identical to one specified
-by \fB-o\fP or \fB-O\fP except that it does contain the information needed to
-reproduce the experiment exactly, using the same random seed for every run.
+The process continues by constructing an results directory for this experiment
+run in the user's root experiment results directory. The location for the
+results directory is named with the current date and time:
+
+.I <ExperimentsDirectory>/<ExperimentName>/YYYY-MM-DD/hh-mm-ss
+
+An experiment XML file is written to \fIexperiment.gsexp\fP in this directory,
+which is identical to one specified by \fB-o\fP or \fB-O\fP except that it
+contains the information needed to reproduce the experiment exactly, including
+an identical set of random seeds.
 
 .IP "5."
-Additionally, a subdirectory is created in the output directory for every single
-combination of parameters. The names of these subdirectories are given by
-the parameter values, in the format \fIp1=v1-p2=v2-p3=v3...\fP Values that stay
-the same for all runs are omitted in directory names. Inside this subdirectory
+Inside the experiment's results directory, another directory is created for each
+case. The names of these subdirectories are given by
+the parameter values, in the format \fIp1=v1-p2=v2-p3=v3...\fP (Values that stay
+the same for all runs are omitted in directory names.) Inside this subdirectory
 is another XML file, named \fIcase.gscase\fP, containing the list of random
 seeds used for runs. If the \fB-d\fP option was specified, the process stops
 here.
@@ -98,34 +99,39 @@ e.g., \fIedu.umich.lsa.cscs.gridsweeper.DroneAdapter\fP.
 Experiment name. This string is used to name the experiment output directory and
 to identify submitted jobs in the grid system.
 
+.IP "\fB-r\fB, \fB--results-directory\fP"
+Directory where experiment results are stored, corresponding to the
+\fIResultsDirectory\fP setting in an experiment XML file. If none is
+provided, \fI~/Results\fP will be used.
+
 .IP "\fB-N\fP, \fB--numruns \fInum-runs\fP"
-Number of runs to perform for each combination of parameter-value assignments.
+Number of runs to perform for each case.
 
 .IP "\fB-S\fP, \fB--seed \fIseed-location\fP"
 The location of the first seed in the seed generation table, given as
 \fIrow\fB:\fIcol\fP. See the full description of seed generation in the
 \fIEXPERIMENT FILE FORMAT\fP section.
 
-.IP "\fB-c\fP, \fB--command \fIcommand\fP"
-Command (model executable path) to run. In effect, this sets the
-.I command
-setting in the adapter domain, e.g.,
-\fIedu.umich.lsa.cscs.gridsweeper.Drone.command\fP,
-so if the adapter class does not support this setting, this option has no
-effect.
+.IP "\fB-m\fP, \fB--model \fImodel\fP"
+Model to run. In most cases, this will mean the model executable file,
+but the meaning is adapter-defined. The built-in adapter for
+Drone-compliant models interprets this as the model executable, but another
+adapter could use this option to specify a choice of models in some other way,
+e.g., a name within a model library that does not correspond directly to the
+filesystem. This option corresponds to setting the \fImodel\fP setting in
+the adapter domain, e.g.,
+\fIedu.umich.lsa.cscs.gridsweeper.DroneAdapter.model\fP.
 
 .IP "\fB-i\fP, \fB--input \fI input-file\fP"
-Path to experiment XML input file. Any settings or options provided at the
-command line will override anything in the input file, regardless of the
-position of this option in the argument list.
+Experiment XML input file. Any settings or options provided at the command line
+will override anything in the input file, regardless of the position of this
+option in the argument list.
 
 .IP "\fB-o\fP, \fB--output \fI output-file\fP"
-Path at which a generated experiment XML file should be written. The generated
+Location where an experiment XML output file should be written. The generated
 file will contain all the settings needed to re-run the experiment with a new
-sequence of random seeds, including settings set by the user's
-.I ~/.gridsweeper
-file, settings in an input experiment XML file, and settings set at the command
-line.
+sequence of random seeds, combining all settings from the experiment XML file
+and the command line.
 
 .IP "\fB-O\fP, \fB--output-only \fI output-file\fP"
 The same as \fB-o\fP, but additionally causes the experiment not to be run at
@@ -139,6 +145,12 @@ submitting jobs to the grid to be run. Output directories are created and
 populated with control files needed to reproduce runs, but the runs do not
 actually happen. If this option appears after \fB-O\fP in the argument list,
 it overrides the no-run behavior caused by that option.
+
+.IP "\fB-e\fB, \fB--email-address\fP"
+Email address to which to send notification of experiment completion,
+corresponding to the \fIEmailAddress\fP setting in an experiment XML file.
+If an email address is not provided, mail will be sent to the local user
+account.
 
 .SH PARAMETER SWEEP ARGUMENTS
 
@@ -180,7 +192,7 @@ must be surrounded by quotes when typing commands in a shell.
 
 .SH SWEEP TYPES
 
-Internally, the set of parameter-value combinations is represented by a single
+Internally, the set of cases is represented by a single
 top-level ``multiplicative combination sweep'', which contains a set of child
 sweeps of various types: single parameter-value assignments, list sweeps,
 range list sweeps, parallel combination sweeps, and multiplicative
@@ -208,8 +220,8 @@ calculate these lists.
 
 .IP "\fBParallel Combination Sweeps\fP"
 Parallel combination sweeps can be used to combine other sweeps that generate
-exactly the same number of parameter combinations. A new set of combinations is
-created by combining the parameter-value assignments from combinations in
+exactly the same number of cases. A new set of cases is
+created by combining the parameter-value assignments from cases in
 different sweeps that have the same position in the enumerated list.
 For example, two value lists, 
 .B r = 0.1, 0.2, 0.3
@@ -217,7 +229,7 @@ and
 .B s = 1, 2, 3
 can be combined to create
 .B r s = 0.1 1, 0.2 2, 0.3 3
-, which has the same number of parameter combinations (3) as each of the sweeps
+, which has the same number of cases (3) as each of the sweeps
 individually.
 
 .IP "\fBMultiplicative Combination Sweeps\fP"
@@ -248,7 +260,7 @@ attribute is used to name experiment directories in the filesystem and in
 naming strings submitted to the grid. The
 .B numRuns
 attribute specifies how many runs with different random seeds should be
-completed for each combination of parameter-value assignments.
+completed for each case.
 
 The attributes
 .B firstSeedRow
@@ -291,7 +303,7 @@ Java class name and an additional `.', e.g.,
 
 .nf
 	<setting
-	 key="edu.umich.lsa.cscs.gridsweeper.DroneAdapter.command"
+	 key="edu.umich.lsa.cscs.gridsweeper.DroneAdapter.model"
 	 value="/bin/echo"
 	/>
 .fi
@@ -374,7 +386,7 @@ The
 .B <parallel>
 tag is used to define a parallel combination sweep. This is also just a
 container, whose children must all generate the exact same number
-of parameter-value combinations, six each in this example:
+of cases, six each in this example:
 
 .nf
 	<parallel>
@@ -462,9 +474,9 @@ The built-in
 .B DroneAdapter
 class supports the following settings:
 
-.I command
+.I model
 .RS
-The path to the model executable. Required.
+The model executable. Required.
 .RE
 
 .I setParamOption
@@ -506,7 +518,7 @@ if and only if the value is equal, ignoring case, to the string
 .I true
 (default: 
 .I true
-, but ignored unless a path is provided).
+, but ignored unless a file is provided).
 .RE
 
 .I inputFileOption
@@ -514,9 +526,9 @@ if and only if the value is equal, ignoring case, to the string
 The command-line option for specifying the input file.
 .RE
 
-.I inputFilePath
+.I inputFile
 .RS
-The path to the input file.
+The input file.
 .RE
 
 .I miscOptions

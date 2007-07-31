@@ -12,40 +12,8 @@ import static edu.umich.lsa.cscs.gridsweeper.DLogger.*;
  * are scoped using their reverse-DNS class names, e.g.,
  * {@code edu.umich.lsa.cscs.gridsweeper.FTPFileTransferSystem.Username}.
  * {@code Settings} is a subclass of {@code java.util.Properties},
- * and simply adds default values and a couple convenience methods.
- * Settings included by default:</p>
+ * and simply adds default values and a couple convenience methods.</p>
  * 
- * <table>
- * 
- * <tr>
- * <td>Preference Name</td> <td>Default Value</td>
- * </tr>
- * 
- * <tr>
- * <td>@{code RootDirectory}</td> <td>{@code /usr/local/gridsweeper}</td>
- * </tr>
- * 
- * <tr>
- * <td>@{code ExperimentsDirectory}</td> <td>{@code ~/Experiments}</td>
- * </tr>
- * 
- * <tr>
- * <td>@{code AdapterClass}</td> <td>{@code edu.umich.lsa.cscs.gridsweeper.DroneAdapter}</td>
- * </tr>
- * 
- * <tr>
- * <td>@{code UseFileTransfer}</td> <td>{@code false}</td>
- * </tr>
- * 
- * <tr>
- * <td>@{code FileTransferSystemClass}</td> <td>{@code edu.umich.lsa.cscs.gridsweeper.FTPFileTransferSystem}</td>
- * </tr>
- * 
- * <tr>
- * <td>@{code edu.umich.lsa.cscs.gridsweeper.FTPFileTransferSystem.Username</td> <td>@{code anonymous}</td>
- * </tr>
- * 
- * </table>
  * @author Ed Baskerville
  *
  */
@@ -60,8 +28,7 @@ public class Settings extends Properties
 	{
 		defaultSettings = new Settings();
 		
-		defaultSettings.setProperty("RootDirectory", "/usr/local/gridsweeper");
-		defaultSettings.setProperty("ExperimentsDirectory", "~/Experiments");
+		defaultSettings.setProperty("ResultsDirectory", "~/Results");
 		
 		defaultSettings.setProperty("AdapterClass", "edu.umich.lsa.cscs.gridsweeper.DroneAdapter");
 		

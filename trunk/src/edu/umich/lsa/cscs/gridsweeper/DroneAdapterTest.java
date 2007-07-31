@@ -14,7 +14,7 @@ public class DroneAdapterTest
 	public void testRealRunWithDefaults() throws AdapterException, UnsupportedEncodingException
 	{
 		Properties properties = new Properties();
-		properties.setProperty("command", "/bin/echo");
+		properties.setProperty("model", "/bin/echo");
 		properties.setProperty("miscOptions", "-n");
 		DroneAdapter adapter = new DroneAdapter(properties);
 		

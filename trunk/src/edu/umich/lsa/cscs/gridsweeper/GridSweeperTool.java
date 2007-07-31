@@ -29,10 +29,11 @@ public class GridSweeperTool
 		NAME,
 		NUM_RUNS,
 		SEED,
-		COMMAND,
+		MODEL,
 		INPUT,
 		OUTPUT,
-		EMAIL
+		EMAIL,
+		RESULTS
 	}
 	
 	static String className;
@@ -269,8 +270,8 @@ public class GridSweeperTool
 						state = ArgState.NUM_RUNS;
 					else if(arg.equals("-S") || arg.equals("--seed"))
 						state = ArgState.SEED;
-					else if(arg.equals("-c") || arg.equals("--command"))
-						state = ArgState.COMMAND;
+					else if(arg.equals("-m") || arg.equals("--model"))
+						state = ArgState.MODEL;
 					else if(arg.equals("-i") || arg.equals("--input"))
 						state = ArgState.INPUT;
 					else if(arg.equals("-o") || arg.equals("--output"))
@@ -280,9 +281,13 @@ public class GridSweeperTool
 						gs.setRunType(RunType.NORUN);
 						state = ArgState.OUTPUT;
 					}
-					else if(arg.equals("-m") || arg.equals("--email-address"))
+					else if(arg.equals("-e") || arg.equals("--email-address"))
 					{
 						state = ArgState.EMAIL;
+					}
+					else if(arg.equals("-r") || arg.equals("--results-directory"))
+					{
+						state = ArgState.RESULTS;
 					}
 					else if(arg.equals("-d") || arg.equals("--dry"))
 					{
@@ -315,8 +320,8 @@ public class GridSweeperTool
 					cliSettings.put("Seed", arg);
 					state = ArgState.START;
 					break;
-				case COMMAND:
-					adapterSettings.put("command", arg);
+				case MODEL:
+					adapterSettings.put("model", arg);
 					state = ArgState.START;
 					break;
 				case INPUT:
@@ -329,6 +334,10 @@ public class GridSweeperTool
 					break;
 				case EMAIL:
 					cliSettings.put("EmailAddress", arg);
+					state = ArgState.START;
+					break;
+				case RESULTS:
+					cliSettings.put("ResultsDirectory", arg);
 					state = ArgState.START;
 					break;
 			}

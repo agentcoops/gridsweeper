@@ -217,10 +217,10 @@ public class GridSweeper
 	{
 		try
 		{
-			String expsDir = expandTildeInPath(settings.getProperty("ExperimentsDirectory"));
+			String expsDir = expandTildeInPath(settings.getProperty("ResultsDirectory"));
 			
 			// First set up big directory for the whole experiment
-			// Located in <experimentDir>/<experimentName>/<experimentDate>/<experimentTime>
+			// Located in <resultsDir>/<experimentName>/<experimentDate>/<experimentTime>
 			String expName = experiment.getName();
 			if(expName == null)
 			{

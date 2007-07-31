@@ -18,7 +18,7 @@ import edu.umich.lsa.cscs.gridsweeper.parameters.ParameterMap;
  * </tr>
  * 
  * <tr>
- * <td>{@code command}</td>         <td>The path to the model executable. Required.</td>
+ * <td>{@code model}</td>         <td>The path to the model executable. Required.</td>
  * <td>(none)</td>
  * </tr>
  * 
@@ -75,7 +75,7 @@ import edu.umich.lsa.cscs.gridsweeper.parameters.ParameterMap;
  */
 public class DroneAdapter implements Adapter
 {
-	private String command;
+	private String model;
 	
 	private String setParamOption;
 	
@@ -95,14 +95,14 @@ public class DroneAdapter implements Adapter
 	 * to fields.
 	 * @param properties Properties for the adapter. See the class description
 	 * for supported properties.
-	 * @throws AdapterException When no command is specified.
+	 * @throws AdapterException When no model is specified.
 	 */
 	public DroneAdapter(Properties properties) throws AdapterException
 	{
-		command = properties.getProperty("command");
-		if(command == null)
+		model = properties.getProperty("model");
+		if(model == null)
 		{
-			throw new AdapterException("\"command\" property must be specified.");
+			throw new AdapterException("\"model\" property must be specified.");
 		}
 		
 		setParamOption = properties.getProperty("setParamOption", "-D");
@@ -146,7 +146,7 @@ public class DroneAdapter implements Adapter
 			arguments.add(setParamOption + name + "=" + parameterMap.get(name));
 		}
 		
-		StringBuffer messageBuilder = new StringBuffer(command);
+		StringBuffer messageBuilder = new StringBuffer(model);
 		for(String arg : arguments)
 		{
 			messageBuilder.append(" " + StringUtils.escape(arg, " "));
@@ -161,7 +161,7 @@ public class DroneAdapter implements Adapter
 		
 		// Create command array
 		String[] cmdArray = new String[arguments.size() + 1];
-		cmdArray[0] = command;
+		cmdArray[0] = model;
 		for(int i = 0; i < arguments.size(); i++)
 		{
 			cmdArray[i+1] = arguments.get(i);
