@@ -266,7 +266,7 @@ public class GridSweeperTool
 						state = ArgState.ADAPTER;
 					else if(arg.equals("-n") || arg.equals("--name"))
 						state = ArgState.NAME;
-					else if(arg.equals("-N") || arg.equals("--numruns"))
+					else if(arg.equals("-N") || arg.equals("--num-runs"))
 						state = ArgState.NUM_RUNS;
 					else if(arg.equals("-S") || arg.equals("--seed"))
 						state = ArgState.SEED;
@@ -285,7 +285,7 @@ public class GridSweeperTool
 					{
 						state = ArgState.EMAIL;
 					}
-					else if(arg.equals("-r") || arg.equals("--results-directory"))
+					else if(arg.equals("-r") || arg.equals("--results-dir"))
 					{
 						state = ArgState.RESULTS;
 					}
