@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<experiment name="echo" numRuns="10">
+<experiment name="echo" numRuns="2">
 	<setting key="edu.umich.lsa.cscs.gridsweeper.DroneAdapter.model" value="/bin/echo" />
 	
 	<setting key="ResultsDirectory" value="~/Results" />
+	<setting key="EmailAddress" value="edbaskerville@gmail.com" />
 	
 	<abbrev param="alpha" abbrev="a" />
 	<abbrev param="beta" abbrev="b" />
@@ -13,7 +14,7 @@
 	<value param="alpha" value="0.5" />
 	<value param="beta" value="0.3"/>
 	
-	<range param="gamma" start="0.1" end="1.0" increment="0.1" />
-	<range param="nu" start="0.05" end="0.1" increment="0.01" />
+	<range param="gamma" start="0.1" end="0.2" increment="0.1" />
+	<range param="nu" start="0.05" end="0.06" increment="0.01" />
 
 </experiment>
