@@ -75,8 +75,8 @@ public class ExperimentXMLWriter extends XMLWriter
 	 */
 	private void printSettings()
 	{
-		Settings settings = (Settings)experiment.getSettings().clone();
-		settings.putAll(Settings.defaultSettings());
+		Settings settings = (Settings)Settings.defaultSettings().clone();
+		settings.putAll(experiment.getSettings());
 		
 		for(Object settingObj : settings.keySet())
 		{
