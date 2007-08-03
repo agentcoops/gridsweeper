@@ -95,11 +95,13 @@ public class GridSweeperRunner
 			{
 				String stdoutFilename = "stdout." + runNumber;
 				byte[] stdoutData = results.getStdoutData();
-				writeData(stdoutFilename, stdoutData);
+				if(stdoutData.length > 0)
+					writeData(stdoutFilename, stdoutData);
 				
 				String stderrFilename = "stderr." + runNumber;
 				byte[] stderrData = results.getStderrData();
-				writeData(stderrFilename, stderrData);
+				if(stderrData.length > 0)
+					writeData(stderrFilename, stderrData);
 			}
 		}
 		catch(Exception e)
