@@ -19,16 +19,18 @@ public class RunSetup implements Serializable
 	private StringMap inputFiles;
 	private String fileTransferSubpath;
 	private ParameterMap parameters;
+	private int numRuns;
 	private int runNumber;
 	private int rngSeed;
 	private StringList outputFiles;
 	
-	public RunSetup(Settings settings, StringMap inputFiles, String fileTransferSubpath, ParameterMap parameters, int runNumber, int rngSeed, StringList outputFiles)
+	public RunSetup(Settings settings, StringMap inputFiles, String fileTransferSubpath, ParameterMap parameters, int numRuns, int runNumber, int rngSeed, StringList outputFiles)
 	{
 		this.settings = settings;
 		this.inputFiles = inputFiles;
 		this.fileTransferSubpath = fileTransferSubpath;
 		this.parameters = parameters;
+		this.numRuns = numRuns;
 		this.runNumber = runNumber;
 		this.rngSeed = rngSeed;
 		this.outputFiles = outputFiles;
@@ -47,6 +49,11 @@ public class RunSetup implements Serializable
 	public int getRunNumber()
 	{
 		return runNumber;
+	}
+	
+	public int getNumRuns()
+	{
+		return numRuns;
 	}
 	
 	public ParameterMap getParameters()

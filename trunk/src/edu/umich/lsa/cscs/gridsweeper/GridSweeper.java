@@ -427,7 +427,7 @@ public class GridSweeper
 			String stdinPath = appendPathComponent(caseDir, ".gsweep_in." + runNum);
 			RunSetup setup = new RunSetup(settings,
 					experiment.getInputFiles(), caseId, expCase.getParameterMap(),
-					runNum, rngSeed, experiment.getOutputFiles());
+					experiment.getNumRuns(), runNum, rngSeed, experiment.getOutputFiles());
 			ObjectOutputStream stdinStream = new ObjectOutputStream(new FileOutputStream(stdinPath));
 			stdinStream.writeObject(setup);
 			stdinStream.close();

@@ -67,6 +67,7 @@ public class GridSweeperRunner
 			// Run!
 			ParameterMap parameters = setup.getParameters();
 			int runNumber = setup.getRunNumber();
+			int numRuns = setup.getNumRuns();
 			int rngSeed = setup.getRngSeed();
 			results = adapter.run(parameters, runNumber, rngSeed);
 			
@@ -93,12 +94,14 @@ public class GridSweeperRunner
 			// If file transfer is on, this will happen at the client end of things
 			if(!useFileTransfer)
 			{
-				String stdoutFilename = "stdout." + runNumber;
+				String rnStr = getRNString(numRuns, runNumber);
+				
+				String stdoutFilename = "stdout." + rnStr;
 				byte[] stdoutData = results.getStdoutData();
 				if(stdoutData.length > 0)
 					writeData(stdoutFilename, stdoutData);
 				
-				String stderrFilename = "stderr." + runNumber;
+				String stderrFilename = "stderr." + rnStr;
 				byte[] stderrData = results.getStderrData();
 				if(stderrData.length > 0)
 					writeData(stderrFilename, stderrData);
@@ -118,6 +121,21 @@ public class GridSweeperRunner
 			stdoutStream.writeObject(results);
 		}
 		catch(Exception e) {}
+	}
+	
+	private static String getRNString(int numRuns, int runNumber)
+	{
+		String numRunsStr = "" + numRuns;
+		String rnNoZerosStr = "" + runNumber;
+		
+		StringBuffer rnStrBuf = new StringBuffer();
+		int diff = numRunsStr.length() - rnNoZerosStr.length();
+		for(int i = 0; i < diff; i++)
+		{
+			rnStrBuf.append("0");
+		}
+		rnStrBuf.append(rnNoZerosStr);
+		return rnStrBuf.toString();
 	}
 
 	private static void writeData(String filename, byte[] data) throws IOException
