@@ -642,6 +642,7 @@ public class GridSweeper
 			message.append("GridSweeper experiment dry run complete.\n\n");
 		
 		message.append("   Experiment name: " + expName + "\n");
+		message.append(" Results directory: " + expDir + "\n");
 		
 		message.append("      Submitted at: ");
 		DateFormat format = DateFormat.getDateTimeInstance();
