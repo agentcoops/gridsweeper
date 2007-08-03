@@ -125,11 +125,11 @@ public class GridSweeperRunner
 	
 	private static String getRNString(int numRuns, int runNumber)
 	{
-		String numRunsStr = "" + numRuns;
+		String maxRNStr = "" + (numRuns - 1);
 		String rnNoZerosStr = "" + runNumber;
 		
 		StringBuffer rnStrBuf = new StringBuffer();
-		int diff = numRunsStr.length() - rnNoZerosStr.length();
+		int diff = maxRNStr.length() - rnNoZerosStr.length();
 		for(int i = 0; i < diff; i++)
 		{
 			rnStrBuf.append("0");
