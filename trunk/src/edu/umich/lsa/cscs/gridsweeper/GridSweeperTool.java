@@ -66,12 +66,32 @@ public class GridSweeperTool
 		try
 		{
 			GridSweeperTool tool = new GridSweeperTool();
-			tool.run(args);
+			tool.run(preParseArgs(args));
 		}
 		catch(GridSweeperException e)
 		{
 			System.err.println("Could not run GridSweeper. " + e.getMessage());
 		}
+	}
+	
+	private static StringList preParseArgs(String[] args) throws GridSweeperException
+	{
+		StringList ppArgs = new StringList(args.length);
+		
+		for(String arg : args)
+		{
+			if(arg.length() > 2 && arg.charAt(0) == '-' && arg.charAt(1) != '-')
+			{
+				String opt = arg.substring(0, 2);
+				String optArg = arg.substring(2);
+				
+				ppArgs.add(opt);
+				ppArgs.add(optArg);
+			}
+			else ppArgs.add(arg);
+		}
+		
+		return ppArgs;
 	}
 	
 	public GridSweeperTool() throws GridSweeperException
@@ -87,7 +107,7 @@ public class GridSweeperTool
 	 * is not set, or if parsing, loading, setup, running, or monitoring jobs
 	 * generate any other uncaught exceptions.
 	 */
-	public void run(String[] args)
+	public void run(StringList args)
 	{
 		boolean debug = false;
 		for(String arg : args)
@@ -132,7 +152,7 @@ public class GridSweeperTool
 		}
 	}
 
-	private void loadExperiment(String[] args) throws GridSweeperException
+	private void loadExperiment(StringList args) throws GridSweeperException
 	{
 		Settings cliSettings = new Settings();
 		Settings adapterSettings = new Settings();
@@ -249,7 +269,7 @@ public class GridSweeperTool
 	 * list of the form start:increment:end.</p>
 	 * @param args Command-line arguments.
 	 */
-	void parseArgs(String[] args, Settings cliSettings, 
+	void parseArgs(StringList args, Settings cliSettings, 
 			Settings adapterSettings, Settings fileTransferSettings,
 			List<Sweep> cliSweeps)
 		throws GridSweeperException
