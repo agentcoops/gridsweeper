@@ -169,6 +169,9 @@ public class DroneAdapter implements Adapter
 		
 		try
 		{
+			System.err.println("cmdArray:");
+			System.err.println(cmdArray.toString());
+			
 			// Actually run the damn thing, getting a process object with which to interact with it
 			Process process = Runtime.getRuntime().exec(cmdArray);
 			
