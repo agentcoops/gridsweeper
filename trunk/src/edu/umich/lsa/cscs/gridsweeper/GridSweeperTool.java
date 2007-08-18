@@ -4,9 +4,12 @@ import static edu.umich.lsa.cscs.gridsweeper.DLogger.*;
 
 import java.io.FileNotFoundException;
 import java.math.BigDecimal;
+import java.net.MalformedURLException;
 import java.util.*;
 import java.util.logging.*;
 import java.util.regex.*;
+
+import org.xml.sax.SAXParseException;
 
 import static edu.umich.lsa.cscs.gridsweeper.StringUtils.*;
 import edu.umich.lsa.cscs.gridsweeper.GridSweeper.RunType;
@@ -740,9 +743,10 @@ public class GridSweeperTool
 			experiment = new Experiment(sharedSettings,
 					new java.net.URL("file", "", experimentPath));
 		}
-		catch(Exception e)
+		catch (MalformedURLException e)
 		{
-			throw new GridSweeperException("Could not load experiment file.", e);
+			throw new GridSweeperException("Could not find experiment file "
+					+ experimentPath + ".", e);
 		}
 	}
 }

@@ -11,14 +11,14 @@ public class ExperimentTestParse
 	Experiment experiment;
 
 	@Test
-	public void empty() throws ExperimentException
+	public void empty() throws GridSweeperException
 	{
 		experiment = new Experiment(null, getURL("empty"));
 		assertEquals("test_empty", experiment.getName());
 	}
 	
 	@Test
-	public void properties() throws ExperimentException
+	public void properties() throws GridSweeperException
 	{
 		experiment = new Experiment(null, getURL("properties"));
 		assertEquals(10, experiment.getNumRuns());
@@ -26,7 +26,7 @@ public class ExperimentTestParse
 	}
 	
 	@Test
-	public void abbrevs() throws ExperimentException
+	public void abbrevs() throws GridSweeperException
 	{
 		experiment = new Experiment(null, getURL("abbrevs"));
 		assertEquals("p1", experiment.getAbbreviations().get("param1"));

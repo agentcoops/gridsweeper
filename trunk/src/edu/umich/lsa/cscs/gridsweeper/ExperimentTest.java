@@ -22,7 +22,7 @@ public class ExperimentTest
 	}
 	
 	@Test
-	public void generateCases() throws ExperimentException
+	public void generateCases() throws GridSweeperException
 	{
 		List<ExperimentCase> cases = experiment.generateCases();
 		

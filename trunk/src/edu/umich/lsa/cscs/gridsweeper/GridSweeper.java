@@ -164,15 +164,7 @@ public class GridSweeper
 		Settings settings = experiment.getSettings();
 
 		// Assemble cases
-		try
-		{
-			cases = experiment.generateCases();
-		}
-		catch (ExperimentException e)
-		{
-			// TODO: use ExperimentException to create better error information
-			throw new GridSweeperException("Could not generate experiment cases", e);
-		}
+		cases = experiment.generateCases();
 		
 		// Set up main experiment directory
 		setUpExperimentDirectory(settings);

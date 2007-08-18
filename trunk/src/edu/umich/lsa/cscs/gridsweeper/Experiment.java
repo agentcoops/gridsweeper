@@ -6,6 +6,9 @@ import static edu.umich.lsa.cscs.gridsweeper.StringUtils.*;
 
 import javax.xml.parsers.*;
 
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+
 import cern.jet.random.*;
 import cern.jet.random.engine.*;
 
@@ -71,7 +74,7 @@ public class Experiment
 	 * @param experimentURL The URL containing the XML. 
 	 * @throws ExperimentException If the XML cannot be parsed.
 	 */
-	public Experiment(Settings settings, java.net.URL experimentURL) throws ExperimentException
+	public Experiment(Settings settings, java.net.URL experimentURL) throws GridSweeperException
 	{
 		this(settings);
 		try
@@ -86,9 +89,16 @@ public class Experiment
 				setName(lastPathComponent(experimentURL.getPath()));
 			}
 		}
+		catch(SAXParseException e)
+		{
+			throw new GridSweeperException("Experiment file contains an error " +
+					"at line " + e.getLineNumber() + ", column " +
+					e.getColumnNumber() + ": " +
+					e.getMessage(), e);
+		}
 		catch(Exception e)
 		{
-			throw new ExperimentException("Received exception trying to parse URL.", e);
+			throw new GridSweeperException("Received exception trying to parse experiment XML.", e);
 		}
 	}
 	
@@ -99,7 +109,7 @@ public class Experiment
 	 * @return A list of experiment cases
 	 * @throws ExperimentException
 	 */
-	public List<ExperimentCase> generateCases() throws ExperimentException
+	public List<ExperimentCase> generateCases() throws GridSweeperException
 	{
 		List<ExperimentCase> cases = new ArrayList<ExperimentCase>();
 		
@@ -124,7 +134,7 @@ public class Experiment
 		}
 		catch(Exception e)
 		{
-			throw new ExperimentException("Received exception creating experiment cases.", e);
+			throw new GridSweeperException("Received exception creating experiment cases.", e);
 		}
 		
 		return cases;
