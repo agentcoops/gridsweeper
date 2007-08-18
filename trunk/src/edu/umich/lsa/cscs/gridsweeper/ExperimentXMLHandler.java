@@ -3,8 +3,7 @@ package edu.umich.lsa.cscs.gridsweeper;
 import java.math.BigDecimal;
 import java.util.*;
 
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
+import org.xml.sax.*;
 import org.xml.sax.helpers.DefaultHandler;
 
 import edu.umich.lsa.cscs.gridsweeper.parameters.*;
@@ -21,6 +20,8 @@ public class ExperimentXMLHandler extends DefaultHandler
 {
 	private List<Object> stack;
 	private Experiment experiment;
+	
+	private Locator locator;
 
 	/**
 	 * An enum representing the supported XML tags.
@@ -64,8 +65,7 @@ public class ExperimentXMLHandler extends DefaultHandler
 		fine("ending parsing");
 		if(peek() != null)
 		{
-			SAXException exception = new SAXException("Encountered end of document before closing experiment tag.");
-			throwing(getClass().toString(), "endDocument", exception); 
+			SAXException exception = new SAXParseException("Encountered end of document before closing experiment tag.", locator); 
 			throw exception;
 		}
 	}
@@ -83,143 +83,135 @@ public class ExperimentXMLHandler extends DefaultHandler
 		StringMap attrMap = getMapFromAttributes(attributes);
 		Object top = peek();
 		
-		try
+		if(qName.equals("experiment"))
 		{
-			if(qName.equals("experiment"))
+			if(top != null)
+				throw new SAXParseException("experiment tag with non-empty stack", locator);
+			
+			experiment.setName(attrMap.get("name"));
+			
+			String numRunsStr = attrMap.get("numRuns");
+			if(numRunsStr != null)
 			{
-				if(top != null)
-					throw new SAXException("experiment tag with non-empty stack");
-				
-				experiment.setName(attrMap.get("name"));
-				
-				String numRunsStr = attrMap.get("numRuns");
-				if(numRunsStr != null)
-				{
-					experiment.setNumRuns(Integer.parseInt(numRunsStr));
-				}
-				
-				String firstSeedRowStr = attrMap.get("firstSeedRow");
-				if(firstSeedRowStr != null)
-				{
-					experiment.setFirstSeedRow(Integer.parseInt(firstSeedRowStr));
-				}
-				
-				String seedColStr = attrMap.get("seedCol");
-				if(seedColStr != null)
-				{
-					experiment.setSeedCol(Integer.parseInt(seedColStr));
-				}
-				
-				push(experiment);
+				experiment.setNumRuns(Integer.parseInt(numRunsStr));
 			}
-			else if(qName.equals("input"))
+			
+			String firstSeedRowStr = attrMap.get("firstSeedRow");
+			if(firstSeedRowStr != null)
 			{
-				if(top != experiment)
-					throw new SAXException("input tag with non-experiment on top of stack");
-				
-				String source = attrMap.get("source");
-				String destination = attrMap.get("destination");
-				
-				if(source == null)
-					throw new SAXException("source attribute missing from input tag");
-				if(destination == null)
-					throw new SAXException("destination attribute missing from input tag");
-				
-				experiment.getInputFiles().put(source, destination);
-				
-				push(Tag.INPUT);
+				experiment.setFirstSeedRow(Integer.parseInt(firstSeedRowStr));
 			}
-			else if(qName.equals("output"))
+			
+			String seedColStr = attrMap.get("seedCol");
+			if(seedColStr != null)
 			{
-				if(top != experiment)
-					throw new SAXException("output tag with non-experiment on top of stack");
-				
-				String path = attrMap.get("path");
-				
-				if(path == null)
-					throw new SAXException("path attribute missing from output tag");
-				
-				experiment.getOutputFiles().add(path);
-				
-				push(Tag.OUTPUT);
+				experiment.setSeedCol(Integer.parseInt(seedColStr));
 			}
-			else if(qName.equals("setting"))
-			{
-				if(top != experiment)
-					throw new SAXException("setting tag with non-experiment on top of stack");
-				
-				String key = attrMap.get("key");
-				String value = attrMap.get("value");
-				
-				if(key == null)
-					throw new SAXException("key attribute missing from setting tag");
-				if(value == null)
-					throw new SAXException("value attribute missing from setting tag");
-				
-				experiment.getSettings().put(key, value);
-				
-				push(Tag.SETTING);
-			}
-			else if(qName.equals("abbrev"))
-			{
-				if(top != experiment)
-					throw new SAXException("abbrev tag with non-experiment on top of stack");
-				
-				String param = attrMap.get("param");
-				String abbrev = attrMap.get("abbrev");
-				
-				if(param == null)
-					throw new SAXException("param attribute missing from abbrev tag");
-				if(abbrev == null)
-					throw new SAXException("abbrev attribute missing from abbrev tag");
-				
-				experiment.getAbbreviations().put(param, abbrev);
-				push(Tag.ABBREV);
-			}
-			else if(qName.equals("value"))
-			{
-				startSweepElement(qName, attrMap);
-			}
-			else if(qName.equals("list"))
-			{
-				startSweepElement(qName, attrMap);
-			}
-			else if(qName.equals("item"))
-			{
-				if(!(top instanceof ListSweep))
-					throw new SAXException("item tag with non-list on top of stack");
-				ListSweep listSweep = (ListSweep)top;
-				
-				String value = attrMap.get("value");
-				
-				if(value == null)
-					throw new SAXException("value attribute missing from item tag");
-				
-				listSweep.add(value);
-				
-				push(Tag.ITEM);
-			}
-			else if(qName.equals("range"))
-			{
-				startSweepElement(qName, attrMap);
-			}
-			else if(qName.equals("multiplicative"))
-			{
-				startSweepElement(qName, attrMap);
-			}
-			else if(qName.equals("parallel"))
-			{
-				startSweepElement(qName, attrMap);
-			}
-			else
-			{
-				throw new SAXException("unknown tag " + qName);
-			}
+			
+			push(experiment);
 		}
-		catch(SAXException e)
+		else if(qName.equals("input"))
 		{
-			throwing(getClass().toString(), "startElement", e);
-			throw e;
+			if(top != experiment)
+				throw new SAXParseException("input tag with non-experiment on top of stack", locator);
+			
+			String source = attrMap.get("source");
+			String destination = attrMap.get("destination");
+			
+			if(source == null)
+				throw new SAXParseException("source attribute missing from input tag", locator);
+			if(destination == null)
+				throw new SAXParseException("destination attribute missing from input tag", locator);
+			
+			experiment.getInputFiles().put(source, destination);
+			
+			push(Tag.INPUT);
+		}
+		else if(qName.equals("output"))
+		{
+			if(top != experiment)
+				throw new SAXParseException("output tag with non-experiment on top of stack", locator);
+			
+			String path = attrMap.get("path");
+			
+			if(path == null)
+				throw new SAXParseException("path attribute missing from output tag", locator);
+			
+			experiment.getOutputFiles().add(path);
+			
+			push(Tag.OUTPUT);
+		}
+		else if(qName.equals("setting"))
+		{
+			if(top != experiment)
+				throw new SAXParseException("setting tag with non-experiment on top of stack", locator);
+			
+			String key = attrMap.get("key");
+			String value = attrMap.get("value");
+			
+			if(key == null)
+				throw new SAXParseException("key attribute missing from setting tag", locator);
+			if(value == null)
+				throw new SAXParseException("value attribute missing from setting tag", locator);
+			
+			experiment.getSettings().put(key, value);
+			
+			push(Tag.SETTING);
+		}
+		else if(qName.equals("abbrev"))
+		{
+			if(top != experiment)
+				throw new SAXParseException("abbrev tag with non-experiment on top of stack", locator);
+			
+			String param = attrMap.get("param");
+			String abbrev = attrMap.get("abbrev");
+			
+			if(param == null)
+				throw new SAXParseException("param attribute missing from abbrev tag", locator);
+			if(abbrev == null)
+				throw new SAXParseException("abbrev attribute missing from abbrev tag", locator);
+			
+			experiment.getAbbreviations().put(param, abbrev);
+			push(Tag.ABBREV);
+		}
+		else if(qName.equals("value"))
+		{
+			startSweepElement(qName, attrMap);
+		}
+		else if(qName.equals("list"))
+		{
+			startSweepElement(qName, attrMap);
+		}
+		else if(qName.equals("item"))
+		{
+			if(!(top instanceof ListSweep))
+				throw new SAXParseException("item tag with non-list on top of stack", locator);
+			ListSweep listSweep = (ListSweep)top;
+			
+			String value = attrMap.get("value");
+			
+			if(value == null)
+				throw new SAXParseException("value attribute missing from item tag", locator);
+			
+			listSweep.add(value);
+			
+			push(Tag.ITEM);
+		}
+		else if(qName.equals("range"))
+		{
+			startSweepElement(qName, attrMap);
+		}
+		else if(qName.equals("multiplicative"))
+		{
+			startSweepElement(qName, attrMap);
+		}
+		else if(qName.equals("parallel"))
+		{
+			startSweepElement(qName, attrMap);
+		}
+		else
+		{
+			throw new SAXParseException("unknown tag " + qName, locator);
 		}
 	}
 
@@ -234,78 +226,70 @@ public class ExperimentXMLHandler extends DefaultHandler
 		finer("endElement: " + qName);
 		Object top = peek();
 		
-		try
+		if(top == null)
+			throw new SAXParseException("end tag found with empty stack", locator);
+		
+		if(qName.equals("experiment"))
 		{
-			if(top == null)
-				throw new SAXException("end tag found with empty stack");
-			
-			if(qName.equals("experiment"))
-			{
-				if(top != experiment)
-					throw new SAXException("mismatched experiment end tag");
-			}
-			else if(qName.equals("input"))
-			{
-				if(top != Tag.INPUT)
-					throw new SAXException("mismatched input end tag");
-			}
-			else if(qName.equals("output"))
-			{
-				if(top != Tag.OUTPUT)
-					throw new SAXException("mismatched input end tag");
-			}
-			else if(qName.equals("setting"))
-			{
-				if(top != Tag.SETTING)
-					throw new SAXException("mismatched setting end tag");
-			}
-			else if(qName.equals("abbrev"))
-			{
-				if(top != Tag.ABBREV)
-					throw new SAXException("mismatched abbrev end tag");
-			}
-			else if(qName.equals("value"))
-			{
-				if(!(top instanceof SingleValueSweep))
-					throw new SAXException("mismatched value end tag");
-			}
-			else if(qName.equals("list"))
-			{
-				if(!(top instanceof ListSweep))
-					throw new SAXException("mismatched list end tag");
-			}
-			else if(qName.equals("item"))
-			{
-				if(top != Tag.ITEM)
-					throw new SAXException("mismatched item end tag");
-			}
-			else if(qName.equals("range"))
-			{
-				if(!(top instanceof RangeListSweep))
-					throw new SAXException("mismatched range end tag");
-			}
-			else if(qName.equals("multiplicative"))
-			{
-				if(!(top instanceof MultiplicativeCombinationSweep))
-					throw new SAXException("mismatched multiplicative end tag");
-			}
-			else if(qName.equals("parallel"))
-			{
-				if(!(top instanceof ParallelCombinationSweep))
-					throw new SAXException("mismatched parallel end tag");
-			}
-			else
-			{
-				throw new SAXException("unknown end tag " + qName);
-			}
-			
-			pop();
+			if(top != experiment)
+				throw new SAXParseException("mismatched experiment end tag", locator);
 		}
-		catch(SAXException e)
+		else if(qName.equals("input"))
 		{
-			throwing(getClass().toString(), "endElement", e);
-			throw e;
+			if(top != Tag.INPUT)
+				throw new SAXParseException("mismatched input end tag", locator);
 		}
+		else if(qName.equals("output"))
+		{
+			if(top != Tag.OUTPUT)
+				throw new SAXParseException("mismatched input end tag", locator);
+		}
+		else if(qName.equals("setting"))
+		{
+			if(top != Tag.SETTING)
+				throw new SAXParseException("mismatched setting end tag", locator);
+		}
+		else if(qName.equals("abbrev"))
+		{
+			if(top != Tag.ABBREV)
+				throw new SAXParseException("mismatched abbrev end tag", locator);
+		}
+		else if(qName.equals("value"))
+		{
+			if(!(top instanceof SingleValueSweep))
+				throw new SAXParseException("mismatched value end tag", locator);
+		}
+		else if(qName.equals("list"))
+		{
+			if(!(top instanceof ListSweep))
+				throw new SAXParseException("mismatched list end tag", locator);
+		}
+		else if(qName.equals("item"))
+		{
+			if(top != Tag.ITEM)
+				throw new SAXParseException("mismatched item end tag", locator);
+		}
+		else if(qName.equals("range"))
+		{
+			if(!(top instanceof RangeListSweep))
+				throw new SAXParseException("mismatched range end tag", locator);
+		}
+		else if(qName.equals("multiplicative"))
+		{
+			if(!(top instanceof MultiplicativeCombinationSweep))
+				throw new SAXParseException("mismatched multiplicative end tag", locator);
+		}
+		else if(qName.equals("parallel"))
+		{
+			if(!(top instanceof ParallelCombinationSweep))
+				throw new SAXParseException("mismatched parallel end tag", locator);
+		}
+		else
+		{
+			throw new SAXParseException("unknown end tag " + qName, locator);
+		}
+		
+		pop();
 	}
     
 	/**
@@ -374,7 +358,7 @@ public class ExperimentXMLHandler extends DefaultHandler
 			parent = (CombinationSweep)top;
 		}
 		else
-			throw new SAXException("value tag with non-sweep on top of stack");
+			throw new SAXParseException("value tag with non-sweep on top of stack", locator);
 		
 		if(qName.equals("value"))
 		{
@@ -404,9 +388,9 @@ public class ExperimentXMLHandler extends DefaultHandler
 		String value = attrMap.get("value");
 		
 		if(param == null)
-			throw new SAXException("param attribute missing from value tag");
+			throw new SAXParseException("param attribute missing from value tag", locator);
 		if(value == null)
-			throw new SAXException("value attribute missing from value tag");
+			throw new SAXParseException("value attribute missing from value tag", locator);
 		
 		SingleValueSweep sweep = new SingleValueSweep(param, value); 
 		parent.add(sweep);
@@ -424,7 +408,7 @@ public class ExperimentXMLHandler extends DefaultHandler
 		String param = attrMap.get("param");
 		
 		if(param == null)
-			throw new SAXException("param attribute missing from list tag");
+			throw new SAXParseException("param attribute missing from list tag", locator);
 		
 		ListSweep listSweep = new ListSweep(param);
 		parent.add(listSweep);
@@ -446,13 +430,13 @@ public class ExperimentXMLHandler extends DefaultHandler
 		String increment = attrMap.get("increment");
 		
 		if(param == null)
-			throw new SAXException("param attribute missing from range tag");
+			throw new SAXParseException("param attribute missing from range tag", locator);
 		if(start== null)
-			throw new SAXException("start attribute missing from range tag");
+			throw new SAXParseException("start attribute missing from range tag", locator);
 		if(end == null)
-			throw new SAXException("end attribute missing from range tag");
+			throw new SAXParseException("end attribute missing from range tag", locator);
 		if(increment == null)
-			throw new SAXException("increment attribute missing from range tag");
+			throw new SAXParseException("increment attribute missing from range tag", locator);
 		
 		try
 		{
@@ -463,7 +447,7 @@ public class ExperimentXMLHandler extends DefaultHandler
 		}
 		catch(NumberFormatException e)
 		{
-			throw new SAXException("badly formatted number in range tag");
+			throw new SAXParseException("badly formatted number in range tag", locator);
 		}
 	}
 	
@@ -491,5 +475,10 @@ public class ExperimentXMLHandler extends DefaultHandler
 		ParallelCombinationSweep sweep = new ParallelCombinationSweep();
 		parent.add(sweep);
 		push(sweep);
+	}
+	
+	public void setDocumentLocator(Locator locator)
+	{
+		this.locator = locator;
 	}
 }
