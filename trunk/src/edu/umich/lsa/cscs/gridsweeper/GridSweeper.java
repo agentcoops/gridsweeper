@@ -560,7 +560,7 @@ public class GridSweeper
 					|| info.getExitStatus() != 0)
 				{
 					drmaaErrorList.add(jobId);
-					msgOut.println("  (Warning: DRMAA reports that the run did not" +
+					msgOut.println("  (Warning: DRMAA reports that the run did not " +
 							"complete normally.)");
 				}
 				// Load RunResults from disk

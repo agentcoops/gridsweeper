@@ -82,6 +82,8 @@ public class RunSetup implements Serializable
 		map.put("settings", settings);
 		map.put("inputFiles", inputFiles);
 		map.put("fileTransferSubpath", fileTransferSubpath);
+		map.put("parameters", parameters);
+		map.put("numRuns", numRuns);
 		map.put("runNumber", "" + runNumber);
 		map.put("rngSeed", "" + rngSeed);
 		map.put("outputFiles", outputFiles);

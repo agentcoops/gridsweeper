@@ -21,7 +21,7 @@ public class AdapterFactory
 	 * @return An adapter with the specified class and properties, or
 	 * {@code null} if the adapter could not be created.
 	 */
-	public static Adapter createAdapter(String adapterClassName, Properties properties)
+	public static Adapter createAdapter(String adapterClassName, Properties properties) throws GridSweeperException
 	{
 		// TODO: Consider throwing an exception describing what went wrong. 
 		try
@@ -30,7 +30,7 @@ public class AdapterFactory
 		}
 		catch(Exception e)
 		{
-			return null;
+			throw new GridSweeperException(e);
 		}
 	}
 	
@@ -42,7 +42,7 @@ public class AdapterFactory
 	 * @return An adapter with the specified class and properties, or
 	 * {@code null} if the adapter could not be created.
 	 */
-	public static Adapter createAdapter(Class adapterClass, Properties properties)
+	public static Adapter createAdapter(Class adapterClass, Properties properties) throws GridSweeperException
 	{
 		// TODO: Consider throwing an exception describing what went wrong.
 		try
@@ -55,8 +55,7 @@ public class AdapterFactory
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
-			return null;
+			throw new GridSweeperException(e);
 		}
 	}
 }

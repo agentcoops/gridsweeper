@@ -1,9 +1,7 @@
 package edu.umich.lsa.cscs.gridsweeper;
 
 import java.io.*;
-
 import static edu.umich.lsa.cscs.gridsweeper.StringUtils.*;
-
 import edu.umich.lsa.cscs.gridsweeper.parameters.ParameterMap;
 
 /**
@@ -24,12 +22,17 @@ public class GridSweeperRunner
 	 */
 	public static void main(String[] args)
 	{
+		System.err.println("GridSweeperRunner main() starting...");
+		
 		RunResults results;
 		try
 		{
 			// Load RunSetup object
 			ObjectInputStream stdinStream = new ObjectInputStream(System.in);
 			RunSetup setup = (RunSetup)stdinStream.readObject();
+			
+			System.err.println("RunSetup object:");
+			System.err.println(setup.toString());
 			
 			// Get GridSweeper settings
 			Settings settings = setup.getSettings();
@@ -63,6 +66,7 @@ public class GridSweeperRunner
 			String adapterClassName = settings.getSetting("AdapterClass");
 			Settings adapterSettings = settings.getSettingsForClass(adapterClassName);
 			Adapter adapter = AdapterFactory.createAdapter(adapterClassName, adapterSettings);
+			System.err.println("Adapter loaded.");
 			
 			// Run!
 			ParameterMap parameters = setup.getParameters();
