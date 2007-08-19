@@ -38,11 +38,11 @@ public class GridSweeperRunner
 			Settings settings = setup.getSettings();
 			
 			// Download input files
-			boolean useFileTransfer = settings.getBooleanProperty("UseFileTransfer");
+			boolean useFileTransfer = settings.getBooleanProperty("UseFileTransfer", false);
 			FileTransferSystem fts = null;
 			if(useFileTransfer)
 			{
-				String className = settings.getSetting("FileTransferSystemClassName");
+				String className = settings.getProperty("FileTransferSystemClassName", "edu.umich.lsa.cscs.gridsweeper.FTPFileTransferSystem");
 				Settings ftsSettings = settings.getSettingsForClass(className);
 				fts = FileTransferSystemFactory.getFactory().getFileTransferSystem(className, ftsSettings);
 				fts.connect();
@@ -63,7 +63,7 @@ public class GridSweeperRunner
 				fts.disconnect();
 			}
 			
-			String adapterClassName = settings.getSetting("AdapterClass");
+			String adapterClassName = settings.getProperty("AdapterClass", "edu.umich.lsa.cscs.gridsweeper.DroneAdapter");
 			Settings adapterSettings = settings.getSettingsForClass(adapterClassName);
 			Adapter adapter = AdapterFactory.createAdapter(adapterClassName, adapterSettings);
 			System.err.println("Adapter loaded.");

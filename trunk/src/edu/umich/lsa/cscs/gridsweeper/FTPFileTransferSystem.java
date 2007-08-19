@@ -70,7 +70,7 @@ public class FTPFileTransferSystem implements FileTransferSystem
 		}
 		else port = 0;
 		
-		username = settings.getProperty("Username");
+		username = settings.getProperty("Username", "anonymous");
 		password = settings.getProperty("Password");
 		
 		directory = settings.getProperty("Directory");

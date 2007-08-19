@@ -75,16 +75,15 @@ public class ExperimentXMLWriter extends XMLWriter
 	 */
 	private void printSettings()
 	{
-		Settings settings = (Settings)Settings.defaultSettings().clone();
-		settings.putAll(experiment.getSettings());
+		Settings settings = experiment.getSettings();
 		
-		for(Object settingObj : settings.keySet())
+		for(String key : settings.keySet())
 		{
-			String key = (String)settingObj;
+			String casedKey = settings.getCasedKey(key);
 			String value = settings.getProperty(key);
 			
 			StringMap attrs = new StringMap();
-			attrs.put("key", key);
+			attrs.put("key", casedKey);
 			attrs.put("value", value);
 			printTagStart("setting", attrs, true);
 		}

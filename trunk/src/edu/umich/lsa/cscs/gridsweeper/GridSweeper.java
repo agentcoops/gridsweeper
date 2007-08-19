@@ -171,7 +171,7 @@ public class GridSweeper
 
 		// Set up directory & input files on file transfer system if asked for
 		if(runType == RunType.RUN && 
-				settings.getBooleanProperty("UseFileTransfer"))
+				settings.getBooleanProperty("UseFileTransfer", false))
 		{
 			setUpFileTransfer(settings);
 		}
@@ -209,7 +209,7 @@ public class GridSweeper
 	{
 		try
 		{
-			String expsDir = expandTildeInPath(settings.getProperty("ResultsDirectory"));
+			String expsDir = expandTildeInPath(settings.getProperty("ResultsDirectory", "~/Results"));
 			
 			// First set up big directory for the whole experiment
 			// Located in <resultsDir>/<experimentName>/<experimentDate>/<experimentTime>
@@ -247,7 +247,7 @@ public class GridSweeper
 		{
 			msgOut.println("Setting up file transfer system...");
 			
-			String className = settings.getSetting("FileTransferSystemClassName");
+			String className = settings.getProperty("FileTransferSystemClassName", "edu.umich.lsa.cscs.gridsweeper.FTPFileTransferSystem");
 			Settings ftsSettings = settings.getSettingsForClass(className);
 			fts = FileTransferSystemFactory.getFactory().getFileTransferSystem(className, ftsSettings);
 			fts.connect();

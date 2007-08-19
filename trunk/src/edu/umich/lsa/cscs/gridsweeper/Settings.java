@@ -1,7 +1,5 @@
 package edu.umich.lsa.cscs.gridsweeper;
 
-import java.util.*;
-import java.io.*;
 import static edu.umich.lsa.cscs.gridsweeper.DLogger.*;
 
 // TODO: make settings objects case-insensitive by overriding setProperty, getProperty, etc.
@@ -11,50 +9,18 @@ import static edu.umich.lsa.cscs.gridsweeper.DLogger.*;
  * includes standard values for user settings. Settings for plugins
  * are scoped using their reverse-DNS class names, e.g.,
  * {@code edu.umich.lsa.cscs.gridsweeper.FTPFileTransferSystem.Username}.
- * {@code Settings} is a subclass of {@code java.util.Properties},
- * and simply adds default values and a couple convenience methods.</p>
+ * {@code Settings} is a subclass of {@code StringMap},
+ * and adds case-insensitivity (with preservation).
  * 
  * @author Ed Baskerville
  *
  */
-public class Settings extends Properties
+public class Settings extends StringMap
 {
 	private static final long serialVersionUID = 1L;
-	
-	static final Settings defaultSettings;
 	static Settings sharedSettings;
 	
-	static
-	{
-		defaultSettings = new Settings();
-		
-		defaultSettings.setProperty("ResultsDirectory", "~/Results");
-		
-		defaultSettings.setProperty("AdapterClass", "edu.umich.lsa.cscs.gridsweeper.DroneAdapter");
-		
-		defaultSettings.setProperty("UseFileTransfer", "false");
-		defaultSettings.setProperty("FileTransferSystemClass", "edu.umich.lsa.cscs.gridsweeper.FTPFileTransferSystem");
-		
-		defaultSettings.setProperty("edu.umich.lsa.cscs.gridsweeper.FTPFileTransferSystem.Username", "anonymous");
-	}
-	
-	/** 
-	 * Default constructor, simply calls the superclass implementation.
-	 *
-	 */
-	public Settings()
-	{
-		super();
-	}
-	
-	/**
-	 * One-argument constructor with defaults, simpily calls the superclass implementation.
-	 * @param defaults
-	 */
-	public Settings(Properties defaults)
-	{
-		super(defaults);
-	}
+	StringMap casedKeys = new StringMap();
 	
 	/**
 	 * Returns the shared settings object, creating it if it does not yet exist.
@@ -65,23 +31,10 @@ public class Settings extends Properties
 	{
 		if(sharedSettings == null)
 		{
-			sharedSettings = new Settings(defaultSettings);
-			try
-			{
-				sharedSettings.load(new FileInputStream(System.getProperty("user.home") + "/.gridsweeper"));
-				fine("Loaded user settings:");
-				fine(sharedSettings.toString());
-			}
-			catch(FileNotFoundException e) {}
-			catch(IOException e) {}
+			sharedSettings = new Settings();
 		}
 		
 		return sharedSettings;
-	}
-	
-	public static Settings defaultSettings()
-	{
-		return defaultSettings;
 	}
 	
 	/**
@@ -125,9 +78,58 @@ public class Settings extends Properties
 		return settings;
 	}
 	
+	public String getProperty(String key, String defaultValue)
+	{
+		String value = get(key);
+		if(value == null) value = defaultValue;
+		return value;
+	}
+	
+	public String getProperty(String key)
+	{
+		return get(key);
+	}
+	
+	public void setProperty(String key, String value)
+	{
+		put(key, value);
+	}
+
 	public String getSetting(String name)
 	{
 		return getProperty(name);
+	}
+	
+	@Override
+	public String get(Object key)
+	{
+		if(!(key instanceof String)) return null;
+		return super.get(((String)key).toLowerCase());
+	}
+	
+	@Override
+	public String put(String key, String value)
+	{
+		String lcKey = key.toLowerCase();
+		casedKeys.put(lcKey, key);
+		return super.put(lcKey, value);
+	}
+	
+	@Override
+	public boolean containsKey(Object key)
+	{
+		if(!(key instanceof String)) return false;
+		String lcKey = ((String)key).toLowerCase();
+		return super.containsKey(lcKey);
+	}
+
+	@Override
+	public String remove(Object key)
+	{
+		if(!(key instanceof String)) return null;
+		String lcKey = ((String)key).toLowerCase();
+		casedKeys.remove(lcKey);
+		return super.remove(lcKey);
 	}
 
 	public void putAllForClass(Settings settings, String className)
@@ -138,7 +140,17 @@ public class Settings extends Properties
 			String key = (String)keyObj;
 			setProperty(className + "." + key, settings.getProperty(key));
 		}
-		// TODO Auto-generated method stub
-		
+	}
+
+	public boolean getBooleanProperty(String string, boolean defaultValue)
+	{
+		String value = getProperty(string);
+		if(value == null) return defaultValue;
+		return Boolean.parseBoolean(value);
+	}
+
+	public String getCasedKey(String key)
+	{
+		return casedKeys.get(key);
 	}
 }

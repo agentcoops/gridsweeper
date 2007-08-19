@@ -1,7 +1,6 @@
 package edu.umich.lsa.cscs.gridsweeper;
 
 import java.io.*;
-import java.util.*;
 
 import edu.umich.lsa.cscs.gridsweeper.parameters.ParameterMap;
 
@@ -93,30 +92,30 @@ public class DroneAdapter implements Adapter
 	/**
 	 * Standard {@link Adapter} constructor for {@code DroneAdapter}. Assigns properties
 	 * to fields.
-	 * @param properties Properties for the adapter. See the class description
+	 * @param settings Properties for the adapter. See the class description
 	 * for supported properties.
 	 * @throws AdapterException When no model is specified.
 	 */
-	public DroneAdapter(Properties properties) throws AdapterException
+	public DroneAdapter(Settings settings) throws AdapterException
 	{
-		model = properties.getProperty("model");
+		model = settings.getProperty("model");
 		if(model == null)
 		{
 			throw new AdapterException("\"model\" property must be specified.");
 		}
 		
-		setParamOption = properties.getProperty("setParamOption", "-D");
+		setParamOption = settings.getProperty("setParamOption", "-D");
 		
-		runNumOption = properties.getProperty("runNumOption", "-N");
-		runNumPrefix = properties.getProperty("runNumPrefix", "");
+		runNumOption = settings.getProperty("runNumOption", "-N");
+		runNumPrefix = settings.getProperty("runNumPrefix", "");
 		
-		rngSeedOption = properties.getProperty("rngSeedOption", "-S");
+		rngSeedOption = settings.getProperty("rngSeedOption", "-S");
 		
-		useInputFile = Boolean.parseBoolean(properties.getProperty("useInputFile", "true"));
-		inputFileOption = properties.getProperty("inputFileOption", "-I");
-		inputFilePath = properties.getProperty("inputFilePath");
+		useInputFile = Boolean.parseBoolean(settings.getProperty("useInputFile", "true"));
+		inputFileOption = settings.getProperty("inputFileOption", "-I");
+		inputFilePath = settings.getProperty("inputFilePath");
 		
-		miscOptions = properties.getProperty("miscOptions");
+		miscOptions = settings.getProperty("miscOptions");
 	}
 
 	/**

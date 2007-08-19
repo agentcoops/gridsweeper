@@ -219,11 +219,11 @@ public class GridSweeperTool
 		
 		experiment.getSettings().putAllForClass(
 				adapterSettings,
-				experiment.getSettings().getProperty("AdapterClass"));
+				experiment.getSettings().getProperty("AdapterClass", "edu.umich.lsa.cscs.gridsweeper.DroneAdapter"));
 		
 		experiment.getSettings().putAllForClass(
 				fileTransferSettings,
-				experiment.getSettings().getProperty("FileTransferSystemClass"));
+				experiment.getSettings().getProperty("FileTransferSystemClass", "edu.umich.lsa.cscs.gridsweeper.FTPFileTransferSystem"));
 		
 		// Load adapter settings by prepending class prefix
 		for(Object keyObj : adapterSettings.keySet())

@@ -39,7 +39,7 @@ public class FileTransferSystemFactory
 	{
 		try
 		{
-			Class ftsClass = Class.forName(settings.getProperty("FileTransferSystemClass"));
+			Class ftsClass = Class.forName(settings.getProperty("FileTransferSystemClass", "edu.umich.lsa.cscs.gridsweeper.FTPFileTransferSystem"));
 			Class[] parameterTypes = new Class[] { Settings.class };
 			Constructor constructor = ftsClass.getConstructor(parameterTypes);
 			Object[] initargs = new Object[] { settings };

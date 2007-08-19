@@ -6,17 +6,16 @@ import static org.junit.Assert.*;
 import edu.umich.lsa.cscs.gridsweeper.parameters.*;
 
 import java.io.UnsupportedEncodingException;
-import java.util.*;
 
 public class DroneAdapterTest
 {
 	@Test
 	public void testRealRunWithDefaults() throws AdapterException, UnsupportedEncodingException
 	{
-		Properties properties = new Properties();
-		properties.setProperty("model", "/bin/echo");
-		properties.setProperty("miscOptions", "-n");
-		DroneAdapter adapter = new DroneAdapter(properties);
+		Settings settings = new Settings();
+		settings.setProperty("model", "/bin/echo");
+		settings.setProperty("miscOptions", "-n");
+		DroneAdapter adapter = new DroneAdapter(settings);
 		
 		ParameterMap parameters = new ParameterMap();
 		parameters.put("beta", "0.1");

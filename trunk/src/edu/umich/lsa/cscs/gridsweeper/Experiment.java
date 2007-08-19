@@ -53,7 +53,7 @@ public class Experiment
 	public Experiment(Settings settings)
 	{
 		numRuns = 1;
-		this.settings = new Settings(Settings.defaultSettings());
+		this.settings = new Settings();
 		if(settings != null) this.settings.putAll(settings);
 		abbreviations = new StringMap();
 		inputFiles = new StringMap();
