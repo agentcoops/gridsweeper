@@ -116,7 +116,7 @@ public class Experiment
 		// Generate the list of parameter values
 		try
 		{
-			List<ParameterMap> parameterMaps = rootSweep.generateMaps();
+			List<ParameterMap> parameterMaps = rootSweep.generateMaps(true);
 			
 			// Generate the experiment cases
 			for(ParameterMap parameterMap : parameterMaps)
@@ -130,9 +130,15 @@ public class Experiment
 				cases.add(new ExperimentCase(parameterMap, rngSeeds));
 			}
 		}
-		catch(Exception e)
+		catch(DuplicateParameterException e)
 		{
-			throw new GridSweeperException("Received exception creating experiment cases.", e);
+			throw new GridSweeperException("Could not generate experiment cases: " +
+					"parameter \"" + e.getName() + "\" is used by multiple sweeps.");
+		}
+		catch(SweepLengthException e)
+		{
+			throw new GridSweeperException("Could not generate experiment cases: " + 
+					"mismatched child sweep lengths in a parallel combination sweep.");
 		}
 		
 		return cases;

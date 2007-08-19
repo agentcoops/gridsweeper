@@ -46,9 +46,49 @@ public class MultiplicativeCombinationSweep extends CombinationSweep
 	@Override
 	public List<ParameterMap> generateMaps() throws SweepLengthException, DuplicateParameterException
 	{
+		return generateMaps(false);
+	}
+	
+	public List<ParameterMap> generateMaps(boolean allowOverrides) throws SweepLengthException, DuplicateParameterException
+	{
 		if(children.size() == 0) return new ArrayList<ParameterMap>(0);
 		
-		return generateMaps(children);
+		// If overrides are allowed (i.e., this is the root sweep of an experiment),
+		// the parameter maps are generated from all values except the
+		// SingleValueSweep children. Then, values for any parameters not already
+		// used are loaded from the SingleValueSweeps.
+		if(allowOverrides)
+		{
+			List<SingleValueSweep> baseChildren = new ArrayList<SingleValueSweep>();
+			List<Sweep> otherChildren = new ArrayList<Sweep>();
+			
+			for(Sweep child : children)
+			{
+				if(child instanceof SingleValueSweep)
+					baseChildren.add((SingleValueSweep)child);
+				else
+					otherChildren.add(child);
+			}
+			
+			List<ParameterMap> maps = generateMaps(otherChildren);
+			assert(maps.size() > 0);
+			ParameterMap firstMap = maps.get(0);
+			
+			for(SingleValueSweep baseValue : baseChildren)
+			{
+				String name = baseValue.getName();
+				if(!firstMap.containsKey(name))
+				{
+					for(ParameterMap map : maps)
+					{
+						map.put(name, baseValue.getValue());
+					}
+				}
+			}
+			
+			return maps;
+		}
+		else return generateMaps(children);
 	}
 
 	/**
