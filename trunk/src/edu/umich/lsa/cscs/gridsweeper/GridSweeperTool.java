@@ -2,6 +2,7 @@ package edu.umich.lsa.cscs.gridsweeper;
 
 import static edu.umich.lsa.cscs.gridsweeper.DLogger.*;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
@@ -277,7 +278,11 @@ public class GridSweeperTool
 	{
 		ArgState state = ArgState.START;
 		
-		for(String arg : args)
+		if(args.size() == 1 && new File(args.get(0)).exists())
+		{
+			experimentPath = args.get(0);
+		}
+		else for(String arg : args)
 		{
 			finer("parsing argument: " + arg);
 			switch(state)
@@ -317,6 +322,10 @@ public class GridSweeperTool
 					else if(arg.equals("-D") || arg.equals("--debug"))
 					{
 						// Do nothing; checked for first thing in main
+					}
+					else if(arg.startsWith("-"))
+					{
+						throw new GridSweeperException("Unexpected option: \"" + arg + "\"");
 					}
 					else
 					{
@@ -719,7 +728,7 @@ public class GridSweeperTool
 	
 	private void parseFail(String arg) throws GridSweeperException
 	{
-		throw new GridSweeperException("Invalid sweep specification: " + arg);
+		throw new GridSweeperException("Could not parse \"" + arg + "\" as a sweep.");
 	}
 	
 	/**
