@@ -38,10 +38,10 @@ public class FTPFileTransferSystemTest
 	public void setUp() throws Exception
 	{
 		Settings settings = new Settings();
-		settings.setProperty("Hostname", "localhost");
-		settings.setProperty("Username", "gsweep");
-		settings.setProperty("Password", "gridsweeper");
-		settings.setProperty("Directory", "ftp");
+		settings.setProperty("ftp.Hostname", "localhost");
+		settings.setProperty("ftp.Username", "gsweep");
+		settings.setProperty("ftp.Password", "gridsweeper");
+		settings.setProperty("ftp.Directory", "ftp");
 		
 		ftpFS = new FTPFileTransferSystem(settings);
 	}

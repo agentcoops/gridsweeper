@@ -60,20 +60,20 @@ public class FTPFileTransferSystem implements FileTransferSystem
 	{
 		DLogger.finer("settings: " + settings);
 		
-		hostname = settings.getProperty("Hostname");
+		hostname = settings.getProperty("ftp.hostname");
 		if(hostname == null) throw new FileTransferException("Cannot initialize FTP file system without hostname.");
 		
-		String portStr = settings.getProperty("Port");
+		String portStr = settings.getProperty("ftp.port");
 		if(portStr != null)
 		{
-			port = Integer.parseInt(settings.getProperty("Port"));
+			port = Integer.parseInt(settings.getProperty("ftp.port"));
 		}
 		else port = 0;
 		
-		username = settings.getProperty("Username", "anonymous");
-		password = settings.getProperty("Password");
+		username = settings.getProperty("ftp.username", "anonymous");
+		password = settings.getProperty("ftp.password");
 		
-		directory = settings.getProperty("Directory");
+		directory = settings.getProperty("ftp.rootDirectory");
 		
 		ftpClient = new FTPClient();
 	}

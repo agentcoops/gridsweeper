@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <experiment name="echo" numRuns="2">
-	<setting key="edu.umich.lsa.cscs.gridsweeper.DroneAdapter.model" value="/bin/echo" />
+	<setting key="Model" value="/bin/echo" />
 	
 	<setting key="ResultsDirectory" value="~/Results" />
 	<setting key="EmailAddress" value="edbaskerville@gmail.com" />

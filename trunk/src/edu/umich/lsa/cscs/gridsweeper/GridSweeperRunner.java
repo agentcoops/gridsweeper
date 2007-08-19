@@ -43,8 +43,7 @@ public class GridSweeperRunner
 			if(useFileTransfer)
 			{
 				String className = settings.getProperty("FileTransferSystemClassName", "edu.umich.lsa.cscs.gridsweeper.FTPFileTransferSystem");
-				Settings ftsSettings = settings.getSettingsForClass(className);
-				fts = FileTransferSystemFactory.getFactory().getFileTransferSystem(className, ftsSettings);
+				fts = FileTransferSystemFactory.getFactory().getFileTransferSystem(className, settings);
 				fts.connect();
 				
 				StringMap inputFiles = setup.getInputFiles();
@@ -64,8 +63,7 @@ public class GridSweeperRunner
 			}
 			
 			String adapterClassName = settings.getProperty("AdapterClass", "edu.umich.lsa.cscs.gridsweeper.DroneAdapter");
-			Settings adapterSettings = settings.getSettingsForClass(adapterClassName);
-			Adapter adapter = AdapterFactory.createAdapter(adapterClassName, adapterSettings);
+			Adapter adapter = AdapterFactory.createAdapter(adapterClassName, settings);
 			System.err.println("Adapter loaded.");
 			
 			// Run!

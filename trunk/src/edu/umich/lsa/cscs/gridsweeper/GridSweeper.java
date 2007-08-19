@@ -248,8 +248,7 @@ public class GridSweeper
 			msgOut.println("Setting up file transfer system...");
 			
 			String className = settings.getProperty("FileTransferSystemClassName", "edu.umich.lsa.cscs.gridsweeper.FTPFileTransferSystem");
-			Settings ftsSettings = settings.getSettingsForClass(className);
-			fts = FileTransferSystemFactory.getFactory().getFileTransferSystem(className, ftsSettings);
+			fts = FileTransferSystemFactory.getFactory().getFileTransferSystem(className, settings);
 			fts.connect();
 			
 			boolean alreadyExists;
