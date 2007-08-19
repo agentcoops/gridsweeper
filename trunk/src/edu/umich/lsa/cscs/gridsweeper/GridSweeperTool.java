@@ -304,7 +304,7 @@ public class GridSweeperTool
 					}
 					else if(experimentPath == null && new File(arg).exists())
 					{
-						experimentPath = args.get(0);
+						experimentPath = arg;
 					}
 					else
 					{
