@@ -157,10 +157,8 @@ public class GridSweeperTool
 	private void loadExperiment(StringList args) throws GridSweeperException
 	{
 		Settings cliSettings = new Settings();
-		Settings adapterSettings = new Settings();
-		Settings fileTransferSettings = new Settings();
 		List<Sweep> cliSweeps = new ArrayList<Sweep>();
-		parseArgs(args, cliSettings, adapterSettings, fileTransferSettings, cliSweeps);
+		parseArgs(args, cliSettings, cliSweeps);
 		
 		// Load experiment file
 		loadExperimentFile();
@@ -217,23 +215,6 @@ public class GridSweeperTool
 		// Combine settings from command-line arguments and experiment
 		experiment.getSettings().putAll(cliSettings);
 		
-		experiment.getSettings().putAllForClass(
-				adapterSettings,
-				experiment.getSettings().getProperty("AdapterClass", "edu.umich.lsa.cscs.gridsweeper.DroneAdapter"));
-		
-		experiment.getSettings().putAllForClass(
-				fileTransferSettings,
-				experiment.getSettings().getProperty("FileTransferSystemClass", "edu.umich.lsa.cscs.gridsweeper.FTPFileTransferSystem"));
-		
-		// Load adapter settings by prepending class prefix
-		for(Object keyObj : adapterSettings.keySet())
-		{
-			String key = (String)keyObj;
-			experiment.getSettings().setProperty(
-					experiment.getSettings().getProperty("AdapterClass")
-					+ "." + key, adapterSettings.getProperty(key));
-		}
-		
 		for(Sweep sweep : cliSweeps)
 		{
 			experiment.getRootSweep().add(sweep);
@@ -271,8 +252,7 @@ public class GridSweeperTool
 	 * list of the form start:increment:end.</p>
 	 * @param args Command-line arguments.
 	 */
-	void parseArgs(StringList args, Settings cliSettings, 
-			Settings adapterSettings, Settings fileTransferSettings,
+	void parseArgs(StringList args, Settings cliSettings,
 			List<Sweep> cliSweeps)
 		throws GridSweeperException
 	{
@@ -351,7 +331,7 @@ public class GridSweeperTool
 					state = ArgState.START;
 					break;
 				case MODEL:
-					adapterSettings.put("model", arg);
+					cliSettings.put("Model", arg);
 					state = ArgState.START;
 					break;
 				case INPUT:
