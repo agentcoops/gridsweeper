@@ -5,8 +5,6 @@ import java.util.*;
 import static edu.umich.lsa.cscs.gridsweeper.StringUtils.*;
 
 import javax.xml.parsers.*;
-
-import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 import cern.jet.random.*;

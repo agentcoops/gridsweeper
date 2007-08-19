@@ -9,8 +9,6 @@ import java.util.*;
 import java.util.logging.*;
 import java.util.regex.*;
 
-import org.xml.sax.SAXParseException;
-
 import static edu.umich.lsa.cscs.gridsweeper.StringUtils.*;
 import edu.umich.lsa.cscs.gridsweeper.GridSweeper.RunType;
 import edu.umich.lsa.cscs.gridsweeper.parameters.*;

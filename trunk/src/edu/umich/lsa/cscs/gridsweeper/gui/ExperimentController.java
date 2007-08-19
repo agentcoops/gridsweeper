@@ -4,7 +4,6 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import edu.umich.lsa.cscs.gridsweeper.*;
-import edu.umich.lsa.cscs.gridsweeper.parameters.*;
 
 /**
  * @author Ed Baskerville

@@ -86,7 +86,7 @@ public class ExperimentXMLHandler extends DefaultHandler
 		if(qName.equals("experiment"))
 		{
 			if(top != null)
-				throw new SAXParseException("experiment tag with non-empty stack", locator);
+				throwUnexpected("experiment");
 			
 			experiment.setName(attrMap.get("name"));
 			
@@ -113,15 +113,15 @@ public class ExperimentXMLHandler extends DefaultHandler
 		else if(qName.equals("input"))
 		{
 			if(top != experiment)
-				throw new SAXParseException("input tag with non-experiment on top of stack", locator);
+				throwUnexpected("input");
 			
 			String source = attrMap.get("source");
 			String destination = attrMap.get("destination");
 			
 			if(source == null)
-				throw new SAXParseException("source attribute missing from input tag", locator);
+				throwMissing("input", "source");
 			if(destination == null)
-				throw new SAXParseException("destination attribute missing from input tag", locator);
+				throwMissing("input", "destination");
 			
 			experiment.getInputFiles().put(source, destination);
 			
@@ -130,12 +130,12 @@ public class ExperimentXMLHandler extends DefaultHandler
 		else if(qName.equals("output"))
 		{
 			if(top != experiment)
-				throw new SAXParseException("output tag with non-experiment on top of stack", locator);
+				throwUnexpected("output");
 			
 			String path = attrMap.get("path");
 			
 			if(path == null)
-				throw new SAXParseException("path attribute missing from output tag", locator);
+				throwMissing("output", "path");
 			
 			experiment.getOutputFiles().add(path);
 			
@@ -144,15 +144,15 @@ public class ExperimentXMLHandler extends DefaultHandler
 		else if(qName.equals("setting"))
 		{
 			if(top != experiment)
-				throw new SAXParseException("setting tag with non-experiment on top of stack", locator);
+				throwUnexpected("setting");
 			
 			String key = attrMap.get("key");
 			String value = attrMap.get("value");
 			
 			if(key == null)
-				throw new SAXParseException("key attribute missing from setting tag", locator);
+				throwMissing("setting", "key");
 			if(value == null)
-				throw new SAXParseException("value attribute missing from setting tag", locator);
+				throwMissing("setting", "value");
 			
 			experiment.getSettings().put(key, value);
 			
@@ -161,15 +161,15 @@ public class ExperimentXMLHandler extends DefaultHandler
 		else if(qName.equals("abbrev"))
 		{
 			if(top != experiment)
-				throw new SAXParseException("abbrev tag with non-experiment on top of stack", locator);
+				throwUnexpected("abbrev");
 			
 			String param = attrMap.get("param");
 			String abbrev = attrMap.get("abbrev");
 			
 			if(param == null)
-				throw new SAXParseException("param attribute missing from abbrev tag", locator);
+				throwMissing("abbrev", "param");
 			if(abbrev == null)
-				throw new SAXParseException("abbrev attribute missing from abbrev tag", locator);
+				throwMissing("abbrev", "abbrev");
 			
 			experiment.getAbbreviations().put(param, abbrev);
 			push(Tag.ABBREV);
@@ -185,13 +185,13 @@ public class ExperimentXMLHandler extends DefaultHandler
 		else if(qName.equals("item"))
 		{
 			if(!(top instanceof ListSweep))
-				throw new SAXParseException("item tag with non-list on top of stack", locator);
+				throwUnexpected("item");
 			ListSweep listSweep = (ListSweep)top;
 			
 			String value = attrMap.get("value");
 			
 			if(value == null)
-				throw new SAXParseException("value attribute missing from item tag", locator);
+				throwMissing("item", "value");
 			
 			listSweep.add(value);
 			
@@ -211,7 +211,7 @@ public class ExperimentXMLHandler extends DefaultHandler
 		}
 		else
 		{
-			throw new SAXParseException("unknown tag " + qName, locator);
+			throwUnknown("qName");
 		}
 	}
 
@@ -480,5 +480,21 @@ public class ExperimentXMLHandler extends DefaultHandler
 	public void setDocumentLocator(Locator locator)
 	{
 		this.locator = locator;
+	}
+	
+	private void throwUnexpected(String tag) throws SAXParseException
+	{
+		throw new SAXParseException("Unexpected \"" + tag + "\" element.", locator);
+	}
+	
+	private void throwMissing(String tag, String attribute) throws SAXParseException
+	{
+		throw new SAXParseException("Missing \"" + attribute + "\" attribute from \""
+				+ tag + "\" element.", locator);
+	}
+	
+	private void throwUnknown(String tag) throws SAXParseException
+	{
+		throw new SAXParseException("Unknown element \"" + tag + "\".", locator);
 	}
 }
