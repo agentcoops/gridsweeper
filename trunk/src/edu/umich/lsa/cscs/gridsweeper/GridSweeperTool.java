@@ -257,12 +257,7 @@ public class GridSweeperTool
 		throws GridSweeperException
 	{
 		ArgState state = ArgState.START;
-		
-		if(args.size() == 1 && new File(args.get(0)).exists())
-		{
-			experimentPath = args.get(0);
-		}
-		else for(String arg : args)
+		for(String arg : args)
 		{
 			finer("parsing argument: " + arg);
 			switch(state)
@@ -306,6 +301,10 @@ public class GridSweeperTool
 					else if(arg.startsWith("-"))
 					{
 						throw new GridSweeperException("Unexpected option: \"" + arg + "\"");
+					}
+					else if(experimentPath == null && new File(arg).exists())
+					{
+						experimentPath = args.get(0);
 					}
 					else
 					{
