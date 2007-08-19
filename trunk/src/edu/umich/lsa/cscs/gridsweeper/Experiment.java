@@ -96,7 +96,7 @@ public class Experiment
 		}
 		catch(Exception e)
 		{
-			throw new GridSweeperException("Received exception trying to parse experiment XML.", e);
+			throw new GridSweeperException("Received exception trying to parse experiment XML: " + e.getMessage(), e);
 		}
 	}
 	
