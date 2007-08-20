@@ -662,7 +662,7 @@ public class GridSweeper
 			else
 			{
 				int runCount = jobIdToRunMap.size();
-				message.append(String.format("%d of %d runs had errors (%.1f%%).\n",
+				message.append(String.format("%d of %d runs had errors (%.1f%%)...\n\n",
 					errorCount, runCount, (double)errorCount/runCount * 100)); 
 				
 				// Start with DRMAA-detected errors
