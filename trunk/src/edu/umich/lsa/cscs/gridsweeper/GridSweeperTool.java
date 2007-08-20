@@ -35,6 +35,8 @@ public class GridSweeperTool
 		INPUT,
 		OUTPUT,
 		EMAIL,
+		ABBREV,
+		SETTING,
 		RESULTS
 	}
 	
@@ -158,7 +160,8 @@ public class GridSweeperTool
 	{
 		Settings cliSettings = new Settings();
 		List<Sweep> cliSweeps = new ArrayList<Sweep>();
-		parseArgs(args, cliSettings, cliSweeps);
+		StringMap cliAbbrevs = new StringMap();
+		parseArgs(args, cliSettings, cliSweeps, cliAbbrevs);
 		
 		// Load experiment file
 		loadExperimentFile();
@@ -220,6 +223,8 @@ public class GridSweeperTool
 			experiment.getRootSweep().add(sweep);
 		}
 		
+		experiment.getAbbreviations().putAll(cliAbbrevs);
+		
 		if(experiment.getName() == null)
 		{
 			throw new GridSweeperException("Experiment name not provided; " +
@@ -253,7 +258,7 @@ public class GridSweeperTool
 	 * @param args Command-line arguments.
 	 */
 	void parseArgs(StringList args, Settings cliSettings,
-			List<Sweep> cliSweeps)
+			List<Sweep> cliSweeps, StringMap cliAbbrevs)
 		throws GridSweeperException
 	{
 		ArgState state = ArgState.START;
@@ -289,6 +294,14 @@ public class GridSweeperTool
 					else if(arg.equals("-r") || arg.equals("--results-dir"))
 					{
 						state = ArgState.RESULTS;
+					}
+					else if(arg.equals("-s") || arg.equals("--setting"))
+					{
+						state = ArgState.SETTING;
+					}
+					else if(arg.equals("-A") || arg.equals("--abbrev"))
+					{
+						state = ArgState.ABBREV;
 					}
 					else if(arg.equals("-d") || arg.equals("--dry"))
 					{
@@ -347,6 +360,14 @@ public class GridSweeperTool
 					break;
 				case RESULTS:
 					cliSettings.put("ResultsDirectory", arg);
+					state = ArgState.START;
+					break;
+				case SETTING:
+					parseSetting(cliSettings, arg);
+					state = ArgState.START;
+					break;
+				case ABBREV:
+					parseAbbrev(cliAbbrevs, arg);
 					state = ArgState.START;
 					break;
 			}
@@ -734,5 +755,33 @@ public class GridSweeperTool
 			throw new GridSweeperException("Could not find experiment file "
 					+ experimentPath + ".", e);
 		}
+	}
+
+	private void parseSetting(Settings cliSettings, String arg) throws GridSweeperException
+	{
+		equalMatcher.reset(arg);
+		if(!equalMatcher.matches())
+		{
+			throw new GridSweeperException("Could not parse \"" + arg + "\" as a setting.");
+		}
+		
+		String lhs = equalMatcher.group(1);
+		String rhs = equalMatcher.group(2);
+		
+		cliSettings.setProperty(lhs, rhs);
+	}
+	
+	private void parseAbbrev(StringMap cliAbbrevs, String arg) throws GridSweeperException
+	{
+		equalMatcher.reset(arg);
+		if(!equalMatcher.matches())
+		{
+			throw new GridSweeperException("Could not parse \"" + arg + "\" as a setting.");
+		}
+		
+		String lhs = equalMatcher.group(1);
+		String rhs = equalMatcher.group(2);
+		
+		cliAbbrevs.put(lhs, rhs);
 	}
 }
