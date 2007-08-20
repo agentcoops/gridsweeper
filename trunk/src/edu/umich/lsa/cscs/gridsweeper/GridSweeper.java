@@ -654,14 +654,16 @@ public class GridSweeper
 		if(runType == RunType.RUN)
 		{
 			// Print error messages, if present
-			if(drmaaErrorList.size() == 0 && gsErrorList.size() == 0
-				&& execErrorList.size() == 0)
+			int errorCount = drmaaErrorList.size() + gsErrorList.size() + execErrorList.size();
+			if(errorCount == 0)
 			{
 				message.append("No errors occurred.\n");
 			}
 			else
 			{
-				message.append("Some errors occurred during the experiment...\n\n");
+				int runCount = jobIdToRunMap.size();
+				message.append(String.format("%d of %d runs had errors (%.1f%%).\n",
+					errorCount, runCount, (double)errorCount/runCount * 100)); 
 				
 				// Start with DRMAA-detected errors
 				for(String jobId : drmaaErrorList)
