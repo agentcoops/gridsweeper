@@ -152,7 +152,6 @@ public class DroneAdapter implements Adapter
 		}
 		
 		int status = 0;
-		// String message = messageBuilder.toString();
 		String message = messageBuilder.toString();
 		
 		byte[] stdoutData = null;
@@ -199,7 +198,7 @@ public class DroneAdapter implements Adapter
 		}
 		catch (IOException e)
 		{
-			throw new AdapterException("Received IOException running process", e);
+			throw new AdapterException("Could not run model \"" + model + "\".", e);
 		}
 		
 		return new RunResults(status, message, stdoutData, stderrData);

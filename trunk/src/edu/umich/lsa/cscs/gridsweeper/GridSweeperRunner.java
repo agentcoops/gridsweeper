@@ -121,6 +121,7 @@ public class GridSweeperRunner
 		{
 			ObjectOutputStream stdoutStream = new ObjectOutputStream(System.out);
 			stdoutStream.writeObject(results);
+			stdoutStream.close();
 		}
 		catch(Exception e) {}
 	}
