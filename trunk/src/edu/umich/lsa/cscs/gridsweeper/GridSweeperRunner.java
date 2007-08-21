@@ -21,7 +21,7 @@
 
 package edu.umich.lsa.cscs.gridsweeper;
 
-import static edu.umich.lsa.cscs.gridsweeper.StringUtils.appendPathComponent;
+import static edu.umich.lsa.cscs.gridsweeper.StringUtils.*;
 
 import java.io.*;
 
@@ -100,7 +100,7 @@ public class GridSweeperRunner
 			int runNumber = setup.getRunNumber();
 			int numRuns = setup.getNumRuns();
 			int rngSeed = setup.getRngSeed();
-			results = adapter.run(parameters, runNumber, rngSeed);
+			results = adapter.run(parameters, runNumber, numRuns, rngSeed);
 			
 			/*
 			// Stage files listed in run properties back to server (if asked for)
@@ -127,7 +127,7 @@ public class GridSweeperRunner
 			// If file transfer is on, this will happen at the client end of things
 			/*if(!useFileTransfer)
 			{*/
-				String rnStr = getRNString(numRuns, runNumber);
+				String rnStr = formatPaddedInt(runNumber, numRuns - 1);
 				
 				String stdoutFilename = "stdout." + rnStr;
 				byte[] stdoutData = results.getStdoutData();
@@ -155,21 +155,6 @@ public class GridSweeperRunner
 			stdoutStream.close();
 		}
 		catch(Exception e) {}
-	}
-	
-	private static String getRNString(int numRuns, int runNumber)
-	{
-		String maxRNStr = "" + (numRuns - 1);
-		String rnNoZerosStr = "" + runNumber;
-		
-		StringBuffer rnStrBuf = new StringBuffer();
-		int diff = maxRNStr.length() - rnNoZerosStr.length();
-		for(int i = 0; i < diff; i++)
-		{
-			rnStrBuf.append("0");
-		}
-		rnStrBuf.append(rnNoZerosStr);
-		return rnStrBuf.toString();
 	}
 
 	private static void writeData(String filename, byte[] data) throws IOException

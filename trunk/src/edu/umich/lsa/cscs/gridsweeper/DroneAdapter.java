@@ -143,7 +143,7 @@ class DroneAdapter implements Adapter
 	 * 
 	 * @throws AdapterException If an I/O error occurs. 
 	 */
-	public RunResults run(ParameterMap parameterMap, int runNumber, int rngSeed) throws AdapterException
+	public RunResults run(ParameterMap parameterMap, int runNumber, int numRuns, int rngSeed) throws AdapterException
 	{
 		StringList arguments = new StringList();
 		

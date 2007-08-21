@@ -38,7 +38,7 @@ class DroneAdapterTest
 		
 		ParameterMap parameters = new ParameterMap();
 		parameters.put("beta", "0.1");
-		RunResults results = adapter.run(parameters, 5, 100);
+		RunResults results = adapter.run(parameters, 5, 10, 100);
 		
 		byte[] stdoutData = results.getStdoutData();
 		String stdoutString = new String(stdoutData, "UTF-8");

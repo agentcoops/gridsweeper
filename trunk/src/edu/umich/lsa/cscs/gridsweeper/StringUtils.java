@@ -250,4 +250,19 @@ public class StringUtils
 		
 		return tokens;
 	}
+	
+	public static String formatPaddedInt(int value, int maxValue)
+	{
+		String maxRNStr = "" + maxValue;
+		String rnNoZerosStr = "" + value;
+		
+		StringBuffer rnStrBuf = new StringBuffer();
+		int diff = maxRNStr.length() - rnNoZerosStr.length();
+		for(int i = 0; i < diff; i++)
+		{
+			rnStrBuf.append("0");
+		}
+		rnStrBuf.append(rnNoZerosStr);
+		return rnStrBuf.toString();
+	}
 }

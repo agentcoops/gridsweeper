@@ -45,5 +45,5 @@ public interface Adapter
 	 * and standard error.
 	 * @throws AdapterException For any reason defined by the implementing class.
 	 */
-	public RunResults run(ParameterMap parameterMap, int runNumber, int rngSeed) throws AdapterException;
+	public RunResults run(ParameterMap parameterMap, int runNumber, int numRuns, int rngSeed) throws AdapterException;
 }
