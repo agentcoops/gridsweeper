@@ -122,7 +122,7 @@ public class DroneAdapter implements Adapter
 		model = settings.getProperty("model");
 		if(model == null)
 		{
-			throw new AdapterException("\"model\" property must be specified.");
+			throw new AdapterException("The \"model\" property must be specified.");
 		}
 		
 		setParamOption = settings.getProperty("setParamOption", "-D");
@@ -142,7 +142,7 @@ public class DroneAdapter implements Adapter
 	/**
 	 * Runs the Drone model as specified by the properties and the arguments to this method.  
 	 * 
-	 * @throws AdapterException If an I/O error occurs.
+	 * @throws AdapterException If an I/O error occurs. 
 	 */
 	public RunResults run(ParameterMap parameterMap, int runNumber, int rngSeed) throws AdapterException
 	{

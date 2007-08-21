@@ -96,6 +96,8 @@ public class GridSweeperTool
 		catch(GridSweeperException e)
 		{
 			System.err.println("Could not run GridSweeper. " + e.getMessage());
+			System.err.println("\nComplete details:");
+			e.printStackTrace();
 		}
 	}
 	
@@ -273,7 +275,23 @@ public class GridSweeperTool
 				"edu.umich.lsa.cscs.gridsweeper.DroneAdapter");
 		
 		// Just create an instance. If no exception gets thrown, we're fine.
-		AdapterFactory.createAdapter(adapterClassName, settings);
+		try
+		{
+			AdapterFactory.createAdapter(adapterClassName, settings);
+		}
+		catch(Exception e)
+		{
+			if(e instanceof AdapterException)
+			{
+				throw new GridSweeperException("The experiment cannot be run: " + 
+						e.getMessage(), e);
+			}
+			else
+			{
+				throw new GridSweeperException("An unexpected error occurred"
+					+ " validating model settings.", e);
+			}
+		}
 	}
 	
 	/**

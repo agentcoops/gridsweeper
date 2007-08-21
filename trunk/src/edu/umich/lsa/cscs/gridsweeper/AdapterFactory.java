@@ -41,7 +41,7 @@ public class AdapterFactory
 	 * @return An adapter with the specified class and properties, or
 	 * {@code null} if the adapter could not be created.
 	 */
-	public static Adapter createAdapter(String adapterClassName, Settings adapterSettings) throws GridSweeperException
+	public static Adapter createAdapter(String adapterClassName, Settings adapterSettings) throws Exception
 	{
 		Class theClass;
 		try
@@ -64,7 +64,7 @@ public class AdapterFactory
 	 * @return An adapter with the specified class and properties, or
 	 * {@code null} if the adapter could not be created.
 	 */
-	public static Adapter createAdapter(Class adapterClass, Settings settings) throws GridSweeperException
+	public static Adapter createAdapter(Class adapterClass, Settings settings) throws Exception
 	{
 		Class[] parameterTypes = new Class[] { Settings.class };
 		Constructor adapterConstructor;
@@ -82,17 +82,6 @@ public class AdapterFactory
 		}
 		Object[] initargs = new Object[] { settings };
 		
-		try
-		{
-			return (Adapter)adapterConstructor.newInstance(initargs);
-		}
-		catch (Exception e)
-		{
-			if(e instanceof AdapterException)
-				throw new GridSweeperException(e.getMessage(), e);
-			else
-				throw new GridSweeperException(
-						"Received exception trying to create adapter. " + e.getMessage(), e);
-		}
+		return (Adapter)adapterConstructor.newInstance(initargs);
 	}
 }
