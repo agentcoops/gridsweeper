@@ -38,7 +38,7 @@
 
 		<mkdir dir="${classes}"/>
 		<jar 
-			excludes="**/*Test.class **/*.gsweep **/*.gsexp"
+			excludes="**/*.gsweep **/*.gsexp"
 			jarfile="${jarfile}"
 			basedir="${bin}"
 			manifest="MANIFEST.MF"
@@ -53,6 +53,7 @@
 			source="1.5"
 			target="1.5"
 			debug="${compile.debug}"
+			excludes="**/*Test*.java"
 		/>
 	</target>
 	
