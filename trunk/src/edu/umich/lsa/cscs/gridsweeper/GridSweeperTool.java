@@ -171,19 +171,20 @@ public class GridSweeperTool
 		catch(GridSweeperException e)
 		{
 			gs.msgOut.println(e.getMessage());
-			gs.msgOut.println("Could not run GridSweeper. " + e.getMessage());
 			
 			try
 			{
-				PrintStream stream = new PrintStream(new FileOutputStream("/tmp/gridsweeper.log", true));
+				PrintStream stream = new PrintStream(new FileOutputStream("gridsweeper.log", true));
+				stream.println("GridSweeper error log for " + new Date());
 				e.printStackTrace(stream);
+				stream.println("");
 				stream.close();
 				
-				gs.msgOut.println("\nComplete details have been written to \"/tmp/gridsweeper.log\".");
+				gs.msgOut.println("\nComplete details have been written to \"gridsweeper.log\".");
 			}
 			catch(Exception printE)
 			{
-				gs.msgOut.println("\nCould not write complete details to \"/tmp/gridsweeper.log\". Printing to console:");
+				gs.msgOut.println("\nCould not write complete details to \"gridsweeper.log\". Printing to console:");
 				e.printStackTrace(gs.msgOut);
 			}
 		}
@@ -294,7 +295,7 @@ public class GridSweeperTool
 				Throwable cause = e.getCause();
 				if(cause instanceof AdapterException)
 					throw new GridSweeperException("The experiment cannot be run: " + 
-						e.getMessage(), e);
+						cause.getMessage(), e);
 			}
 			else
 			{
