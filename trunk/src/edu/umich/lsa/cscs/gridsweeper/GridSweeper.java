@@ -121,8 +121,6 @@ class GridSweeper
 		if(!rootFile.exists() || !rootFile.isDirectory())
 			throw new GridSweeperException("GRIDSWEEPER_ROOT environment variable invalid.");
 		
-		root = rootFile.getAbsolutePath();
-		
 		pid = getPid();
 		
 		cal = Calendar.getInstance();

@@ -1,6 +1,8 @@
 #!/bin/sh
 
-export GRIDSWEEPER_ROOT=`echo ${0} | sed s/gsweep$//`/..
+ABSPATH=`python -c "import os; print os.path.abspath(\"$0\")"`
+BINPATH=`dirname $ABSPATH`
+export GRIDSWEEPER_ROOT=`dirname $BINPATH`
 export CLASSPATH=${CLASSPATH}:${GRIDSWEEPER_ROOT}/classes/GridSweeper.jar:${GRIDSWEEPER_ROOT}/lib/colt.jar:${GRIDSWEEPER_ROOT}/lib/drmaa.jar
 CLASS=edu.umich.lsa.cscs.gridsweeper.GridSweeperTool
 java -cp ${CLASSPATH} ${CLASS} "$@" <&- &
