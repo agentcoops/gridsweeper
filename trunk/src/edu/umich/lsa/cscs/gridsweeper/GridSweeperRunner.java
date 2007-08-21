@@ -131,12 +131,12 @@ public class GridSweeperRunner
 				
 				String stdoutFilename = "stdout." + rnStr;
 				byte[] stdoutData = results.getStdoutData();
-				if(stdoutData.length > 0)
+				if(stdoutData != null && stdoutData.length > 0)
 					writeData(stdoutFilename, stdoutData);
 				
 				String stderrFilename = "stderr." + rnStr;
 				byte[] stderrData = results.getStderrData();
-				if(stderrData.length > 0)
+				if(stderrData != null && stderrData.length > 0)
 					writeData(stderrFilename, stderrData);
 			//}
 		}
