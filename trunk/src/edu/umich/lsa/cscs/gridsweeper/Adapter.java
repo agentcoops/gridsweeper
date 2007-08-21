@@ -21,7 +21,6 @@
 
 package edu.umich.lsa.cscs.gridsweeper;
 
-import edu.umich.lsa.cscs.gridsweeper.parameters.ParameterMap;
 
 /**
  * The interface for adapters, which execute a model from a

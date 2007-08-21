@@ -60,7 +60,7 @@ import static edu.umich.lsa.cscs.gridsweeper.StringUtils.*;
  * @author Ed Baskerville
  *
  */
-public class FTPFileTransferSystem implements FileTransferSystem
+class FTPFileTransferSystem implements FileTransferSystem
 {
 	String hostname;
 	int port;

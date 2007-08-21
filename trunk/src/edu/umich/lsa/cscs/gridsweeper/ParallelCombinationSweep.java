@@ -19,11 +19,10 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-package edu.umich.lsa.cscs.gridsweeper.parameters;
+package edu.umich.lsa.cscs.gridsweeper;
 
 import java.util.*;
 
-import edu.umich.lsa.cscs.gridsweeper.XMLWriter;
 
 /**
  * Represents a combination of sub-sweeps that are enumerated in parallel.
@@ -35,7 +34,7 @@ import edu.umich.lsa.cscs.gridsweeper.XMLWriter;
  * @author Ed Baskerville
  *
  */
-public class ParallelCombinationSweep extends CombinationSweep
+class ParallelCombinationSweep extends CombinationSweep
 {
 	public ParallelCombinationSweep()
 	{
@@ -64,7 +63,7 @@ public class ParallelCombinationSweep extends CombinationSweep
 	 * </ul>
 	 * @return A list of {@link ParameterMap} objects, one for each combination
 	 * of child parameter maps
-	 * @see edu.umich.lsa.cscs.gridsweeper.parameters.CombinationSweep#generateMaps(java.util.Random)
+	 * @see edu.umich.lsa.cscs.gridsweeper.CombinationSweep#generateMaps(java.util.Random)
 	 */
 	@Override
 	public List<ParameterMap> generateMaps() throws SweepLengthException, DuplicateParameterException

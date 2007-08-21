@@ -26,9 +26,8 @@ import java.util.List;
 
 import org.junit.*;
 import static org.junit.Assert.*;
-import edu.umich.lsa.cscs.gridsweeper.parameters.*;
 
-public class GridSweeperToolTest
+class GridSweeperToolTest
 {
 	@Test
 	public void parseSingleValue() throws GridSweeperException

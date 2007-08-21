@@ -27,7 +27,7 @@ import java.util.*;
 
 import static edu.umich.lsa.cscs.gridsweeper.DateUtils.*;
 
-public class DateUtilsTest
+class DateUtilsTest
 {
 	private Calendar cal;
 	

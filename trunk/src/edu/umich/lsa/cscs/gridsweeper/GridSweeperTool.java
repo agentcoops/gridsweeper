@@ -33,7 +33,6 @@ import java.util.regex.*;
 
 import static edu.umich.lsa.cscs.gridsweeper.StringUtils.*;
 import edu.umich.lsa.cscs.gridsweeper.GridSweeper.RunType;
-import edu.umich.lsa.cscs.gridsweeper.parameters.*;
 
 /**
  * {@code GridSweeperTool} is the principal class of the command-line
@@ -800,17 +799,14 @@ public class GridSweeperTool
 	 */
 	private void loadExperimentFile() throws GridSweeperException
 	{
-		Settings sharedSettings = Settings.sharedSettings();
-		
 		if(experimentPath == null)
 		{
-			experiment = new Experiment(sharedSettings);
+			experiment = new Experiment();
 		}
 		
 		else try
 		{
-			experiment = new Experiment(sharedSettings,
-					new java.net.URL("file", "", experimentPath));
+			experiment = new Experiment(new java.net.URL("file", "", experimentPath));
 		}
 		catch (MalformedURLException e)
 		{

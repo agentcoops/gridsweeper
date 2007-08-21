@@ -30,7 +30,7 @@ import static java.lang.String.format;
  * @author Ed Baskerville
  *
  */
-public class DateUtils
+class DateUtils
 {
 	/**
 	 * Converts a {@code java.util.Calendar} object to a string representation

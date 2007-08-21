@@ -26,11 +26,9 @@ import java.util.*;
 
 import org.junit.*;
 
-import edu.umich.lsa.cscs.gridsweeper.parameters.*;
-
 import static org.junit.Assert.*;
 
-public class ExperimentTest
+class ExperimentTest
 {
 	Experiment experiment;
 	

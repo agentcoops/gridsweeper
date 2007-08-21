@@ -19,9 +19,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-package edu.umich.lsa.cscs.gridsweeper.parameters;
-
-import edu.umich.lsa.cscs.gridsweeper.*;
+package edu.umich.lsa.cscs.gridsweeper;
 
 import java.util.*;
 
@@ -30,7 +28,7 @@ import java.util.*;
  * @author ebaskerv
  *
  */
-public class ListSweep extends SingleSweep
+class ListSweep extends SingleSweep
 {
 	private StringList values;
 	

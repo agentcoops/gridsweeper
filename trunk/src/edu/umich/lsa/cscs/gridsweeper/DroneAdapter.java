@@ -23,7 +23,6 @@ package edu.umich.lsa.cscs.gridsweeper;
 
 import java.io.*;
 
-import edu.umich.lsa.cscs.gridsweeper.parameters.ParameterMap;
 
 /**
  * <p>An adapter that runs models designed for Ted Belding's Drone.
@@ -93,7 +92,7 @@ import edu.umich.lsa.cscs.gridsweeper.parameters.ParameterMap;
  * @author Ed Baskerville
  *
  */
-public class DroneAdapter implements Adapter
+class DroneAdapter implements Adapter
 {
 	private String model;
 	

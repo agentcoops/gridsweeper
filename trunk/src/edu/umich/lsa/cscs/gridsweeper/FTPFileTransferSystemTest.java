@@ -51,7 +51,7 @@ import static org.junit.Assert.*;
  * @author Ed Baskerville
  *
  */
-public class FTPFileTransferSystemTest
+class FTPFileTransferSystemTest
 {
 	FTPFileTransferSystem ftpFS;
 	

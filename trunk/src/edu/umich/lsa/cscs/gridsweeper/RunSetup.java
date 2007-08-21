@@ -24,7 +24,6 @@ package edu.umich.lsa.cscs.gridsweeper;
 import java.io.*;
 import java.util.*;
 
-import edu.umich.lsa.cscs.gridsweeper.parameters.ParameterMap;
 
 /**
  * A class that encapsulates setup data for a model run. Includes a copy of the
@@ -33,7 +32,7 @@ import edu.umich.lsa.cscs.gridsweeper.parameters.ParameterMap;
  * @author Ed Baskerville
  *
  */
-public class RunSetup implements Serializable
+class RunSetup implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 	private Settings settings;

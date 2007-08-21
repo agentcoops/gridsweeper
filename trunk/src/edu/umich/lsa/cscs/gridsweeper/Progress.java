@@ -26,7 +26,7 @@ package edu.umich.lsa.cscs.gridsweeper;
  * @author Ed Baskerville
  *
  */
-public class Progress
+class Progress
 {
 	private double progress;
 	private String message;

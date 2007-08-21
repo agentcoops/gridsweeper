@@ -19,14 +19,14 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-package edu.umich.lsa.cscs.gridsweeper.parameters;
+package edu.umich.lsa.cscs.gridsweeper;
 
 
 import org.junit.*;
 import static org.junit.Assert.*;
 import java.util.*;
 
-public class ListSweepTest
+class ListSweepTest
 {
 	private ListSweep sweep;
 	

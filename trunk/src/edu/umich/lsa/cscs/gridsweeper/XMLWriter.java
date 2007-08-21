@@ -26,7 +26,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 
-public class XMLWriter
+class XMLWriter
 {
 	private static String xmlDeclaration = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
 	private PrintStream xmlStream;

@@ -24,11 +24,9 @@ package edu.umich.lsa.cscs.gridsweeper;
 import org.junit.*;
 import static org.junit.Assert.*;
 
-import edu.umich.lsa.cscs.gridsweeper.parameters.*;
-
 import java.io.UnsupportedEncodingException;
 
-public class DroneAdapterTest
+class DroneAdapterTest
 {
 	@Test
 	public void testRealRunWithDefaults() throws AdapterException, UnsupportedEncodingException

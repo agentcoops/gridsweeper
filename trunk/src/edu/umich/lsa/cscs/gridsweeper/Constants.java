@@ -26,7 +26,7 @@ package edu.umich.lsa.cscs.gridsweeper;
  * @author Ed Baskerville
  *
  */
-public final class Constants
+final class Constants
 {
 	/**
 	 * A variable that can be used in file paths to represent the current

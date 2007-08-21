@@ -29,7 +29,7 @@ import java.io.*;
  * @author Ed Baskerville
  *
  */
-public class DLogger
+class DLogger
 {
 	private static Logger logger;
 	private static StreamHandler streamHandler;

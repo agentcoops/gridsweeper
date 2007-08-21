@@ -21,7 +21,7 @@
 
 package edu.umich.lsa.cscs.gridsweeper;
 
-public class GridSweeperException extends Exception
+class GridSweeperException extends Exception
 {
 	private static final long serialVersionUID = 1L;
 

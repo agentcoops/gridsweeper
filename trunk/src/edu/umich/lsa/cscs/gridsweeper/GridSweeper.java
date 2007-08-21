@@ -41,7 +41,7 @@ import static edu.umich.lsa.cscs.gridsweeper.DLogger.*;
  * @author Ed Baskerville
  *
  */
-public class GridSweeper
+class GridSweeper
 {
 	enum RunType
 	{

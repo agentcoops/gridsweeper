@@ -23,15 +23,13 @@ package edu.umich.lsa.cscs.gridsweeper;
 
 import java.util.*;
 
-import edu.umich.lsa.cscs.gridsweeper.parameters.*;
-
 /**
  * Represents a single case of an experiment, including parameter settings
  * and a list of random seeds, one for each run of the case.
  * @author Ed Baskerville
  *
  */
-public class ExperimentCase
+class ExperimentCase
 {
 	ParameterMap parameterMap;
 	List<Integer> rngSeeds;

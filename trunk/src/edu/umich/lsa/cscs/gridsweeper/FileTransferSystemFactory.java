@@ -28,7 +28,7 @@ import java.lang.reflect.Constructor;
  *
  * @author Ed Baskerville
  */
-public class FileTransferSystemFactory
+class FileTransferSystemFactory
 {
 	private static FileTransferSystemFactory factory;
 	

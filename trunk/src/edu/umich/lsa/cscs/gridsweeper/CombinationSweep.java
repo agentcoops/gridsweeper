@@ -19,11 +19,9 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-package edu.umich.lsa.cscs.gridsweeper.parameters;
+package edu.umich.lsa.cscs.gridsweeper;
 
 import java.util.*;
-
-import edu.umich.lsa.cscs.gridsweeper.*;
 
 /**
  * An abstract class representing parameter sweeps that combine multiple sub-sweeps.

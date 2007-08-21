@@ -23,7 +23,6 @@ package edu.umich.lsa.cscs.gridsweeper;
 
 import java.io.*;
 import static edu.umich.lsa.cscs.gridsweeper.StringUtils.*;
-import edu.umich.lsa.cscs.gridsweeper.parameters.ParameterMap;
 
 /**
  * The GridSweeperRunner command-line tool to actually run the model

@@ -26,7 +26,7 @@ import java.net.URL;
 import org.junit.*;
 import static org.junit.Assert.*;
 
-public class ExperimentTestParse
+class ExperimentTestParse
 {
 	URL fileURL;
 	Experiment experiment;
@@ -34,14 +34,14 @@ public class ExperimentTestParse
 	@Test
 	public void empty() throws GridSweeperException
 	{
-		experiment = new Experiment(null, getURL("empty"));
+		experiment = new Experiment(getURL("empty"));
 		assertEquals("test_empty", experiment.getName());
 	}
 	
 	@Test
 	public void properties() throws GridSweeperException
 	{
-		experiment = new Experiment(null, getURL("properties"));
+		experiment = new Experiment(getURL("properties"));
 		assertEquals(10, experiment.getNumRuns());
 		assertEquals("value", experiment.getSettings().get("anotherProperty"));
 	}
@@ -49,7 +49,7 @@ public class ExperimentTestParse
 	@Test
 	public void abbrevs() throws GridSweeperException
 	{
-		experiment = new Experiment(null, getURL("abbrevs"));
+		experiment = new Experiment(getURL("abbrevs"));
 		assertEquals("p1", experiment.getAbbreviations().get("param1"));
 		assertEquals("p2", experiment.getAbbreviations().get("param2"));
 	}

@@ -23,9 +23,7 @@ package edu.umich.lsa.cscs.gridsweeper;
 
 import java.io.FileNotFoundException;
 
-import edu.umich.lsa.cscs.gridsweeper.parameters.*;
-
-public class ExperimentXMLWriter extends XMLWriter
+class ExperimentXMLWriter extends XMLWriter
 {
 	private Experiment experiment;
 	private boolean writeSeedInfo;

@@ -19,13 +19,11 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-package edu.umich.lsa.cscs.gridsweeper.parameters;
+package edu.umich.lsa.cscs.gridsweeper;
 
 import java.util.*;
 import java.math.*;
-import edu.umich.lsa.cscs.gridsweeper.*;
 
-import edu.umich.lsa.cscs.gridsweeper.XMLWriter;
 
 /**
  * Represents a range of values assigned to a parameter. All values are represented with
@@ -33,7 +31,7 @@ import edu.umich.lsa.cscs.gridsweeper.XMLWriter;
  * @author Ed Baskerville
  *
  */
-public class RangeListSweep extends SingleSweep
+class RangeListSweep extends SingleSweep
 {
 	/**
 	 * The first value in the range. 

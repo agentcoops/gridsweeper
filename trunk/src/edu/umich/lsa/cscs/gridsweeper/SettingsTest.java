@@ -24,14 +24,14 @@ package edu.umich.lsa.cscs.gridsweeper;
 import org.junit.*;
 import static org.junit.Assert.*;
 
-public class SettingsTest
+class SettingsTest
 {
 	Settings settings;
 	
 	@Before
 	public void setUp()
 	{
-		settings = Settings.sharedSettings();
+		settings = new Settings();
 	}
 	
 	@Test

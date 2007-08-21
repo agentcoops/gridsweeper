@@ -31,7 +31,7 @@ import java.lang.reflect.Constructor;
  * @author Ed Baskerville
  *
  */
-public class AdapterFactory
+class AdapterFactory
 {
 	/**
 	 * Creates an adapter from the class name and properties.

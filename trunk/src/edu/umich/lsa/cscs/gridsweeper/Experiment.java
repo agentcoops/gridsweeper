@@ -31,8 +31,6 @@ import org.xml.sax.SAXParseException;
 import cern.jet.random.*;
 import cern.jet.random.engine.*;
 
-import edu.umich.lsa.cscs.gridsweeper.parameters.*;
-
 /**
  * Represents an experiment. An experiment is specified by a root
  * parameter sweep of class
@@ -44,7 +42,7 @@ import edu.umich.lsa.cscs.gridsweeper.parameters.*;
  * @author Ed Baskerville
  *
  */
-public class Experiment
+class Experiment
 {
 	private String name;
 	
@@ -68,14 +66,8 @@ public class Experiment
 	 */
 	public Experiment()
 	{
-		this(null);
-	}
-	
-	public Experiment(Settings settings)
-	{
+		settings = new Settings();
 		numRuns = 1;
-		this.settings = new Settings();
-		if(settings != null) this.settings.putAll(settings);
 		abbreviations = new StringMap();
 		inputFiles = new StringMap();
 		outputFiles = new StringList();
@@ -93,9 +85,9 @@ public class Experiment
 	 * @param experimentURL The URL containing the XML. 
 	 * @throws ExperimentException If the XML cannot be parsed.
 	 */
-	public Experiment(Settings settings, java.net.URL experimentURL) throws GridSweeperException
+	public Experiment(java.net.URL experimentURL) throws GridSweeperException
 	{
-		this(settings);
+		this();
 		try
 		{
 			SAXParser parser = SAXParserFactory.newInstance().newSAXParser();

@@ -19,19 +19,17 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-package edu.umich.lsa.cscs.gridsweeper.parameters;
+package edu.umich.lsa.cscs.gridsweeper;
 
 import java.util.*;
 
-import edu.umich.lsa.cscs.gridsweeper.StringMap;
-import edu.umich.lsa.cscs.gridsweeper.XMLWriter;
 
 /**
  * Represents the most primitive concrete sweep: a single value assigned to a parameter.
  * @author Ed Baskerville
  *
  */
-public class SingleValueSweep extends SingleSweep
+class SingleValueSweep extends SingleSweep
 {
 	/**
 	 * The value of the parameter.

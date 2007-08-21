@@ -19,18 +19,17 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-package edu.umich.lsa.cscs.gridsweeper.gui;
+package edu.umich.lsa.cscs.gridsweeper;
 
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import edu.umich.lsa.cscs.gridsweeper.*;
 
 /**
  * @author Ed Baskerville
  *
  */
-public class ExperimentController
+class ExperimentController
 {
 	final static int MENU_MASK = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 	

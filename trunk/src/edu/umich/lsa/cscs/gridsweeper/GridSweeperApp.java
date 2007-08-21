@@ -19,9 +19,10 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-package edu.umich.lsa.cscs.gridsweeper.gui;
+package edu.umich.lsa.cscs.gridsweeper;
 
 import java.util.*;
+
 
 /**
  * The main controller class for the GridSweeper graphical user interface.

@@ -19,9 +19,9 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-package edu.umich.lsa.cscs.gridsweeper.parameters;
+package edu.umich.lsa.cscs.gridsweeper;
 
-public class SweepLengthException extends Exception
+class SweepLengthException extends Exception
 {
 	private static final long serialVersionUID = 1L;
 }

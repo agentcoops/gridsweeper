@@ -27,8 +27,6 @@ import java.util.*;
 import org.xml.sax.*;
 import org.xml.sax.helpers.DefaultHandler;
 
-import edu.umich.lsa.cscs.gridsweeper.parameters.*;
-
 import static edu.umich.lsa.cscs.gridsweeper.DLogger.*;
 
 /**
@@ -36,7 +34,7 @@ import static edu.umich.lsa.cscs.gridsweeper.DLogger.*;
  * @author Ed Baskerville
  *
  */
-public class ExperimentXMLHandler extends DefaultHandler
+class ExperimentXMLHandler extends DefaultHandler
 {
 	private List<Object> stack;
 	private Experiment experiment;

@@ -23,7 +23,6 @@ package edu.umich.lsa.cscs.gridsweeper;
 
 import java.io.*;
 import java.util.*;
-import edu.umich.lsa.cscs.gridsweeper.parameters.ParameterMap;
 
 /**
  * Generates XML for a specific experiment case, so it can be
@@ -31,7 +30,7 @@ import edu.umich.lsa.cscs.gridsweeper.parameters.ParameterMap;
  * @author Ed Baskerville
  *
  */
-public class ExperimentCaseXMLWriter extends XMLWriter
+class ExperimentCaseXMLWriter extends XMLWriter
 {
 	private ExperimentCase expCase;
 	private String name;

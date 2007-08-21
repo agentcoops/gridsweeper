@@ -37,24 +37,8 @@ import static edu.umich.lsa.cscs.gridsweeper.DLogger.*;
 public class Settings extends StringMap
 {
 	private static final long serialVersionUID = 1L;
-	static Settings sharedSettings;
 	
 	StringMap casedKeys = new StringMap();
-	
-	/**
-	 * Returns the shared settings object, creating it if it does not yet exist.
-	 * Upon initial creation, the object is initialized with hard-coded default values.
-	 * @return The shared settings object.
-	 */
-	public static Settings sharedSettings()
-	{
-		if(sharedSettings == null)
-		{
-			sharedSettings = new Settings();
-		}
-		
-		return sharedSettings;
-	}
 	
 	/**
 	 * Gets a property, treating the string value as a boolean as per
