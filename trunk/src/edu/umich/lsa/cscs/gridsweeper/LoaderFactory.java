@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 import static edu.umich.lsa.cscs.gridsweeper.StringUtils.*;
+import static edu.umich.lsa.cscs.gridsweeper.DLogger.*;
 
 class LoaderFactory
 {
@@ -51,6 +52,11 @@ class LoaderFactory
 			for(int i = 0; i < count; i++)
 			{
 				urlArray[i] = urls.get(i);
+			}
+			
+			for(URL url : urlArray)
+			{
+				finer("added search url: " + url);
 			}
 			
 			loader = new URLClassLoader(urlArray, sysLoader); 
