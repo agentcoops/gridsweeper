@@ -11,7 +11,7 @@ class LoaderFactory
 	{
 		ClassLoader loader;
 		
-		List<URL> URLs = new ArrayList<URL>();
+		List<URL> urls = new ArrayList<URL>();
 		for(String dir : dirs)
 		{
 			File dirFile = new File(dir);
@@ -19,7 +19,7 @@ class LoaderFactory
 			{
 				try
 				{
-					URLs.add(new URL("file", "", dir));
+					urls.add(new URL("file", "", dir));
 				}
 				catch (MalformedURLException e)
 				{
@@ -32,7 +32,7 @@ class LoaderFactory
 					if(subpath.endsWith(".jar"))
 					{
 						String jarPath = appendPathComponent(dir, subpath);
-						try { URLs.add(new URL("file", "", jarPath)); }
+						try { urls.add(new URL("file", "", jarPath)); }
 							catch(MalformedURLException e){}
 					}
 				}
@@ -40,14 +40,20 @@ class LoaderFactory
 		}
 		
 		ClassLoader sysLoader = ClassLoader.getSystemClassLoader(); 
-		if(URLs.size() == 0)
+		if(urls.size() == 0)
 		{
 			loader = sysLoader;
 		}
 		else
 		{
-			URL[] urls = (URL[])(URLs.toArray());
-			loader = new URLClassLoader(urls, sysLoader); 
+			int count = urls.size();
+			URL[] urlArray = new URL[count];
+			for(int i = 0; i < count; i++)
+			{
+				urlArray[i] = urls.get(i);
+			}
+			
+			loader = new URLClassLoader(urlArray, sysLoader); 
 		}
 		
 		return loader;
