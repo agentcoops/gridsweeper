@@ -291,6 +291,10 @@ public class GridSweeperTool
 			ClassLoader classLoader = LoaderFactory.create(dirs);
 			AdapterFactory.createAdapter(adapterClassName, classLoader, settings);
 		}
+		catch(GridSweeperException e)
+		{
+			throw e;
+		}
 		catch(Exception e)
 		{
 			if(e instanceof InvocationTargetException)
