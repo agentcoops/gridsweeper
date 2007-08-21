@@ -88,7 +88,11 @@ public class AdapterFactory
 		}
 		catch (Exception e)
 		{
-			throw new GridSweeperException("Received exception trying to create adapter.", e);
+			if(e instanceof AdapterException)
+				throw new GridSweeperException(e.getMessage(), e);
+			else
+				throw new GridSweeperException(
+						"Received exception trying to create adapter. " + e.getMessage(), e);
 		}
 	}
 }
