@@ -194,14 +194,6 @@ public class DroneAdapter implements Adapter
 			// Actually run the damn thing, getting a process object with which to interact with it
 			Process process = Runtime.getRuntime().exec(cmdArray);
 			
-			/*// Write to stdin stream
-			OutputStream stdinStream = process.getOutputStream();
-			if(stdinData != null)
-			{
-				stdinStream.write(stdinData);
-			}
-			stdinStream.close();*/
-			
 			// Read to end of stdout and stderr streams
 			int b;
 			
