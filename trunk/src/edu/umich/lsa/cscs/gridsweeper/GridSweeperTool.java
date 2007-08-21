@@ -280,7 +280,7 @@ public class GridSweeperTool
 	private void validateAdapter() throws GridSweeperException
 	{
 		Settings settings = experiment.getSettings(); 
-		String adapterClassName = settings.getProperty("AdapterClass",
+		String adapterClassName = settings.getProperty("Adapter",
 				"edu.umich.lsa.cscs.gridsweeper.DroneAdapter");
 		
 		// Just create an instance. If no exception gets thrown, we're fine.

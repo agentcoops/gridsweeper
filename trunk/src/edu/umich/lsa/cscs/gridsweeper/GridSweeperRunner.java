@@ -86,7 +86,7 @@ public class GridSweeperRunner
 			*/
 
 			
-			String adapterClassName = settings.getProperty("AdapterClass", "edu.umich.lsa.cscs.gridsweeper.DroneAdapter");
+			String adapterClassName = settings.getProperty("Adapter", "edu.umich.lsa.cscs.gridsweeper.DroneAdapter");
 			
 			StringList dirs = new StringList();
 			dirs.add(appendPathComponent(System.getenv("GRIDSWEEPER_ROOT"), "plugins"));
