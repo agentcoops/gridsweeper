@@ -23,8 +23,8 @@ package edu.umich.lsa.cscs.gridsweeper;
 
 import static edu.umich.lsa.cscs.gridsweeper.DLogger.*;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.util.*;
@@ -172,8 +172,20 @@ public class GridSweeperTool
 		{
 			gs.msgOut.println(e.getMessage());
 			gs.msgOut.println("Could not run GridSweeper. " + e.getMessage());
-			gs.msgOut.println("\nComplete details:");
-			e.printStackTrace(gs.msgOut);
+			
+			try
+			{
+				PrintStream stream = new PrintStream(new FileOutputStream("/tmp/gridsweeper.log", true));
+				e.printStackTrace(stream);
+				stream.close();
+				
+				gs.msgOut.println("\nComplete details have been written to \"/tmp/gridsweeper.log\".");
+			}
+			catch(Exception printE)
+			{
+				gs.msgOut.println("\nCould not write complete details to \"/tmp/gridsweeper.log\". Printing to console:");
+				e.printStackTrace(gs.msgOut);
+			}
 		}
 	}
 
@@ -277,9 +289,11 @@ public class GridSweeperTool
 		}
 		catch(Exception e)
 		{
-			if(e instanceof AdapterException)
+			if(e instanceof InvocationTargetException)
 			{
-				throw new GridSweeperException("The experiment cannot be run: " + 
+				Throwable cause = e.getCause();
+				if(cause instanceof AdapterException)
+					throw new GridSweeperException("The experiment cannot be run: " + 
 						e.getMessage(), e);
 			}
 			else
