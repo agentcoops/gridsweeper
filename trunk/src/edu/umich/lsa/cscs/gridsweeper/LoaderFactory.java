@@ -20,7 +20,7 @@ class LoaderFactory
 			{
 				try
 				{
-					urls.add(new URL("file", "", dir));
+					urls.add(new URL("file", "", appendPathComponent(dir, "/")));
 				}
 				catch (MalformedURLException e)
 				{
