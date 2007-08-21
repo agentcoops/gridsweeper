@@ -25,7 +25,6 @@ import org.ggf.drmaa.*;
 
 
 import java.io.*;
-import java.net.URLClassLoader;
 import java.text.DateFormat;
 import java.util.*;
 
@@ -124,9 +123,6 @@ class GridSweeper
 		pid = getPid();
 		
 		cal = Calendar.getInstance();
-		
-		load("lib");
-		load("plugins");
 		
 		msgOut = System.err;
 	}
@@ -809,28 +805,5 @@ class GridSweeper
 	public void setExperiment(Experiment experiment)
 	{
 		this.experiment = experiment;
-	}
-	
-	public void load(String dir) throws GridSweeperException
-	{
-		/*String path = appendPathComponent(root, dir + "/");
-		
-		// Get File object and ensure directory exists there
-		// No reason to cause any trouble if it doesn't; just do nothing.
-		File dirObj = new File(path);
-		if(!dirObj.exists() || !dirObj.isDirectory()) return;
-		
-		// Enumerate all .jar files in the directory
-		StringList jarPaths = new StringList(); 
-		String[] contents = dirObj.list();
-		for(String subpath : contents)
-		{
-			if(subpath.endsWith(".jar")) jarPaths.add(subpath);
-		}
-		
-		URLClassLoader loader = new URLClassLoader(null);
-		
-		URLClassLoader(URL[] urls) 
-		*/
 	}
 }

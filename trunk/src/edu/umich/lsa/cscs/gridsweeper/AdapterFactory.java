@@ -41,12 +41,12 @@ class AdapterFactory
 	 * @return An adapter with the specified class and properties, or
 	 * {@code null} if the adapter could not be created.
 	 */
-	public static Adapter createAdapter(String adapterClassName, Settings adapterSettings) throws Exception
+	public static Adapter createAdapter(String adapterClassName, ClassLoader loader, Settings adapterSettings) throws Exception
 	{
 		Class theClass;
 		try
 		{
-			theClass = Class.forName(adapterClassName);
+			theClass = Class.forName(adapterClassName, true, loader);
 		}
 		catch (ClassNotFoundException e)
 		{

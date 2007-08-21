@@ -27,6 +27,7 @@ import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.*;
 import java.util.logging.*;
 import java.util.regex.*;
@@ -285,7 +286,10 @@ public class GridSweeperTool
 		// Just create an instance. If no exception gets thrown, we're fine.
 		try
 		{
-			AdapterFactory.createAdapter(adapterClassName, settings);
+			StringList dirs = new StringList();
+			dirs.add(appendPathComponent(gs.root, "plugins"));
+			ClassLoader classLoader = LoaderFactory.create(dirs);
+			AdapterFactory.createAdapter(adapterClassName, classLoader, settings);
 		}
 		catch(Exception e)
 		{
@@ -806,7 +810,7 @@ public class GridSweeperTool
 		
 		else try
 		{
-			experiment = new Experiment(new java.net.URL("file", "", experimentPath));
+			experiment = new Experiment(new URL("file", "", experimentPath));
 		}
 		catch (MalformedURLException e)
 		{

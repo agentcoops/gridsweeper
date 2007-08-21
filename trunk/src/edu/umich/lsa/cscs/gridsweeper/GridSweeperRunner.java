@@ -21,8 +21,9 @@
 
 package edu.umich.lsa.cscs.gridsweeper;
 
+import static edu.umich.lsa.cscs.gridsweeper.StringUtils.appendPathComponent;
+
 import java.io.*;
-import static edu.umich.lsa.cscs.gridsweeper.StringUtils.*;
 
 /**
  * The GridSweeperRunner command-line tool to actually run the model
@@ -83,9 +84,15 @@ public class GridSweeperRunner
 				fts.disconnect();
 			}
 			*/
+
 			
 			String adapterClassName = settings.getProperty("AdapterClass", "edu.umich.lsa.cscs.gridsweeper.DroneAdapter");
-			Adapter adapter = AdapterFactory.createAdapter(adapterClassName, settings);
+			
+			StringList dirs = new StringList();
+			dirs.add(appendPathComponent(System.getenv("GRIDSWEEPER_ROOT"), "plugins"));
+			ClassLoader classLoader = LoaderFactory.create(dirs);
+			
+			Adapter adapter = AdapterFactory.createAdapter(adapterClassName, classLoader, settings);
 			System.err.println("Adapter loaded.");
 			
 			// Run!
