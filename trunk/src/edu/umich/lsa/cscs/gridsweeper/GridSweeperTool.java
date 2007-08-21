@@ -95,13 +95,11 @@ public class GridSweeperTool
 		}
 		catch(GridSweeperException e)
 		{
-			System.err.println("Could not run GridSweeper. " + e.getMessage());
-			System.err.println("\nComplete details:");
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 		}
 	}
 	
-	private static StringList preParseArgs(String[] args) throws GridSweeperException
+	private static StringList preParseArgs(String[] args)
 	{
 		StringList ppArgs = new StringList(args.length);
 		
@@ -173,11 +171,9 @@ public class GridSweeperTool
 		catch(GridSweeperException e)
 		{
 			gs.msgOut.println(e.getMessage());
-			
-			if(debug)
-			{
-				e.printStackTrace(gs.msgOut);
-			}	
+			gs.msgOut.println("Could not run GridSweeper. " + e.getMessage());
+			gs.msgOut.println("\nComplete details:");
+			e.printStackTrace(gs.msgOut);
 		}
 	}
 
