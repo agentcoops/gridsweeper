@@ -25,6 +25,7 @@ import org.ggf.drmaa.*;
 
 
 import java.io.*;
+import java.net.URLClassLoader;
 import java.text.DateFormat;
 import java.util.*;
 
@@ -92,7 +93,7 @@ class GridSweeper
 	RunType runType = RunType.RUN;
 	List<ExperimentCase> cases = null;
 	
-	boolean useFileTransfer = false;
+	// boolean useFileTransfer = false;
 	
 	Calendar cal;
 	
@@ -102,7 +103,7 @@ class GridSweeper
 	
 	String email;
 	
-	String fileTransferSubpath;
+	// String fileTransferSubpath;
 	
 	Session drmaaSession;
 	StringMap caseIdToJobIdMap;
@@ -119,6 +120,9 @@ class GridSweeper
 		pid = getPid();
 		
 		cal = Calendar.getInstance();
+		
+		load("lib");
+		load("plugins");
 		
 		msgOut = System.err;
 	}
@@ -191,11 +195,11 @@ class GridSweeper
 		setUpExperimentDirectory(settings);
 
 		// Set up directory & input files on file transfer system if asked for
-		if(runType == RunType.RUN && 
+		/*if(runType == RunType.RUN && 
 				settings.getBooleanProperty("UseFileTransfer", false))
 		{
 			setUpFileTransfer(settings);
-		}
+		}*/
 		
 		// Create experiment XML in output directory
 		String xmlPath = appendPathComponent(expDir, "experiment.gsexp");
@@ -260,7 +264,7 @@ class GridSweeper
 		}
 	}
 	
-	private void setUpFileTransfer(Settings settings)
+	/*private void setUpFileTransfer(Settings settings)
 		throws GridSweeperException
 	{
 		FileTransferSystem fts = null;
@@ -311,7 +315,7 @@ class GridSweeper
 		{
 			throw new GridSweeperException("Could not set up file trasfer system", e);
 		}
-	}
+	}*/
 	
 	public void submitCases() throws GridSweeperException
 	{
@@ -448,7 +452,7 @@ class GridSweeper
 			JobTemplate jt = drmaaSession.createJobTemplate();
 			jt.setJobName(caseRunName);
 			jt.setRemoteCommand(appendPathComponent(root, "bin/gsrunner"));
-			if(!useFileTransfer) jt.setWorkingDirectory(caseDir);
+			/*if(!useFileTransfer)*/ jt.setWorkingDirectory(caseDir);
 			jt.setInputPath(":" + stdinPath);
 			jt.setOutputPath(":" + appendPathComponent(caseDir, ".gsweep_out." + runNum));
 			jt.setErrorPath(":" + appendPathComponent(caseDir, ".gsweep_err." + runNum));
@@ -801,5 +805,28 @@ class GridSweeper
 	public void setExperiment(Experiment experiment)
 	{
 		this.experiment = experiment;
+	}
+	
+	public void load(String dir) throws GridSweeperException
+	{
+		/*String path = appendPathComponent(root, dir + "/");
+		
+		// Get File object and ensure directory exists there
+		// No reason to cause any trouble if it doesn't; just do nothing.
+		File dirObj = new File(path);
+		if(!dirObj.exists() || !dirObj.isDirectory()) return;
+		
+		// Enumerate all .jar files in the directory
+		StringList jarPaths = new StringList(); 
+		String[] contents = dirObj.list();
+		for(String subpath : contents)
+		{
+			if(subpath.endsWith(".jar")) jarPaths.add(subpath);
+		}
+		
+		URLClassLoader loader = new URLClassLoader(null);
+		
+		URLClassLoader(URL[] urls) 
+		*/
 	}
 }

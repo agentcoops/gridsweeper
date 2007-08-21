@@ -57,6 +57,7 @@ public class GridSweeperRunner
 			// Get GridSweeper settings
 			Settings settings = setup.getSettings();
 			
+			/*
 			// Download input files
 			boolean useFileTransfer = settings.getBooleanProperty("UseFileTransfer", false);
 			FileTransferSystem fts = null;
@@ -81,6 +82,7 @@ public class GridSweeperRunner
 				
 				fts.disconnect();
 			}
+			*/
 			
 			String adapterClassName = settings.getProperty("AdapterClass", "edu.umich.lsa.cscs.gridsweeper.DroneAdapter");
 			Adapter adapter = AdapterFactory.createAdapter(adapterClassName, settings);
@@ -93,6 +95,7 @@ public class GridSweeperRunner
 			int rngSeed = setup.getRngSeed();
 			results = adapter.run(parameters, runNumber, rngSeed);
 			
+			/*
 			// Stage files listed in run properties back to server (if asked for)
 			if(useFileTransfer)
 			{
@@ -110,12 +113,13 @@ public class GridSweeperRunner
 				
 				fts.disconnect();
 			}
+			*/
 			
 			// If file transfer is off, write standard output and standard error
 			// to local files.
 			// If file transfer is on, this will happen at the client end of things
-			if(!useFileTransfer)
-			{
+			/*if(!useFileTransfer)
+			{*/
 				String rnStr = getRNString(numRuns, runNumber);
 				
 				String stdoutFilename = "stdout." + rnStr;
@@ -127,7 +131,7 @@ public class GridSweeperRunner
 				byte[] stderrData = results.getStderrData();
 				if(stderrData.length > 0)
 					writeData(stderrFilename, stderrData);
-			}
+			//}
 		}
 		catch(Exception e)
 		{
