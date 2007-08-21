@@ -1,5 +1,6 @@
 #!/bin/sh
 
-CLASSPATH=${CLASSPATH}:${GRIDSWEEPER_ROOT}/classes/GridSweeper.jar:${GRIDSWEEPER_ROOT}/lib/colt.jar:${GRIDSWEEPER_ROOT}/lib/drmaa.jar
+export GRIDSWEEPER_ROOT=`echo ${0} | sed s/gsweep$//`/..
+export CLASSPATH=${CLASSPATH}:${GRIDSWEEPER_ROOT}/classes/GridSweeper.jar:${GRIDSWEEPER_ROOT}/lib/colt.jar:${GRIDSWEEPER_ROOT}/lib/drmaa.jar
 CLASS=edu.umich.lsa.cscs.gridsweeper.GridSweeperTool
 java -cp ${CLASSPATH} ${CLASS} "$@" <&- &
