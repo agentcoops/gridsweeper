@@ -150,6 +150,8 @@ public class GridSweeperTool
 			
 			loadExperiment(args);
 			
+			validateAdapter();
+			
 			gs.setExperiment(experiment);
 			
 			// Set up and submit experiment
@@ -262,6 +264,16 @@ public class GridSweeperTool
 			throw new GridSweeperException(
 					"Could not write to output path " + outputPath + ".", e);
 		}		
+	}
+	
+	private void validateAdapter() throws GridSweeperException
+	{
+		Settings settings = experiment.getSettings(); 
+		String adapterClassName = settings.getProperty("AdapterClass",
+				"edu.umich.lsa.cscs.gridsweeper.DroneAdapter");
+		
+		// Just create an instance. If no exception gets thrown, we're fine.
+		AdapterFactory.createAdapter(adapterClassName, settings);
 	}
 	
 	/**

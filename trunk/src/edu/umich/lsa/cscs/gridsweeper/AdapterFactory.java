@@ -43,15 +43,17 @@ public class AdapterFactory
 	 */
 	public static Adapter createAdapter(String adapterClassName, Settings adapterSettings) throws GridSweeperException
 	{
-		// TODO: Consider throwing an exception describing what went wrong. 
+		Class theClass;
 		try
 		{
-			return createAdapter(Class.forName(adapterClassName), adapterSettings);
+			theClass = Class.forName(adapterClassName);
 		}
-		catch(Exception e)
+		catch (ClassNotFoundException e)
 		{
-			throw new GridSweeperException(e);
+			throw new GridSweeperException("Could not find adapter class "
+					+ adapterClassName + ".", e);
 		}
+		return createAdapter(theClass, adapterSettings);
 	}
 	
 	/**
@@ -64,18 +66,29 @@ public class AdapterFactory
 	 */
 	public static Adapter createAdapter(Class adapterClass, Settings settings) throws GridSweeperException
 	{
-		// TODO: Consider throwing an exception describing what went wrong.
+		Class[] parameterTypes = new Class[] { Settings.class };
+		Constructor adapterConstructor;
 		try
 		{
-			Class[] parameterTypes = new Class[] { Settings.class };
-			Constructor adapterConstructor = adapterClass.getConstructor(parameterTypes);
-			Object[] initargs = new Object[] { settings };
-			
+			adapterConstructor = adapterClass.getConstructor(parameterTypes);
+		}
+		catch (SecurityException e)
+		{
+			throw new GridSweeperException("Received SecurityException trying to get adapter constructor.");
+		}
+		catch (NoSuchMethodException e)
+		{
+			throw new GridSweeperException("Adapter class does not implement required constructor.", e);
+		}
+		Object[] initargs = new Object[] { settings };
+		
+		try
+		{
 			return (Adapter)adapterConstructor.newInstance(initargs);
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
-			throw new GridSweeperException(e);
+			throw new GridSweeperException("Received exception trying to create adapter.", e);
 		}
 	}
 }

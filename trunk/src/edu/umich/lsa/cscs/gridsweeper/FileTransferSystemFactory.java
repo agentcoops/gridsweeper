@@ -50,7 +50,7 @@ public class FileTransferSystemFactory
 	 * object contains the class of the file transfer system as well as any
 	 * system-specific settings, specified using Java package reverse-DNS naming (e.g.,
 	 * edu.umich.lsa.cscs.gridsweeper.FTPFileTransferSystem.Username).
-	 * @param className TODO
+	 * @param className The name of the class to retrieve.
 	 * @param settings The settings object specifying the file transfer system
 	 * and its properties.
 	 * @return A file transfer system.

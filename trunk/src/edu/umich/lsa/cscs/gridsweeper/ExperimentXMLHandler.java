@@ -32,8 +32,7 @@ import edu.umich.lsa.cscs.gridsweeper.parameters.*;
 import static edu.umich.lsa.cscs.gridsweeper.DLogger.*;
 
 /**
- * The SAX-based XML parser for experiment XML (.gsexp) files.
- * TODO: Write a complete specification for the file format. For now, see the example files. 
+ * The SAX-based XML parser for experiment XML (.gsexp) files. 
  * @author Ed Baskerville
  *
  */
