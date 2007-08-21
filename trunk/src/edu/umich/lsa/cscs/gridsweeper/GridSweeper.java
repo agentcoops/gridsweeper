@@ -117,6 +117,12 @@ class GridSweeper
 		if(root == null)
 			throw new GridSweeperException("GRIDSWEEPER_ROOT environment variable not set.");
 		
+		File rootFile = new File(root);
+		if(!rootFile.exists() || !rootFile.isDirectory())
+			throw new GridSweeperException("GRIDSWEEPER_ROOT environment variable invalid.");
+		
+		root = rootFile.getAbsolutePath();
+		
 		pid = getPid();
 		
 		cal = Calendar.getInstance();
@@ -471,7 +477,7 @@ class GridSweeper
 			Properties environment = new Properties();
 			environment.setProperty("GRIDSWEEPER_ROOT", root);
 			
-			String classpath = System.getenv("CLASSPATH");
+			String classpath = System.getProperty("java.class.path");
 			if(classpath != null) environment.setProperty("CLASSPATH", classpath);
 			jt.setJobEnvironment(environment);
 			
