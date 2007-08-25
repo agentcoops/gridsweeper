@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+               "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+
+<book>
+
+<bookinfo>
+  <title>GridSweeper User’s Manual</title>
+  <author><firstname>Ed</firstname><surname>Baskerville</surname></author>
+  <copyright><year>2007</year><holder>Ed Baskerville</holder></copyright>
+</bookinfo>
+
+<preface>
+	<title>Foreword</title>
+	This document describes how to use GridSweeper blah blah blah
+</preface>
+
+<chapter>
+	<title>Setting Up GridSweeper</title>
+	<para>
+		This is how to install GridSweeper.
+	</para>
+	
+	<sect1>
+		<title>What You Need</title>
+		<para> ... </para>
+	</sect1>
+	
+	<sect1>
+		<title>Getting the Pieces</title>
+		<para> ... </para>
+	</sect1>
+	
+	<sect1>
+		<title>Installing GridSweeper</title>
+		<para> ... </para>
+	</sect1>
+	
+	<sect1>
+		<title>Configuring GridSweeper</title>
+		<para> ... </para>
+	</sect1>
+</chapter>
+</book>

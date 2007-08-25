@@ -4,7 +4,7 @@
 	<property name="compile.debug" value="true"/>
 	
 	<property name="src" location="src"/>
-	<property name="bin" location="bin"/>
+	<property name="build" location="build"/>
 	<property name="dist" location="dist"/>
 	
 	<property name="classes" location="${dist}/classes"/>
@@ -13,22 +13,12 @@
 	<property name="distman" location="${dist}/man/man1"/>
 	
 	<target name="dist" depends="jar">
-		<copy file="gsweep" tofile="${distbin}/gsweep" />
-		<chmod file="${distbin}/gsweep" perm="755"/>
+		<copy todir="${distbin}">
+		    <fileset dir="bin"/>
+		  </copy>
+		<chmod dir="${dist}/bin" perm="755"/>
 		
-		<copy file="gsdrone" tofile="${distbin}/gsdrone" />
-		<chmod file="${distbin}/gsdrone" perm="755"/>
-		
-		<copy file="gsmail" tofile="${distbin}/gsmail" />
-		<chmod file="${distbin}/gsmail" perm="755"/>
-		
-		<copy file="gsgetpid" tofile="${distbin}/gsgetpid" />
-		<chmod file="${distbin}/gsgetpid" perm="755"/>
-		
-		<copy file="gsrunner" tofile="${distbin}/gsrunner" />
-		<chmod file="${distbin}/gsrunner" perm="755"/>
-		
-		<copy file="gsweep.1" tofile="${distman}/gsweep.1" />
+		<copy file="doc/gsweep.1" tofile="${distman}/gsweep.1" />
 	</target>
 	
 	<target name="jar" depends="compile" description="Build jar">
@@ -40,25 +30,25 @@
 		<jar 
 			excludes="**/*.gsweep **/*.gsexp"
 			jarfile="${jarfile}"
-			basedir="${bin}"
+			basedir="${build}/main"
 			manifest="MANIFEST.MF"
 		/>
 	</target>
 	
 	<target name="compile" description="Compile code">
-		<mkdir dir="${bin}"/>
+		<mkdir dir="${build}/main"/>
 		<javac
 			srcdir="${src}"
-			destdir="${bin}"
+			destdir="${build}/main"
 			source="1.5"
 			target="1.5"
 			debug="${compile.debug}"
-			excludes="**/*Test*.java"
+			excludes="**/*Test*.java **/example/*"
 		/>
 	</target>
 	
 	<target name="clean" description="Remove build and dist dirs">
-		<delete dir="${bin}"/>
+		<delete dir="${build}"/>
 		<delete dir="${dist}"/>
 	</target>
 	

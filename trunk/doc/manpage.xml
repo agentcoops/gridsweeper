@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+               "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+
+
+<refentry id="gsweep">
+
+<refmeta>
+<refentrytitle>gsweep</refentrytitle>
+<manvolnum>1</manvolnum>
+</refmeta>
+
+<refnamediv>
+<refname>gsweep</refname>
+<refname>gsdrone</refname>
+<refpurpose>submit a GridSweeper experiment</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+
+<cmdsynopsis>
+  <command>gsweep</command>
+  <arg>-R
+    <group>
+      <arg>-H</arg>
+      <arg>-L</arg>
+      <arg>-P</arg>
+    </group>
+  </arg>
+  <arg>-f</arg>
+  <arg choice=plain><replaceable>group</replaceable></arg>
+  <arg rep=repeat choice=plain><replaceable>file</replaceable></arg>
+</cmdsynopsis>
+
+<cmdsynopsis>
+  <command>gsdrone</command>
+  <arg>-R 
+    <group>
+      <arg>-H</arg>
+      <arg>-L</arg>
+      <arg>-P</arg>
+    </group>
+  </arg>
+  <arg>-f</arg>
+  <arg choice=plain><replaceable>group</replaceable></arg>
+  <arg rep=repeat choice=plain><replaceable>file</replaceable></arg>
+</cmdsynopsis>
+
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+<para>
+<indexterm><primary>functions</primary>
+  <secondary>printf</secondary></indexterm>
+<indexterm><primary>printing function</primary></indexterm>
+
+<function>printf</function> places output on the standard
+output stream stdout.
+&hellip;
+</para>
+</refsect1>
+</refentry>
