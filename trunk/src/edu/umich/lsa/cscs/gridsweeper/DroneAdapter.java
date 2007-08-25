@@ -21,6 +21,8 @@
 
 package edu.umich.lsa.cscs.gridsweeper;
 
+import static edu.umich.lsa.cscs.gridsweeper.StringUtils.formatPaddedInt;
+
 import java.io.*;
 
 
@@ -152,7 +154,7 @@ class DroneAdapter implements Adapter
 		{
 			arguments.addAll(StringUtils.tokenize(miscOptions));
 		}
-		arguments.add(runNumOption + runNumPrefix + runNumber);
+		arguments.add(runNumOption + runNumPrefix + formatPaddedInt(runNumber, numRuns - 1));
 		arguments.add(rngSeedOption + rngSeed);
 		if(useInputFile && inputFilePath != null)
 		{
