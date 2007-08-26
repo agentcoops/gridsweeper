@@ -6,7 +6,9 @@
 <refentry id="gsweep">
 
 <refmeta>
-<refentrytitle>gsweep</refentrytitle>
+<refentrytitle>gsweep
+	<author>Ed Baskerville</author>
+</refentrytitle>
 <manvolnum>1</manvolnum>
 </refmeta>
 
@@ -19,44 +21,700 @@
 <refsynopsisdiv>
 
 <cmdsynopsis>
-  <command>gsweep</command>
-  <arg>-R
-    <group>
-      <arg>-H</arg>
-      <arg>-L</arg>
-      <arg>-P</arg>
-    </group>
-  </arg>
-  <arg>-f</arg>
-  <arg choice=plain><replaceable>group</replaceable></arg>
-  <arg rep=repeat choice=plain><replaceable>file</replaceable></arg>
-</cmdsynopsis>
-
-<cmdsynopsis>
-  <command>gsdrone</command>
-  <arg>-R 
-    <group>
-      <arg>-H</arg>
-      <arg>-L</arg>
-      <arg>-P</arg>
-    </group>
-  </arg>
-  <arg>-f</arg>
-  <arg choice=plain><replaceable>group</replaceable></arg>
-  <arg rep=repeat choice=plain><replaceable>file</replaceable></arg>
+	<command>gsweep</command>
+	<arg>-n
+		<replaceable>experiment-name</replaceable>
+	</arg>
+	
+	<arg>-r
+		<replaceable>results-directory</replaceable>
+	</arg>
+	
+	<arg>-N
+		<replaceable>num-runs</replaceable>
+	</arg>
+	
+	<arg>-S
+		<replaceable>seed-location</replaceable>
+	</arg>
+	
+	<arg>-m
+		<replaceable>model-specifier</replaceable>
+	</arg>
+	
+	<arg>-i
+		<replaceable>input-file</replaceable>
+	</arg>
+	
+	<arg>
+		<group>
+			<arg>-o</arg>
+			<arg>-O</arg>
+		</group>
+		<replaceable>output-file</replaceable>
+	</arg>
+	
+	<arg>-d</arg>
+	
+	<arg>-a
+		<replaceable>adapter-class</replaceable>
+	</arg>
+	
+	<arg rep="repeat">
+		<replaceable>parameter-setting</replaceable>
+	</arg>
 </cmdsynopsis>
 
 </refsynopsisdiv>
 
-<refsect1><title>Description</title>
-<para>
-<indexterm><primary>functions</primary>
-  <secondary>printf</secondary></indexterm>
-<indexterm><primary>printing function</primary></indexterm>
+<refsect1 id="description">
 
-<function>printf</function> places output on the standard
-output stream stdout.
-&hellip;
+<title>Description</title>
+<para>
+	<command>gsweep</command> is the command-line interface for GridSweeper. <command>gsweep</command> constructs a GridSweeper experiment and submits it to the grid. An experiment is defined by essentially two things: (1) the model being run; and (2) a set of different parameter-value combinations—<emphasis>cases</emphasis>—to apply to the model. Additionally, each case can be run a number of different times, each run having a different random number seed.
 </para>
+
+<para>
+	When <command>gsweep</command> is run, the following things happen:
+</para>
+
+<orderedlist>
+	<listitem><para>
+		Command-line options and parameter sweep arguments are parsed.
+	</para></listitem>
+	
+	<listitem><para>
+		Experiment settings are loaded from an experiment XML file, if provided, and then from command-line options and parameter sweep arguments, overriding any provided in the experiment file.
+	</para></listitem>
+	
+	<listitem><para>
+		If an output directory was specified using -o or -O, the complete set of experiment settings is written out to that directory in the GridSweeper XML experiment format, minus the information needed to reproduce the same sequence of random seeds that will be used for this run. If -O was specified, the process stops here.
+	</para></listitem>
+	
+	<listitem><para>
+		The process continues by constructing a results directory for this experiment run in the user’s root experiment results directory. The location for the results directory is named with the current date and time:
+			<screen><replaceable>experiments-directory</replaceable>/<replaceable>experiment-name</replaceable>/<replaceable>YYYY</replaceable>-<replaceable>MM</replaceable>-<replaceable>DD</replaceable>/<replaceable>hh</replaceable>-<replaceable>mm</replaceable>-<replaceable>ss</replaceable></screen>
+		
+		Inside this directory, GridSweeper creates the file <filename>experiment.gsexp</filename>. This file has the same format as one generated via -o or -O, but also includes the information needed to reproduce the experiment exactly, down to the random seed used for each run.</para></listitem>
+	
+	<listitem><para>
+		For each case, GridSweeper creates a subdirectory of the experiment’s results directory, named using the parameter values for that case:
+		<screen><replaceable>param1</replaceable>=<replaceable>value1</replaceable>-<replaceable>param2</replaceable>=<replaceable>value2</replaceable>&hellip;</screen>
+		
+		Inside this subdirectory is another XML file, named <filename>case.gscase</filename>, which contains the list of random seeds used for runs. (See <link linkend="caseformat">“Case File Format”</link> for a description of the XML file format.) If the -d option was specified, the process stops here.
+	</para></listitem>
+	
+	<listitem><para>
+		Finally, all the runs are submitted to the local grid system, which decides when and on what host to run them. When it’s time, the chosen host starts <command>gsrunner</command>, which creates an adapter and instructs it to run the model with the appropriate parameter values and random seed. (See <link linkend="adapters">“Adapters”</link> for an explanation of adapters.)
+	</para></listitem>
+</orderedlist>
+
+<para>
+	<command>gsdrone</command> is equivalent to
+	<screen>gsweep -a edu.umich.lsa.cscs.gridsweeper.DroneAdapter</screen>
+	Since GridSweeper uses this adapter by default, <command>gsdrone</command> and <command>gsweep</command> are currently equivalent. It is possible that a different default adapter will be used in future versions.
+</para>
+
 </refsect1>
+
+
+<refsect1 id="options">
+
+<title>Options</title>
+
+<variablelist>
+	<varlistentry>
+	<term>-n, --name <replaceable>experiment-name</replaceable></term>
+	<listitem><para>
+		Experiment name. This string is used to name the experiment output directory and to identify submitted jobs in the grid system.
+	</para></listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	<term>-r, --results-dir <replaceable>results-directory</replaceable></term>
+	<listitem><para>
+		Directory where experiment results are stored. Overrides the <varname>ResultsDirectory</varname> setting in an experiment XML file. Defaults to <filename>~/Results</filename>.
+	</para></listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	<term>-N, --num-runs <replaceable>num-runs</replaceable></term>
+	<listitem><para>
+		Number of runs to perform, each with a different random seed, for each case.
+	</para></listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	<term>-S, --seed <replaceable>seed-location</replaceable></term>
+	<listitem>
+		<para>
+			The location of the first seed in the seed generation table, given as
+			<replaceable>row</replaceable>:<replaceable>column</replaceable>. (See <link linkend="random">“Random Seed Generation”</link> for more information about random seeds and the seed table.)
+		</para>
+		
+		<para>
+			This setting overrides the <varname>firstSeedRow</varname> and <varname>seedCol</varname> attributes of the root <varname>experiment</varname> element in an experiment XML file.
+		</para>
+	</listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	<term>-m, --model <replaceable>model-specifier</replaceable></term>
+	<listitem>
+		<para>
+			Model to run. By default, <replaceable>model-specifier</replaceable> is the model executable file to run. If a non-standard adapter is being used, though, it may specify the model in another way—the meaning is adapter-defined. (See <link linkend="adapters">“Adapters”</link> for more information.)
+		</para>
+		
+		<para>
+			This setting overrides the <varname>Model</varname> setting in an experiment XML file.
+		</para>
+	</listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	<term>-i, --input <replaceable>input-file</replaceable></term>
+	<listitem>
+		<para>
+			Experiment XML input file. Any settings or options provided at the command line will override anything in the input file, regardless of the position of this option in the argument list. See <link linkend="expformat">“Experiment File Format”</link> for a detailed description of the file format.
+		</para>
+	</listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	<term>-o, --output <replaceable>output-file</replaceable></term>
+	<listitem>
+		<para>
+			Location where an experiment XML output file. The generated file will contain all the settings needed to re-run the experiment with a new sequence of random seeds. Settings provided at the command line are included. See <link linkend="expformat">“Experiment File Format”</link> for a detailed description of the file format.
+		</para>
+	</listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	<term>-O, --output-only <replaceable>output-file</replaceable></term>
+	<listitem>
+		<para>
+			The same as -o, but additionally causes the experiment not to be run at this time. This option is useful for generating experiment XML files quickly from the command line. If this option appears after -d in the argument list, the dry-run behavior is overridden.
+		</para>
+	</listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	<term>-d, --dry</term>
+	<listitem>
+		<para>
+			Perform a “dry run,” simulating the parameter sweep without actually submitting jobs to the grid to be run. Output directories are created and populated with control files needed to reproduce runs, but the runs do not actually happen. If this option appears after -O in the argument list, the no-run behavior is overridden.
+		</para>
+	</listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	<term>-e, --email-address <replaceable>email-address</replaceable></term>
+	<listitem>
+		<para>
+			Email address to notify at the completion of the experiment. If none is provided, mail will be sent to the local user account. This option overrides the <varname>EmailAddress</varname> setting in an experiment XML file.
+		</para>
+	</listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	<term>-a, --adapter <replaceable>adapter-class</replaceable></term>
+	<listitem>
+		<para>
+			Name of the adapter class. Adapters act as interfaces between GridSweeper and models, converting parameter settings to the format used by the model and running the model executable. See <link linkend="adapters">“Adapters”</link> for more information.
+		</para>
+	</listitem>
+	</varlistentry>
+	
+</variablelist>
+
+</refsect1>
+
+
+<refsect1 id="parametersettings">
+
+<title>Parameter Settings</title>
+
+<para>
+	Parameters settings can be specified at the command line in several different ways. This section describes the syntax for specifying parameter values and sweeps. (See <link linkend="sweeptypes">“Sweep Types”</link> for more information about the structure of parameter sweeps in GridSweeper.)
+</para>
+
+<variablelist>
+
+	<varlistentry>
+	<term>
+		<replaceable>param</replaceable>=<replaceable>value</replaceable>
+	</term>
+	<listitem>
+		<para>
+			Sets the value of a single parameter <replaceable>param</replaceable> to <replaceable>value</replaceable>.
+		</para>
+	</listitem>
+	</varlistentry>
+
+	<varlistentry>
+	<term>
+		<replaceable>param</replaceable>=<replaceable>value1</replaceable>,<replaceable>value2</replaceable>,&hellip;
+	</term>
+	<listitem>
+		<para>
+			Sweeps parameter <replaceable>param</replaceable> through a sequence of values <replaceable>value1</replaceable>, <replaceable>value2</replaceable>, etc.
+		</para>
+	</listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	<term>
+		<replaceable>param</replaceable>=<replaceable>start</replaceable>:<replaceable>increment</replaceable>:<replaceable>end</replaceable>
+	</term>
+	<listitem>
+		<para>
+			Sweeps parameter <replaceable>param</replaceable> through a sequence of values defined by the range starting at <replaceable>start</replaceable>, <replaceable>start</replaceable>+<replaceable>increment</replaceable>, <replaceable>start</replaceable>+2*<replaceable>increment</replaceable>, and so on for all values less than or equal to end. All three values start, increment, and end must be real numbers.
+		</para>
+	</listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	<term>
+		<replaceable>p1</replaceable> <replaceable>p2</replaceable> &hellip; = <replaceable>p1v1</replaceable>,&hellip;,<replaceable>p1vn</replaceable> <replaceable>p2v1</replaceable>,&hellip;,<replaceable>p2vn</replaceable> &hellip;
+	</term>
+	<listitem>
+		<para>
+			Sweeps parameters <replaceable>p1</replaceable>, <replaceable>p2</replaceable>, etc. in parallel, combining <replaceable>p1</replaceable>=<replaceable>p1v1</replaceable> with <replaceable>p2</replaceable>=<replaceable>p2v1</replaceable>, <replaceable>p1</replaceable>=<replaceable>p1v2</replaceable> with <replaceable>p2</replaceable>=<replaceable>p2v2</replaceable>, and so on. Each value list must have the same number of items.
+		</para>
+	</listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	<term>
+		<replaceable>p1</replaceable> <replaceable>p2</replaceable> &hellip; = <replaceable>p1ValueList</replaceable> <replaceable>p2ValueList</replaceable> &hellip;
+	</term>
+	<listitem>
+		<para>
+			where each <replaceable>p&lt;i&gt;ValueList</replaceable> is a list of <varname>n</varname> comma-separated values, e.g., <replaceable>p1v1</replaceable>,&hellip;,<replaceable>p1vn</replaceable>. Sweeps parameters <replaceable>p1</replaceable>, <replaceable>p2</replaceable>, &hellip; in parallel. Each comma-separated list is a series of values to assign to a particular parameter. Values from the same location in different parameters’ lists are combined to generate cases.
+		</para>
+	</listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	<term>
+		<replaceable>p1</replaceable> <replaceable>p2</replaceable> &hellip; = <replaceable>v1ValueList</replaceable>, <replaceable>v2ValueList</replaceable>, &hellip;
+	</term>
+	<listitem>
+		<para>
+			where each <replaceable>v&lt;i&gt;valueList</replaceable> is a list of <varname>m</varname> space-separated values, e.g., <replaceable>p1v1</replaceable> <replaceable>p2v1</replaceable> &hellip; An alternate notation for parallel sweeps. In this notation, values for different parameters belonging to the same case are grouped together.
+		</para>
+	</listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	<term>
+		<replaceable>p1</replaceable> <replaceable>p2</replaceable> ... = <replaceable>s1</replaceable>:<replaceable>i1</replaceable>:<replaceable>e1</replaceable>, <replaceable>s2</replaceable>:<replaceable>i2</replaceable>:<replaceable>e2</replaceable>, ...
+	</term>
+	<listitem>
+		<para>
+			Sweeps parameters <replaceable>p1</replaceable>, <replaceable>p2</replaceable>, etc. in parallel, combining corresponding assignments within the ranges specified by starting values <replaceable>s1</replaceable>, etc., increments <replaceable>i1</replaceable>, etc., and ending values <replaceable>e1</replaceable>, etc. The value lists generated by these ranges must all have the same number of items.
+		</para>
+	</listitem>
+	</varlistentry>
+
+</variablelist>
+
+<para>
+	Because of the use of spaces as a delimiter, the last three types of sweeps must be surrounded by quotes when typing commands in a shell.
+</para>
+
+</refsect1>
+
+
+<refsect1 id="sweeptypes">
+
+<title>Sweep Types</title>
+
+<para>
+	Internally, the set of cases is represented by a single top-level “multiplicative combination sweep”, which contains a set of child sweeps of various types: single parameter-value assignments, list sweeps, range list sweeps, parallel combination sweeps, and multiplicative combination sweeps. Sweeps specified via command-line arguments provide access to the most commonly used subset of capabilities provided by these different kinds of sweeps, and the full power of combining sweeps in arbitrary, recursive ways can be accessed in XML experiment files.
+</para>
+
+<refsect2>
+	<title>List Sweeps</title>
+	<para>
+		List sweeps are used to enumerate a list of values assigned to a single parameter. Any string can be provided as a value, but, in order to support characters reserved by the syntax, strings are interpreted as being percent-escaped, as defined in IETF RFC 3986.
+	</para>
+</refsect2>
+
+<refsect2>
+	<title>Range List Sweeps</title>
+	<para>
+		Range list sweeps represent a shorthand for value lists. Values are enumerated from a starting value by adding a fixed increment until the calculated value is greater than a final value. Thus, the final value is included in the list if and only if it is greater than the starting value by exactly an integer multiple of the increment (say that three times fast). So, 0.1:0.1:0.5 will include the values 0.1, 0.2, 0.3, 0.4, and 0.5, but 0.1:0.1:0.49 will only include 0.1, 0.2, 0.3, and 0.4. Rounding errors are not a problem, because GridSweeper uses an arbitrary-precision decimal number representation to calculate these lists.
+	</para>
+</refsect2>
+
+<refsect2>
+	<title>Parallel Combination Sweeps</title>
+	<para>
+		Parallel combination sweeps can be used to combine other sweeps that generate exactly the same number of cases. A new set of cases is created by combining the parameter-value assignments from cases in different sweeps that have the same position in the enumerated list. For example, two value lists:
+		
+		<screen>r = 0.1, 0.2, 0.3</screen>
+		
+		and
+		
+		<screen>s = 1, 2, 3</screen>
+		
+		can be combined to create:
+		
+		<screen>r s = 0.1 1, 0.2 2, 0.3 3</screen>
+		
+		Note that the number of cases in the combined sweep is the same as the number of cases in each of the sweeps being combined.
+	</para>
+</refsect2>
+
+<refsect2>
+	<title>Multiplicative Combination Sweeps</title>
+	<para>
+		Multiplicative combination sweeps generate all the possible combinations generated by its sub-sweeps, in effect “multiplying” the sweeps together. For example, combining the same two value lists together would yield a new sweep with nine different parameter-value assignments:
+		
+		<screen>r s = 0.1 1, 0.1 2, 0.1 3, 0.2 1, 0.2 2, 0.2 3, 0.3 1, 0.3 2, 0.3 3</screen>
+		
+		Note that the number of cases in the combined sweep (9) is the product (3*3) of the number of cases in the sweeps being combined.
+	</para>
+</refsect2>
+
+</refsect1>
+
+
+<refsect1 id="expformat">
+
+<title>Experiment File Format</title>
+
+<para>
+	The experiment file format described here is used for both input and output files. Experiment files are written in XML with a simple set of elements. At the top level is the &lt;experiment&gt; element:
+</para>
+
+<programlisting>
+<![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<experiment name="My Experiment" numRuns="10"
+	firstSeedRow="0" seedCol="0">
+	<!-- ... -->
+</experiment>
+]]>
+</programlisting>
+
+<para>
+	All attributes of the &lt;experiment&gt; element are optional. The <varname>name</varname> attribute is used to name experiment directories in the filesystem and in naming strings submitted to the grid. The <varname>numRuns</varname> attribute specifies how many runs with different random seeds should be completed for each case.
+</para>
+
+<para>
+	The attributes <varname>firstSeedRow</varname> and <varname>seedCol</varname> identify the starting seed location in a virtual table of random seeds that is used to extract the sequence of random seeds that will be assigned to runs. See <link linkend="random">“Random Seed Generation”</link> for more information.
+</para>
+
+<para>
+	Elements that may appear within &lt;experiment&gt; are described below.
+</para>
+
+<refsect2>
+
+<title>&lt;setting&gt;</title>
+<para>
+	The &lt;experiment&gt; element will typically contain one or more &lt;setting&gt; elements, which look like this:
+
+	<screen>&lt;setting key="key" value="value"/&gt;</screen>
+	
+	See <link linkend="settings">“Settings”</link> for a list of supported settings.
+</para>
+
+</refsect2>
+
+<refsect2>
+
+<title>&lt;value&gt;</title>
+
+<para>
+	The &lt;value&gt; element is used to assign single values to parameters. It takes the form
+
+	<screen>&lt;value param="param" value="value"/&gt;</screen>
+	
+	Parameter values can be any string. In order to support special characters, values are interpreted as being percent-escaped, as described in IETF RFC 3986.
+</para>
+
+</refsect2>
+
+<refsect2>
+
+<title>&lt;list&gt;</title>
+<para>
+	The &lt;list&gt; element is used to define a list sweep for a particular parameter. It contains &lt;item&gt; elements to specify parameter values, as shown here:
+</para>
+		
+<programlisting>
+<![CDATA[
+<list param="param">
+	<item value="value1"/>
+	<item value="value2"/>
+	<!-- ... -->
+</list>
+]]>
+</programlisting>
+
+</refsect2>
+
+<refsect2>
+
+<title>&lt;range&gt;</title>
+
+<para>
+	The &lt;range&gt; element is used to define a range list sweep for a particular parameter. In addition to the parameter name, it supports and requires three attributes, for the start value, end value, and increment:
+	
+	<screen>&lt;range param="param" start="0.0" end="1.0" increment="0.1"/&gt;</screen>
+</para>
+
+</refsect2>
+
+<refsect2>
+
+<title>&lt;multiplicative&gt;</title>
+
+<para>
+	The &lt;multiplicatve&gt; tag is used to define a multiplicative combination sweep. This tag is strictly a container:
+</para>
+
+<programlisting>
+<![CDATA[
+<multiplicative>
+	<range param="param1"
+	 start="0.0" end="1.0" increment="0.1"/>
+	<range param="param2"
+	 start="0" end="100" increment="5"/>
+</multiplicative>
+]]>
+</programlisting>
+
+</refsect2>
+
+<refsect2>
+
+<title>&lt;parallel&gt;</title>
+
+<para>
+	The &lt;parallel&gt; tag is used to define a parallel combination sweep. This is also just a container, whose children must all generate the exact same number of cases, six each in this example:
+</para>
+
+<programlisting>
+<![CDATA[
+<parallel>
+	<range param="param1"
+	 start="0.0" end="1.0" increment="0.2"/>
+	<range param="param2"
+	 start="0" end="100" increment="20"/>
+	<list param="param3">
+		 <item value="25"/>
+		 <item value="399"/>
+		 <item value="4096"/>
+		 <item value="33333"/>
+		 <item value="1677216"/>
+		 <item value="10000000"/>
+	</list>
+</parallel>
+]]>
+</programlisting>
+
+</refsect2>
+
+</refsect1>
+
+
+<refsect1 id="caseformat">
+
+<title>Case File Format</title>
+
+<para>
+	Case files are also written out as XML. The format is very simple, consisting of a single &lt;case&gt; element that in turn contains  a  number  of &lt;value&gt; and &lt;run&gt; elements.
+</para>
+
+<para>
+	The &lt;case&gt; element includes a single attribute, <varname>name</varname>, which is intended for  human readability only and is constructed by GridSweeper from  the experiment name, the parameter settings, and the date. For example:
+</para>
+
+<programlisting>
+<![CDATA[
+<case name="echo - r=0.4-s=0.9 (2007-07-20, 16-29-39)">
+	<!-- ... -->
+</case>
+]]>
+</programlisting>
+
+<para>
+	The  &lt;value&gt;  elements are the same as in experiment XML files, and are the only type of parameter specification allowed  in  case  XML  files. They specify the parameter name with the param attribute, and the value with the value attribute, as in:
+	
+	<screen>&lt;value param="r" value="0.4"/&gt;</screen>
+</para>
+
+<para>
+	Each &lt;run&gt; element includes two attributes, number and rngSeed:
+	
+	<screen>&lt;run number="1" rngSeed="1986201165"/&gt;</screen>
+</para>
+
+<para>
+	Here is a complete example of a case file:
+</para>
+
+<programlisting>
+<![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<case name="echo - r=0.4-s=0.9 (2007-07-20, 16-29-39)">
+	<value param="r" value="0.4"/>
+	<value param="s" value="0.9"/>
+	<run number="0" rngSeed="526374054"/>
+	<run number="1" rngSeed="1986201165"/>
+	<run number="2" rngSeed="1585196345"/>
+	<run number="3" rngSeed="1619001183"/>
+	<run number="4" rngSeed="2137463870"/>
+	<run number="5" rngSeed="549727158"/>
+	<run number="6" rngSeed="1322681018"/>
+	<run number="7" rngSeed="296371489"/>
+	<run number="8" rngSeed="1066118686"/>
+	<run number="9" rngSeed="1141036221"/>
+</case>
+]]>
+</programlisting>
+
+</refsect1>
+
+
+<refsect1 id="settings">
+
+<title>Settings</title>
+
+<para>
+	Settings are used to control GridSweeper’s behavior, and that of adapters. Settings can be set at the command line (see <link linkend="options">“Options”</link>) or in experiment XML files (see <link linkend="expformat">“Experiment File Format”</link>). Setting names are case-insensitive but case-preserving, so the case formatting used at the command line or in input XML will also be used for output XML.
+</para>
+
+<para>
+	GridSweeper supports two built-in settings that are not handled by the adapter:
+</para>
+
+<variablelist>
+	<varlistentry>
+	<term><varname>ResultsDirectory</varname></term>
+	<listitem><para>
+		The user’s experiment results root directory, <filename>~/Results</filename> by default.
+	</para></listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	<term><varname>Adapter</varname></term>
+	<listitem><para>
+		The name of the adapter Java class used to run models on grid agents. Uses a built-in adapter for Drone-compliant models (<classname>edu.umich.lsa.cscs.gridsweeper.DroneAdapter</classname>) by default.
+	</para></listitem>
+	</varlistentry>
+</variablelist>
+
+<para>
+	The <varname>Model</varname> is used by the adapter to identify what model to run. For the built-in Drone adapter class, this setting identifies the location of the model executable file. It is expected that other adapter classes will also support the <varname>Model</varname> setting, but it is not strictly required.
+</para>
+
+<para>
+	Other settings supported by the built-in Drone adapter class are as follows:
+</para>
+
+<variablelist>
+	<varlistentry>
+	<term><varname>SetParamOption</varname></term>
+	<listitem><para>
+		The command-line option preceding parameter assignments <replaceable>param</replaceable>=<replaceable>value</replaceable> (default: -D).
+	</para></listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	<term><varname>RunNumOption</varname></term>
+	<listitem><para>
+		The command-line option preceding the run number (default: -N).
+	</para></listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	<term><varname>RunNumPrefix</varname></term>
+	<listitem><para>
+		A prefix to add before the run number.
+	</para></listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	<term><varname>RNGSeedOption</varname></term>
+	<listitem><para>
+		The command-line option preceding the random seed (default: -S).
+	</para></listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	<term><varname>UseInputFile</varname></term>
+	<listitem><para>
+		Whether or not to provide an input file. Interpreted as <varname>true</varname> if and only if the value is equal, ignoring case, to the string “true” (default: “true”, but ignored unless a file is provided).
+	</para></listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	<term><varname>InputFileOption</varname></term>
+	<listitem><para>
+		The command-line option preceding the input file.
+	</para></listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	<term><varname>InputFile</varname></term>
+	<listitem><para>
+		The input file.
+	</para></listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	<term><varname>MiscOptions</varname></term>
+	<listitem><para>
+		Additional command-line options to supply to the executable.
+	</para></listitem>
+	</varlistentry>
+</variablelist>
+
+<para>
+	
+</para>
+
+</refsect1>
+
+
+<refsect1 id="adapters">
+
+<title>Adapters</title>
+
+<para>
+	In GridSweeper, a software object called an <emphasis>adapter</emphasis> translates the parameter sweeps set up by the user into a format the desired model can understand, and actually runs the model itself. The default adapter for GridSweeper is designed for models that work with Drone, a parameter sweep system developed by Ted Belding.
+</para>
+
+<para>
+	The Drone adapter converts GridSweeper’s internal data structure for parameter settings into command-line arguments for Drone-compliant model executables. For example, run 7 of 100 of a particular experiment case might have parameter <varname>beta</varname> set to 0.4, and <varname>gamma</varname> set to 0.01, and a random seed of 1141036221. When the assigned host begins performing this run, the GridSweeper tool <command>gsrunner</command> creates a Drone adapter and passes it these settings. The Drone adapter, in turn, will run the model with (assuming default settings) the following command:
+	
+	<screen>/path/to/model -S1141036221 -Dbeta=0.4 -Dgamma=0.01 -N007</screen>
+</para>
+
+<para>
+	If you have a model you want to use with GridSweeper, one option is to make sure that it can be run using the Drone adapter, either by modifying how it handles parameters or by writing a shell script to act as an adapter. However, especially if you have many models that follow the same architecture, it will probably be easier and more reliable to create a new GridSweeper adapter to run these models within GridSweeper.
+</para>
+
+<para>
+	For information about building custom adapters, see the GridSweeper Javadoc API documentation.
+</para>
+
+</refsect1>
+
+
+<refsect1 id="random">
+
+<title>Random Seed Generation</title>
+
+<para>
+	Random seeds are generated using the <classname>RandomSeedGenerator</classname> class from the CERN Colt scientific computing library, whose sole purpose is to decorrelate seeds from any uniform random number generator. Seeds are selected deterministically, in sequence from one of two columns, 0 or 1, in a virtual seed table. The range of rows is 0 to 2^32 - 1. If <varname>firstSeedRow</varname> or <varname>seedCol</varname> are missing, they are chosen at random. Unless you are trying to reproduce a prior experiment, there is no reason to specify these attributes, but they will appear in the experiment file generated in the experiment results directory. You can read more in the <ulink url="http://dsd.lbl.gov/~hoschek/colt/api/index.html">Colt API documentation</ulink>.
+</para>
+
+</refsect1>
+
 </refentry>
