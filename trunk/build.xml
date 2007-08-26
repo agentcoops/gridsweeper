@@ -5,6 +5,7 @@
 	
 	<property name="src" location="src"/>
 	<property name="build" location="build"/>
+	<property name="doc" location="doc"/>
 	<property name="dist" location="dist"/>
 	
 	<property name="classes" location="${dist}/classes"/>
@@ -12,13 +13,20 @@
 	<property name="distbin" location="${dist}/bin"/>
 	<property name="distman" location="${dist}/man/man1"/>
 	
-	<target name="dist" depends="jar">
+	<target name="dist" depends="jar,doc">
 		<copy todir="${distbin}">
-		    <fileset dir="bin"/>
-		  </copy>
-		<chmod dir="${dist}/bin" perm="755"/>
+			<fileset dir="bin"/>
+		</copy>
 		
-		<copy file="doc/gsweep.1" tofile="${distman}/gsweep.1" />
+		<chmod perm="755">
+			<fileset dir="${distbin}"/>
+		</chmod>
+		
+		<copy todir="${distman}">
+			<fileset dir="${build}/doc/man/man1"/>
+		</copy>
+		
+		<mkdir dir="${dist}/plugins"/>
 	</target>
 	
 	<target name="jar" depends="compile" description="Build jar">
@@ -45,6 +53,30 @@
 			debug="${compile.debug}"
 			excludes="**/*Test*.java **/example/*"
 		/>
+	</target>
+	
+	<target name="doc" description="Generate documentation" depends="man">
+	</target>
+	
+	<target name="man" depends="checkman" unless="manBuild.notRequired">
+		<mkdir dir="${build}/doc/man/man1"/>
+		
+		<exec dir="${doc}" executable="xsltproc">
+			<arg line="-o ../build/doc/man/man1/"/>
+			<arg value="docbook-xsl/manpages/docbook.xsl"/>
+			<arg value="manpage.xml"/>
+		</exec>
+	</target>
+	
+	<target name="checkman">
+		<condition property="manBuild.notRequired">
+			<and>
+				<uptodate targetfile="${build}/doc/man/man1/gsweep.1"
+					srcfile="${doc}/manpage.xml" />
+				<uptodate targetfile="${build}/doc/man/man1/gsdrone.1"
+					srcfile="${doc}/manpage.xml" />
+			</and>
+		</condition>
 	</target>
 	
 	<target name="clean" description="Remove build and dist dirs">
