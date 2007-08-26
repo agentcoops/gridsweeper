@@ -30,6 +30,7 @@
 		</copy>
 		
 		<mkdir dir="${dist}/plugins"/>
+		<mkdir dir="${dist}/lib"/>
 	</target>
 	
 	<target name="jar" depends="compile" description="Build jar">

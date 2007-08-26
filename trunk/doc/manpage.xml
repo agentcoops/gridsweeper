@@ -12,6 +12,11 @@
 <manvolnum>1</manvolnum>
 </refmeta>
 
+<refentryinfo>
+	<author>Ed Baskerville</author>
+	<pubdate>27 August 2007</pubdate>
+</refentryinfo>
+
 <refnamediv>
 <refname>gsweep</refname>
 <refname>gsdrone</refname>

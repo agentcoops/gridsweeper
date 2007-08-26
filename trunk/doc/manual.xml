@@ -8,14 +8,70 @@
   <title>GridSweeper User’s Manual</title>
   <author><firstname>Ed</firstname><surname>Baskerville</surname></author>
   <copyright><year>2007</year><holder>Ed Baskerville</holder></copyright>
+  <pubdate>27 August 2007</pubdate>
 </bookinfo>
 
-<preface>
-	<title>Foreword</title>
-	This document describes how to use GridSweeper blah blah blah
+<preface id="about">
+	<title>About This Manual</title>
+	<para>
+		If you spend a lot of time running batches of scientific models on your computer, you probably want them to take less time. If you have lots of computers at your disposal, you’ve probably already found one simple answer: perform runs on multiple machines in parallel. If you’re handy with such things, you may have gone a step further and used a grid system (e.g., the Sun Grid Engine) to ship runs to different computers. GridSweeper is a program designed to take care of the last step, submitting jobs to a grid, in a way that saves you time and doesn’t require elaborate setup on your part. The aim of this manual is the same as that of GridSweeper itself: to save you time. It is not an exhaustive reference manual for the GridSweeper system. Rather, it guides you, step by step, through some typical things you are likely to do with GridSweeper.
+	</para>
+	
+	<para>
+		In <xref linkend="using"/>, I will briefly explain how GridSweeper works, and then take you through some examples of using the software. If you are in charge of setting up GridSweeper for a system, <xref linkend="setup"/> tells you how. Finally, if you are interested in extending GridSweeper for different kinds of computer models, check out <xref linkend="adapters"/>
+	</para>
+	
+	<para>
+		The GridSweeper distribution comes with some other documents that you may find useful. The reference manual for the <command>gsweep</command> tool, also available as a Unix manpage, contains information about all the command-line options. For programmers, the GridSweeper API documentation contains information about extending GridSweeper with adapter plug-ins.
+	</para>
 </preface>
 
-<chapter>
+<chapter id="using">
+	<title>Using GridSweeper</title>
+	<para>
+		This chapter contains information about using GridSweeper. In <xref linkend="howitworks"/>, I give an overview of how GridSweeper is put together. <xref linkend="simpleexample"/> guides you through an everyday example of using GridSweeper. Next, in <xref linkend="sweepsindepth"/>, I go into more detail about using parameter sweeps. Finally, <xref linkend="tipsandtricks"/> covers some finer points of GridSweeper use.
+	</para>
+	
+	<sect1 id="howitworks">
+		<title>The Way Things Work</title>
+		<para>
+			In a lab setting, work is organized around the <emphasis>experiment</emphasis>, a well-defined set things to be done. For example, you might set up 100 petri dishes, each containing the same amount of agar solution and bacteria. Let’s also say that the first ten dishes contain some hydrochloric acid at some concentration; the next ten dishes contain twice the concentration; the next ten three times the concentration; and so on. You then take photographs of the colonies periodically for ten days. At the end, you compare the photos, draw some growth curves, and come to some conclusion about the effect of hydrochloric acid on the bacteria.
+		</para>
+		
+		<para>
+			GridSweeper makes it easy to set up your computational experiments in an analgous way. Instead of petri dishes, you have 100 runs of your model program. Varying amounts of hydrochloric acid are replaced by a sweep over a model parameter. And the remaining, uncontrollable variation in the initial conditions is replaced by different seed values in the program’s random number generator.
+		</para>
+		
+		<para>
+			In basic usage, you set up a GridSweeper experiment by writing an <emphasis>experiment file</emphasis>. Experiment files are written in a straightforward XML-based text format designed to be hard to mess up. In this file you name the experiment, identify the model you want to run, and list parameter settings and sweeps.
+		</para>
+		
+		<para>
+			Once the experiment file is ready, you run it using the GridSweeper command-line tool (<command>gsweep</command> or <command>gsdrone</command>). The tool then enumerates all the different sets of parameter assignments, called <emphasis>cases</emphasis>, and submits a pile of jobs to the grid to be run. Once the run
+		</para>
+		
+		<para>
+			The grid handles all the details of deciding when and where to perform each run. When a run begins, however, another piece of GridSweeper software, called the <emphasis>adapter</emphasis>, takes over. The adapter takes the parameter settings constructed by GridSweeper and runs your model, providing parameter settings in the proper format. GridSweeper has a built-in adapter for models built for the <ulink url="http://www.cscs.umich.edu/Software/Drone/">Drone</ulink> batch system, and adapters can be written in Java for other systems (see <xref linkend="adapters"/>).
+		</para>
+	</sect1>
+	
+	<sect1 id="simpleexample">
+		<title>A Simple Example</title>
+		<para> ... </para>
+	</sect1>
+	
+	<sect1 id="sweepsindepth">
+		<title>Sweeps In Depth</title>
+		<para> ... </para>
+	</sect1>
+	
+	<sect1 id="tipsandtricks">
+		<title>Tips &amp; Tricks</title>
+		<para> ... </para>
+	</sect1>
+</chapter>
+
+<chapter id="setup">
 	<title>Setting Up GridSweeper</title>
 	<para>
 		This is how to install GridSweeper.
@@ -41,4 +97,27 @@
 		<para> ... </para>
 	</sect1>
 </chapter>
+
+<chapter id="adapters">
+	<title>Using Adapter Plug-ins</title>
+	<para>
+		intro about adapters
+	</para>
+	
+	<sect1>
+		<title>Installing Adapter Plug-ins</title>
+		<para> ... </para>
+	</sect1>
+	
+	<sect1>
+		<title>Using Adapter Plug-ins</title>
+		<para> ... </para>
+	</sect1>
+	
+	<sect1>
+		<title>Writing Adapter Plug-ins</title>
+		<para> ... </para>
+	</sect1>
+</chapter>
+
 </book>
