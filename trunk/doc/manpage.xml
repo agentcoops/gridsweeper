@@ -687,11 +687,15 @@
 <title>Adapters</title>
 
 <para>
-	In GridSweeper, a software object called an <emphasis>adapter</emphasis> translates the parameter sweeps set up by the user into a format the desired model can understand, and actually runs the model itself. The default adapter for GridSweeper is designed for models that work with Drone, a parameter sweep system developed by Ted Belding.
+	In GridSweeper, a software object called an <emphasis>adapter</emphasis> translates the parameter sweeps set up by the user into a format the desired model can understand, and actually runs the model itself.
 </para>
 
 <para>
-	The Drone adapter converts GridSweeper’s internal data structure for parameter settings into command-line arguments for Drone-compliant model executables. For example, run 7 of 100 of a particular experiment case might have parameter <varname>beta</varname> set to 0.4, and <varname>gamma</varname> set to 0.01, and a random seed of 1141036221. When the assigned host begins performing this run, the GridSweeper tool <command>gsrunner</command> creates a Drone adapter and passes it these settings. The Drone adapter, in turn, will run the model with (assuming default settings) the following command:
+	Additional adapters can be installed in the <filename>plugins</filename> directory inside the GridSweeper installation directory, either in JAR files or as raw Java classes in a package directory hierarchy rooted in <filename>plugins</filename>.
+</para>
+
+<para>
+	The default adapter for GridSweeper is designed for models that work with Drone, a parameter sweep system developed by Ted Belding. The Drone adapter converts GridSweeper’s internal data structure for parameter settings into command-line arguments for Drone-compliant model executables. For example, run 7 of 100 of a particular experiment case might have parameter <varname>beta</varname> set to 0.4, and <varname>gamma</varname> set to 0.01, and a random seed of 1141036221. When the assigned host begins performing this run, the GridSweeper tool <command>gsrunner</command> creates a Drone adapter and passes it these settings. The Drone adapter, in turn, will run the model with (assuming default settings) the following command:
 	
 	<screen>/path/to/model -S1141036221 -Dbeta=0.4 -Dgamma=0.01 -N007</screen>
 </para>
