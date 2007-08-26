@@ -11,6 +11,7 @@
 	<property name="classes" location="${dist}/classes"/>
 	<property name="jarfile" location="${classes}/GridSweeper.jar"/>
 	<property name="distbin" location="${dist}/bin"/>
+	<property name="distdoc" location="${dist}/doc"/>
 	<property name="distman" location="${dist}/man/man1"/>
 	
 	<target name="dist" depends="jar,doc">
@@ -21,6 +22,8 @@
 		<chmod perm="755">
 			<fileset dir="${distbin}"/>
 		</chmod>
+		
+		<copy todir="${distdoc}" file="${build}/doc/gridsweeper-manual.html"/>
 		
 		<copy todir="${distman}">
 			<fileset dir="${build}/doc/man/man1"/>
@@ -55,10 +58,10 @@
 		/>
 	</target>
 	
-	<target name="doc" description="Generate documentation" depends="man">
+	<target name="doc" description="Generate documentation" depends="manpage, manual">
 	</target>
 	
-	<target name="man" depends="checkman" unless="manBuild.notRequired">
+	<target name="manpage" depends="checkmanpage" if="shouldBuildManpage">
 		<mkdir dir="${build}/doc/man/man1"/>
 		
 		<exec dir="${doc}" executable="xsltproc">
@@ -68,14 +71,35 @@
 		</exec>
 	</target>
 	
-	<target name="checkman">
-		<condition property="manBuild.notRequired">
-			<and>
-				<uptodate targetfile="${build}/doc/man/man1/gsweep.1"
-					srcfile="${doc}/manpage.xml" />
-				<uptodate targetfile="${build}/doc/man/man1/gsdrone.1"
-					srcfile="${doc}/manpage.xml" />
-			</and>
+	<target name="checkmanpage">
+		<condition property="shouldBuildManpage">
+			<not>
+				<and>
+					<uptodate targetfile="${build}/doc/man/man1/gsweep.1"
+						srcfile="${doc}/manpage.xml" />
+					<uptodate targetfile="${build}/doc/man/man1/gsdrone.1"
+						srcfile="${doc}/manpage.xml" />
+				</and>
+			</not>
+		</condition>
+	</target>
+	
+	<target name="manual" depends="checkmanual" if="shouldBuildManual">
+		<mkdir dir="${build}/doc"/>
+		
+		<exec dir="${doc}" executable="xsltproc">
+			<arg line="-o ../build/doc/gridsweeper-manual.html"/>
+			<arg value="docbook-xsl/html/docbook.xsl"/>
+			<arg value="manual.xml"/>
+		</exec>
+	</target>
+	
+	<target name="checkmanual">
+		<condition property="shouldBuildManual">
+			<not>
+				<uptodate targetfile="${build}/doc/gridsweeper-manual.html"
+					srcfile="${doc}/manual.xml" />
+			</not>
 		</condition>
 	</target>
 	
