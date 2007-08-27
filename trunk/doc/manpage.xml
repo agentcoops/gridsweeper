@@ -65,6 +65,14 @@
 		<replaceable>adapter-class</replaceable>
 	</arg>
 	
+	<arg rep="repeat">-s
+		<replaceable>key</replaceable>=<replaceable>value</replaceable>
+	</arg>
+	
+	<arg rep="repeat">-A
+		<replaceable>name</replaceable>=<replaceable>abbrev</replaceable>
+	</arg>
+	
 	<arg rep="repeat">
 		<replaceable>parameter-setting</replaceable>
 	</arg>
@@ -222,10 +230,37 @@
 	</varlistentry>
 	
 	<varlistentry>
+	<term>-r, --results-dir <replaceable>results-dir</replaceable></term>
+	<listitem>
+		<para>
+			Root directory for experiment results. Overrides the <varname>ResultsDirectory</varname> setting in an experiment XML file.
+		</para>
+	</listitem>
+	</varlistentry>
+	
+	<varlistentry>
 	<term>-a, --adapter <replaceable>adapter-class</replaceable></term>
 	<listitem>
 		<para>
 			Name of the adapter class. Adapters act as interfaces between GridSweeper and models, converting parameter settings to the format used by the model and running the model executable. See <link linkend="adapters">“Adapters”</link> for more information.
+		</para>
+	</listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	<term>-s, --setting <replaceable>key</replaceable>=<replaceable>value</replaceable></term>
+	<listitem>
+		<para>
+			Sets setting <replaceable>key</replaceable> to <replaceable>value</replaceable>.
+		</para>
+	</listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	<term>-A, --abbrev <replaceable>name</replaceable>=<replaceable>abbrev</replaceable></term>
+	<listitem>
+		<para>
+			Sets the abbreviation <replaceable>abbrev</replaceable> for the parameter named <replaceable>name</replaceable>.
 		</para>
 	</listitem>
 	</varlistentry>
@@ -595,7 +630,7 @@
 </para>
 
 <para>
-	GridSweeper supports two built-in settings that are not handled by the adapter:
+	GridSweeper supports three built-in settings that are not handled by the adapter:
 </para>
 
 <variablelist>
@@ -603,6 +638,13 @@
 	<term><varname>ResultsDirectory</varname></term>
 	<listitem><para>
 		The user’s experiment results root directory, <filename>~/Results</filename> by default.
+	</para></listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	<term><varname>EmailAddress</varname></term>
+	<listitem><para>
+		The notification email address, set to the user’s local Unix account by default.
 	</para></listitem>
 	</varlistentry>
 	
