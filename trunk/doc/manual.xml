@@ -26,49 +26,265 @@
 	</para>
 </preface>
 
+
 <chapter id="using">
-	<title>Using GridSweeper</title>
-	<para>
-		This chapter contains information about using GridSweeper. In <xref linkend="howitworks"/>, I give an overview of how GridSweeper is put together. <xref linkend="simpleexample"/> guides you through an everyday example of using GridSweeper. Next, in <xref linkend="sweepsindepth"/>, I go into more detail about using parameter sweeps. Finally, <xref linkend="tipsandtricks"/> covers some finer points of GridSweeper use.
-	</para>
+
+<title>Using GridSweeper</title>
+
+<para>
+	This chapter contains information about using GridSweeper. In <xref linkend="howitworks"/>, I give an overview of how GridSweeper is put together. <xref linkend="simpleexample"/> guides you through an everyday example of using GridSweeper. Next, in <xref linkend="sweepsindepth"/>, I go into more detail about using parameter sweeps. Finally, <xref linkend="tipsandtricks"/> covers some finer points of GridSweeper usage.
+</para>
+
+<sect1 id="howitworks">
+<title>The Way Things Work</title>
+
+<para>
+	In a lab setting, work is organized around the <emphasis>experiment</emphasis>, a well-defined set things to be done. For example, you might set up 100 petri dishes, each containing the same amount of agar solution and bacteria. Let’s also say that the first ten dishes contain some hydrochloric acid at some concentration; the next ten dishes contain twice the concentration; the next ten three times the concentration; and so on. You then take photographs of the colonies periodically for ten days. At the end, you compare the photos, draw some growth curves, and come to some conclusion about the effect of hydrochloric acid on the bacteria.
+</para>
+
+<para>
+	GridSweeper makes it easy to set up your computational experiments in an analgous way. Instead of petri dishes, you have 100 runs of your model program. Varying amounts of hydrochloric acid are replaced by a sweep over a model parameter. And the remaining, uncontrollable variation in the initial conditions is replaced by different seed values in the program’s random number generator.
+</para>
+
+<para>
+	In basic usage, you set up a GridSweeper experiment by writing an <emphasis>experiment file</emphasis>. Experiment files are written in a straightforward XML-based text format designed to be hard to mess up. In this file you name the experiment, identify the model you want to run, and list parameter settings and sweeps.
+</para>
+
+<para>
+	Once the experiment file is ready, you run it using the GridSweeper command-line tool (<command>gsweep</command> or <command>gsdrone</command>). The tool then enumerates all the different sets of parameter assignments, called <emphasis>cases</emphasis>, and submits a pile of jobs to the grid to be run. Once the run
+</para>
+
+<para>
+	The grid handles all the details of deciding when and where to perform each run. When a run begins, however, another piece of GridSweeper software, called the <emphasis>adapter</emphasis>, takes over. The adapter takes the parameter settings constructed by GridSweeper and runs your model, providing parameter settings in the proper format. GridSweeper has a built-in adapter for models built for the <ulink url="http://www.cscs.umich.edu/Software/Drone/">Drone</ulink> batch system, and adapters can be written in Java for other systems (see <xref linkend="adapters"/>).
+</para>
+
+</sect1>
+
+<sect1 id="simpleexample">
+<title>A Simple Example</title>
+
+<para>
+	To see how to run an experiment with GridSweeper, I’ll walk you through a typical example. Say you have a model that takes four parameters, <varname>alpha</varname>, <varname>beta</varname>, <varname>gamma</varname>, and <varname>nu</varname>. For this experiment, you want to vary <varname>gamma</varname> from 0.1 to 0.5 in increments of 0.1, and to set <varname>nu</varname> to 0.05, 0.06, and 0.09. That is, you want to test all fifteen combinations of different values for <varname>gamma</varname> and <varname>nu</varname> while holding <varname>alpha</varname> and <varname>beta</varname> constant.
+</para>
+
+<example id="simpleexamplecode">
+<title>A Simple GridSweeper Experiment File</title>
+
+<programlisting>
+<![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<experiment name="Simple Example" numRuns="2">
+    <setting key="Model" value="/bin/echo"/>
+    
+    <setting key="ResultsDirectory" value="~/data"/>
+    <setting key="EmailAddress" value="ed@example.com"/>
+    
+    <abbrev param="alpha" abbrev="a"/>
+    <abbrev param="beta" abbrev="b"/>
+    <abbrev param="gamma" abbrev="g"/>
+    <abbrev param="nu" abbrev="n"/>
+    
+    <value param="alpha" value="0.5"/>
+    <value param="beta" value="0.3"/>
+    <value param="gamma" value="0.1"/>
+    <value param="nu" value="0.04"/>
+    
+    <range param="gamma"
+           start="0.1" end="0.5" increment="0.1"/>
+    
+    <list param="nu">
+        <item value="0.05"/>
+        <item value="0.06"/>
+        <item value="0.09"/>
+    </list>
+</experiment>
+]]>
+</programlisting>
+
+</example>
+
+<para>
+	At the risk of sacrificing suspense, the XML file for this experiment will look a lot like <xref linkend="simpleexamplecode"/>, which you can find in the GridSweeper installation directory, in <filename>doc/examples/simple_example.gsexp</filename>. Let’s go through it piece by piece:
+</para>
+
+<orderedlist>
+	<listitem><para>
+		The first line, <code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;</code>, indicates that this is, indeed, an XML file. All experiment files should have this at the top. Although you’re unlikely to run into encoding problems with GridSweeper experiment files, it’s a good idea to get in the habit of saving in UTF-8 encoding—check your text editor’s settings.
+	</para></listitem>
 	
-	<sect1 id="howitworks">
-		<title>The Way Things Work</title>
-		<para>
-			In a lab setting, work is organized around the <emphasis>experiment</emphasis>, a well-defined set things to be done. For example, you might set up 100 petri dishes, each containing the same amount of agar solution and bacteria. Let’s also say that the first ten dishes contain some hydrochloric acid at some concentration; the next ten dishes contain twice the concentration; the next ten three times the concentration; and so on. You then take photographs of the colonies periodically for ten days. At the end, you compare the photos, draw some growth curves, and come to some conclusion about the effect of hydrochloric acid on the bacteria.
-		</para>
-		
-		<para>
-			GridSweeper makes it easy to set up your computational experiments in an analgous way. Instead of petri dishes, you have 100 runs of your model program. Varying amounts of hydrochloric acid are replaced by a sweep over a model parameter. And the remaining, uncontrollable variation in the initial conditions is replaced by different seed values in the program’s random number generator.
-		</para>
-		
-		<para>
-			In basic usage, you set up a GridSweeper experiment by writing an <emphasis>experiment file</emphasis>. Experiment files are written in a straightforward XML-based text format designed to be hard to mess up. In this file you name the experiment, identify the model you want to run, and list parameter settings and sweeps.
-		</para>
-		
-		<para>
-			Once the experiment file is ready, you run it using the GridSweeper command-line tool (<command>gsweep</command> or <command>gsdrone</command>). The tool then enumerates all the different sets of parameter assignments, called <emphasis>cases</emphasis>, and submits a pile of jobs to the grid to be run. Once the run
-		</para>
-		
-		<para>
-			The grid handles all the details of deciding when and where to perform each run. When a run begins, however, another piece of GridSweeper software, called the <emphasis>adapter</emphasis>, takes over. The adapter takes the parameter settings constructed by GridSweeper and runs your model, providing parameter settings in the proper format. GridSweeper has a built-in adapter for models built for the <ulink url="http://www.cscs.umich.edu/Software/Drone/">Drone</ulink> batch system, and adapters can be written in Java for other systems (see <xref linkend="adapters"/>).
-		</para>
-	</sect1>
+	<listitem><para>
+		The second and last lines mark the beginning and end of the <code>&lt;experiment&gt;</code> element, which contains everything else. The attribute <code>name="Simple Example"</code> will be used to name the output directory on disk, and <code>numRuns="2"</code> indicates that the model should be run twice with different random number generator seeds for each experiment case. Between these tags are a number of child elements.
+	</para></listitem>
 	
-	<sect1 id="simpleexample">
-		<title>A Simple Example</title>
-		<para> ... </para>
-	</sect1>
+	<listitem><para>
+		The first <code>&lt;setting&gt;</code> element sets the location of the model executable. Here I am using <filename>/bin/echo</filename>, rather than a real model, to test things out. (Note that there is no separate ending tag for this element: instead, putting a slash before the final <code>&gt;</code> indicates that the element ends immediately.)
+	</para></listitem>
 	
-	<sect1 id="sweepsindepth">
-		<title>Sweeps In Depth</title>
-		<para> ... </para>
-	</sect1>
+	<listitem><para>
+		The next <code>&lt;setting&gt;</code> element sets the location where results from the experiment will be written out. If left unspecified, GridSweeper will use <filename>~/Results/</filename>.
+	</para></listitem>
 	
-	<sect1 id="tipsandtricks">
-		<title>Tips &amp; Tricks</title>
-		<para> ... </para>
-	</sect1>
+	<listitem><para>
+		The next element sets a notification email address. When the experiment is complete, GridSweeper will let you know by sending a message to this address. If none is specified, GridSweeper will send mail to your Unix user account. Before trying out this experiment file, change this to your email address!
+	</para></listitem>
+	
+	<listitem><para>
+		The <code>&lt;abbrev&gt;</code> elements specify short names for the parameters you are using. These short names are used to name output directories for different experiment cases. If left out, the full names will be used.
+	</para></listitem>
+	
+	<listitem><para>
+		Next, four <code>&lt;value&gt;</code> elements set the base values for the four parameters. If a parameter is used in a sweep, the values generated by the sweep will override these base values.
+	</para></listitem>
+	
+	<listitem><para>
+		The <code>&lt;range&gt;</code> element is an example of one kind of parameter sweep, a range list sweep. This sweep specifies that the parameter <varname>gamma</varname> will be assigned values from 0.1 to 0.5 in increments of 0.1: 0.1, 0.2, 0.3, 0.4, and 0.5.
+	</para></listitem>
+	
+	<listitem><para>
+		The <code>&lt;list&gt;</code> element is a simple list sweep for the parameter <varname>nu</varname>. Within it are three <code>&lt;item&gt;</code> elements, specifying that <varname>nu</varname> will be set to the values 0.05, 0.06, and 0.09.
+	</para></listitem>
+	
+</orderedlist>
+
+<para>
+	Before running this experiment, copy the file to somewhere in your home directory, say <filename>~/simple_example.gsexp</filename>. Modify the file to use your email address and the location you want experiment results to go.
+</para>
+
+<para>
+	To run the experiment, type this command at the command line:
+	
+	<screen>$ gsdrone ~/simple_example.gsexp</screen>
+</para>
+
+<para>
+	This will generate a bunch of output, which should look something like this:
+</para>
+
+<screen>
+Running experiment "Simple Example"...
+Created experiment directory "/users/ed/data/Simple Example/2007-08-27/02-45-46".
+Establishing grid session
+Submitting cases:
+g=0.1-n=0.05
+  Submitted run 0 (DRMAA job ID 27934)
+  Submitted run 1 (DRMAA job ID 27935)
+g=0.1-n=0.06
+  Submitted run 0 (DRMAA job ID 27936)
+  Submitted run 1 (DRMAA job ID 27937)
+
+...
+
+g=0.5-n=0.06
+  Submitted run 0 (DRMAA job ID 27960)
+  Submitted run 1 (DRMAA job ID 27961)
+g=0.5-n=0.09
+  Submitted run 0 (DRMAA job ID 27962)
+  Submitted run 1 (DRMAA job ID 27963)
+All cases submitted.
+Experiment submitted.
+Detaching from console (monitoring process id: 15701)...
+Status output will be written to:
+  /users/ebaskerv/data/Simple Example/2007-08-27/02-45-46/status.log
+and an email will be sent to ed@example.com upon experiment completion.
+You may now close this console or log out without disturbing the experiment.
+</screen>
+	
+<note><para>
+	GridSweeper runs in the background, and one side-effect of this is that you won’t see a new prompt after submission is completed. (The new prompt showed up <emphasis>before</emphasis> all this output.) You can still type commands at this empty line, but if it bothers you, you can press Return or Enter to get a new one.
+</para></note>
+
+<para>
+	After this output is complete, GridSweeper continues to run on the current machine, receiving information about completed runs as they finish. While the experiment is still running, you can take a look at the output directory created for this experiment (e.g., <filename>~/data/Simple Example/2007-08-27/02-45-46</filename>):
+</para>
+
+<screen>
+$ cd ~/data/Simple Example/2007-08-27/02-45-46
+$ ls
+experiment.gsexp  g=0.2-n=0.05  g=0.3-n=0.06  g=0.4-n=0.09  status.log
+g=0.1-n=0.05      g=0.2-n=0.06  g=0.3-n=0.09  g=0.5-n=0.05
+g=0.1-n=0.06      g=0.2-n=0.09  g=0.4-n=0.05  g=0.5-n=0.06
+g=0.1-n=0.09      g=0.3-n=0.05  g=0.4-n=0.06  g=0.5-n=0.09
+</screen>
+
+<para>
+	The file <filename>experiment.gsexp</filename> is almost the same as the input experiment file, but adds some information needed to reproduce the experiment exactly, with the same random number seeds assigned to each run. The file <filename>status.log</filename> is where GridSweeper sends output after the experiment has been submitted to the grid. You can monitor it to see how the experiment is progressing. Here is what it looks like once things are done:
+</para>
+
+<screen>
+$ tail status.log
+Completed run g=0.5-n=0.09, run 1 (DRMAA job ID 27963)
+27 of 30 complete (90.0%).
+Completed run g=0.5-n=0.05, run 0 (DRMAA job ID 27958)
+28 of 30 complete (93.3%).
+Completed run g=0.5-n=0.06, run 1 (DRMAA job ID 27961)
+29 of 30 complete (96.7%).
+Completed run g=0.5-n=0.09, run 0 (DRMAA job ID 27962)
+30 of 30 complete (100.0%).
+All jobs completed.
+Sent notification email to ed@example.com.
+</screen>
+
+<para>
+	You should also receive a notification email:
+</para>
+
+<screen>
+To: ed@example.com
+Subject: Simple Example complete
+
+GridSweeper experiment run complete.
+
+   Experiment name: Simple Example
+ Results directory: /users/ed/Results/Simple Example/2007-08-27/02-45-46
+      Submitted at: Aug 27, 2007 2:45:46 AM
+      Elapsed time: 0h0m51s
+
+No errors occurred.
+</screen>
+
+<para>
+	The remaining entries—<filename>g=0.2-n=0.05</filename>, etc.—are case directories, one for each set of parameter assignments. Let’s look inside one:
+</para>
+
+<screen>
+$ cd g\=0.2-n\=0.05
+$ ls
+case.gscase  stdout.0  stdout.1
+</screen>
+
+<para>
+	The first file, <filename>case.gscase</filename>, contains all the parameter-value assignments for the case, and the random number geneator seeds for each run in the case. The two <filename>stdout</filename> files contain the standard output generated by the model. (If the model writes to standard error, <filename>stderr</filename> files will also be created.)
+</para>
+
+<para>
+	Since <filename>/bin/echo</filename> was specified in as the model executable, the <filename>stdout</filename> files just contain the command-line arguments passed to the “model”:
+</para>
+
+<screen>
+$ cat stdout.*
+-N0 -S1616746228 -Dalpha=0.5 -Dnu=0.05 -Dgamma=0.2 -Dbeta=0.3
+-N1 -S1776718494 -Dalpha=0.5 -Dnu=0.05 -Dgamma=0.2 -Dbeta=0.3
+</screen>
+
+<para>
+	The first argument specifies the run number, which the model program may want to use as a suffix for output files. The second argument provides a seed for the model program’s random number generator. The remaining arguments assign parameter values. The argument options <code>-N</code>, <code>-S</code>, and <code>-D</code> can be changed in the experiment file using the <varname>RunNumOption</varname>, <varname>RNGSeedOption</varname>, and <varname>SetParamOption</varname> settings, respectively.
+</para>
+
+<para>
+	That’s pretty much it for basic GridSweeper usage. To review: first, you create an experiment file. After that, you run it. Finally, you wait for it to finish, and GridSweeper lets you know when your data is ready.
+</para>
+
+</sect1>
+
+<sect1 id="sweepsindepth">
+	<title>Sweeps In Depth</title>
+	<para> ... </para>
+</sect1>
+
+<sect1 id="tipsandtricks">
+	<title>Tips &amp; Tricks</title>
+	<para> ... </para>
+</sect1>
 </chapter>
 
 <chapter id="setup">
@@ -101,7 +317,7 @@
 <chapter id="adapters">
 	<title>Using Adapter Plug-ins</title>
 	<para>
-		intro about adapters
+		...
 	</para>
 	
 	<sect1>

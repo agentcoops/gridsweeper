@@ -25,6 +25,10 @@
 		
 		<copy todir="${distdoc}" file="${build}/doc/gridsweeper-manual.html"/>
 		
+		<copy todir="${distdoc}/examples">
+			<fileset dir="${doc}/examples"/>
+		</copy>
+		
 		<copy todir="${distman}">
 			<fileset dir="${build}/doc/man/man1"/>
 		</copy>
