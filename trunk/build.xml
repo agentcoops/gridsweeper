@@ -29,6 +29,10 @@
 			<fileset dir="${doc}/examples"/>
 		</copy>
 		
+		<copy todir="${distdoc}/api">
+			<fileset dir="${build}/doc/api"/>
+		</copy>
+		
 		<copy todir="${distman}">
 			<fileset dir="${build}/doc/man/man1"/>
 		</copy>
@@ -63,7 +67,7 @@
 		/>
 	</target>
 	
-	<target name="doc" description="Generate documentation" depends="manpage, manual">
+	<target name="doc" description="Generate documentation" depends="manpage, manual, apidoc">
 	</target>
 	
 	<target name="manpage" depends="checkmanpage" if="shouldBuildManpage">
@@ -106,6 +110,25 @@
 					srcfile="${doc}/manual.xml" />
 			</not>
 		</condition>
+	</target>
+	
+	<target name="apidoc">
+		<javadoc
+			Public="true"
+			destdir="${build}/doc/api">
+			<fileset dir="${src}/edu/umich/lsa/cscs/gridsweeper">
+				<or>
+					<filename name="Adapter.java"/>
+					<filename name="AdapterException.java"/>
+					<filename name="ParameterMap.java"/>
+					<filename name="RunResults.java"/>
+					<filename name="Settings.java"/>
+					<filename name="StringList.java"/>
+					<filename name="StringMap.java"/>
+					<filename name="StringUtils.java"/>
+				</or>
+			</fileset>
+		</javadoc>
 	</target>
 	
 	<target name="clean" description="Remove build and dist dirs">

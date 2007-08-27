@@ -28,7 +28,7 @@ import java.util.List;
  * @author Ed Baskerville
  *
  */
-public abstract class SingleSweep implements Sweep
+abstract class SingleSweep implements Sweep
 {
 	/**
 	 * The parameter name used by this sweep.

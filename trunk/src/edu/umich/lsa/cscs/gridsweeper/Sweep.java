@@ -28,7 +28,7 @@ import java.util.*;
  * which generates parameter name/value maps from parameter sweep settings.
  * @author Ed Baskerville 
  */
-public interface Sweep
+interface Sweep
 {
 	/**
 	 * Generates an enumerated list of {@link ParameterMap} objects, each of which

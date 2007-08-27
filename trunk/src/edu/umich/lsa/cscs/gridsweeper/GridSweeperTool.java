@@ -132,7 +132,7 @@ public class GridSweeperTool
 	 * is not set, or if parsing, loading, setup, running, or monitoring jobs
 	 * generate any other uncaught exceptions.
 	 */
-	public void run(StringList args)
+	private void run(StringList args)
 	{
 		boolean debug = false;
 		for(String arg : args)

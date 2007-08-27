@@ -28,7 +28,7 @@ import java.util.*;
  * @author Ed Baskerville
  *
  */
-public abstract class CombinationSweep implements Sweep
+abstract class CombinationSweep implements Sweep
 {
 	/**
 	 * A list containing sub-sweeps to be combined.
