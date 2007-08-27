@@ -1,4 +1,7 @@
 #!/bin/sh
 
+ABSPATH=`python -c "import os; print os.path.abspath(\"$0\")"`
+BINPATH=`dirname $ABSPATH`
+GRIDSWEEPER_ROOT=`dirname $BINPATH`
 ADAPTER="edu.umich.lsa.cscs.gridsweeper.DroneAdapter"
 ${GRIDSWEEPER_ROOT}/bin/gsweep -a ${ADAPTER} "$@"
