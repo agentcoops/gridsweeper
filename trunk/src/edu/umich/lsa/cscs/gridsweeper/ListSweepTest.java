@@ -26,7 +26,7 @@ import org.junit.*;
 import static org.junit.Assert.*;
 import java.util.*;
 
-class ListSweepTest
+public class ListSweepTest
 {
 	private ListSweep sweep;
 	

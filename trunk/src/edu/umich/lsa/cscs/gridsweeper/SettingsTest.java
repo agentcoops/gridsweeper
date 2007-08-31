@@ -24,7 +24,7 @@ package edu.umich.lsa.cscs.gridsweeper;
 import org.junit.*;
 import static org.junit.Assert.*;
 
-class SettingsTest
+public class SettingsTest
 {
 	Settings settings;
 	

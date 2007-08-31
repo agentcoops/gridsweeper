@@ -26,7 +26,7 @@ import static org.junit.Assert.*;
 
 import java.io.UnsupportedEncodingException;
 
-class DroneAdapterTest
+public class DroneAdapterTest
 {
 	@Test
 	public void testRealRunWithDefaults() throws AdapterException, UnsupportedEncodingException

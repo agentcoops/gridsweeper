@@ -26,7 +26,7 @@ import static org.junit.Assert.*;
 
 import java.util.*;
 
-class ParallelCombinationSweepTest
+public class ParallelCombinationSweepTest
 {
 	private ParallelCombinationSweep sweep;
 	

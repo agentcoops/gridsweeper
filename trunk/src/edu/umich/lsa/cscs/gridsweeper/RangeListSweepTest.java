@@ -28,7 +28,7 @@ import static org.junit.Assert.*;
 import java.math.*;
 import java.util.*;
 
-class RangeListSweepTest
+public class RangeListSweepTest
 {
 	@Test
 	public void singleSweep()

@@ -90,23 +90,39 @@ class MultiplicativeCombinationSweep extends CombinationSweep
 					otherChildren.add(child);
 			}
 			
-			List<ParameterMap> maps = generateMaps(otherChildren);
-			assert(maps.size() > 0);
-			ParameterMap firstMap = maps.get(0);
-			
-			for(SingleValueSweep baseValue : baseChildren)
+			if(otherChildren.size() > 0)
 			{
-				String name = baseValue.getName();
-				if(!firstMap.containsKey(name))
+				List<ParameterMap> maps = generateMaps(otherChildren);
+				assert(maps.size() > 0);
+				ParameterMap firstMap = maps.get(0);
+				
+				for(SingleValueSweep baseValue : baseChildren)
 				{
-					for(ParameterMap map : maps)
+					String name = baseValue.getName();
+					if(!firstMap.containsKey(name))
 					{
-						map.put(name, baseValue.getValue());
+						for(ParameterMap map : maps)
+						{
+							map.put(name, baseValue.getValue());
+						}
 					}
 				}
+				
+				return maps;
 			}
-			
-			return maps;
+			else
+			{
+				ParameterMap map = new ParameterMap();
+				
+				for(SingleValueSweep baseValue : baseChildren)
+				{
+					map.put(baseValue.getName(), baseValue.getValue());
+				}
+				
+				List<ParameterMap> maps = new ArrayList<ParameterMap>();
+				maps.add(map);
+				return maps;
+			}
 		}
 		else return generateMaps(children);
 	}

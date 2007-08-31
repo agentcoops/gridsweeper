@@ -28,7 +28,7 @@ import static org.junit.Assert.*;
 
 import java.util.*;
 
-class MultiplicativeCombinationSweepTest
+public class MultiplicativeCombinationSweepTest
 {
 	MultiplicativeCombinationSweep sweep;
 	List<ParameterMap> maps;

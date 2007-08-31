@@ -112,16 +112,6 @@ class GridSweeper
 	
 	public GridSweeper() throws GridSweeperException
 	{
-		root = System.getenv("GRIDSWEEPER_ROOT");
-		if(root == null)
-			throw new GridSweeperException("GRIDSWEEPER_ROOT environment variable not set.");
-		
-		File rootFile = new File(root);
-		if(!rootFile.exists() || !rootFile.isDirectory())
-			throw new GridSweeperException("GRIDSWEEPER_ROOT environment variable invalid.");
-		
-		pid = getPid();
-		
 		cal = Calendar.getInstance();
 		
 		msgOut = System.err;
@@ -319,6 +309,16 @@ class GridSweeper
 	
 	public void submitCases() throws GridSweeperException
 	{
+		root = System.getenv("GRIDSWEEPER_ROOT");
+		if(root == null)
+			throw new GridSweeperException("GRIDSWEEPER_ROOT environment variable not set.");
+		
+		File rootFile = new File(root);
+		if(!rootFile.exists() || !rootFile.isDirectory())
+			throw new GridSweeperException("GRIDSWEEPER_ROOT environment variableinvalid.");
+		
+		pid = getPid();
+	
 		if(runType == RunType.NORUN) return;
 		
 		try

@@ -28,14 +28,14 @@ import org.junit.*;
 
 import static org.junit.Assert.*;
 
-class ExperimentTest
+public class ExperimentTest
 {
 	Experiment experiment;
 	
 	@Before
 	public void setUp() throws Exception
 	{
-		experiment = new Experiment(null);
+		experiment = new Experiment();
 		experiment.setNumRuns(10);
 		experiment.getRootSweep().add(new SingleValueSweep("param", "1"));
 	}

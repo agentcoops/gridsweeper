@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <experiment name="test_properties" numRuns="10">
-	
 	<setting key="anotherSetting" value="value" />
 
 </experiment>

@@ -26,7 +26,7 @@ import java.net.URL;
 import org.junit.*;
 import static org.junit.Assert.*;
 
-class ExperimentTestParse
+public class ExperimentTestParse
 {
 	URL fileURL;
 	Experiment experiment;
@@ -39,11 +39,11 @@ class ExperimentTestParse
 	}
 	
 	@Test
-	public void properties() throws GridSweeperException
+	public void settings() throws GridSweeperException
 	{
-		experiment = new Experiment(getURL("properties"));
+		experiment = new Experiment(getURL("settings"));
 		assertEquals(10, experiment.getNumRuns());
-		assertEquals("value", experiment.getSettings().get("anotherProperty"));
+		assertEquals("value", experiment.getSettings().get("anotherSetting"));
 	}
 	
 	@Test
@@ -56,6 +56,6 @@ class ExperimentTestParse
 	
 	private URL getURL(String testName)
 	{
-		return getClass().getResource("ExperimentTestParse_" + testName + ".gsweep");
+		return getClass().getResource("ExperimentTestParse_" + testName + ".gsexp");
 	}
 }

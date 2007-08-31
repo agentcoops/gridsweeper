@@ -27,14 +27,14 @@ import java.util.*;
 
 import static edu.umich.lsa.cscs.gridsweeper.DateUtils.*;
 
-class DateUtilsTest
+public class DateUtilsTest
 {
 	private Calendar cal;
 	
 	@Before
 	public void setUp()
 	{
-		cal = new GregorianCalendar(2006, 9, 17);
+		cal = new GregorianCalendar(2006, 8, 17);
 		cal.set(Calendar.HOUR_OF_DAY, 12);
 		cal.set(Calendar.MINUTE, 5);
 		cal.set(Calendar.SECOND, 25);

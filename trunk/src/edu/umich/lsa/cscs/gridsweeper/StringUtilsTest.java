@@ -25,7 +25,7 @@ import org.junit.*;
 import static org.junit.Assert.*;
 import static edu.umich.lsa.cscs.gridsweeper.StringUtils.*;
 
-class StringUtilsTest
+public class StringUtilsTest
 {
 	@Before
 	public void setUp()
