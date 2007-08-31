@@ -24,6 +24,7 @@
 		</chmod>
 		
 		<copy todir="${distdoc}" file="${build}/doc/gridsweeper-manual.html"/>
+		<copy todir="${distdoc}" file="${build}/doc/gridsweeper-manpage.html"/>
 		
 		<copy todir="${distdoc}/examples">
 			<fileset dir="${doc}/examples"/>
@@ -67,7 +68,7 @@
 		/>
 	</target>
 	
-	<target name="doc" description="Generate documentation" depends="manpage, manual, apidoc">
+	<target name="doc" description="Generate documentation" depends="manpage, manpagehtml, manual, apidoc">
 	</target>
 	
 	<target name="manpage" depends="checkmanpage" if="shouldBuildManpage">
@@ -89,6 +90,25 @@
 					<uptodate targetfile="${build}/doc/man/man1/gsdrone.1"
 						srcfile="${doc}/manpage.xml" />
 				</and>
+			</not>
+		</condition>
+	</target>
+	
+	<target name="manpagehtml" depends="checkmanpagehtml" if="shouldBuildManpageHtml">
+		<mkdir dir="${build}/doc"/>
+		
+		<exec dir="${doc}" executable="xsltproc">
+			<arg line="-o ../build/doc/gridsweeper-manpage.html"/>
+			<arg value="docbook-xsl/html/docbook.xsl"/>
+			<arg value="manpage.xml"/>
+		</exec>
+	</target>
+	
+	<target name="checkmanpagehtml">
+		<condition property="shouldBuildManpageHtml">
+			<not>
+				<uptodate targetfile="${build}/doc/gridsweeper-manpage.html"
+					srcfile="${doc}/manpage.xml" />
 			</not>
 		</condition>
 	</target>
