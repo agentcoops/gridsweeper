@@ -6,7 +6,7 @@
 	<property name="src" location="src"/>
 	<property name="build" location="build"/>
 	<property name="doc" location="doc"/>
-	<property name="dist" location="dist"/>
+	<property name="dist" location="dist/gridsweeper"/>
 	
 	<property name="classes" location="${dist}/classes"/>
 	<property name="jarfile" location="${classes}/GridSweeper.jar"/>
@@ -40,6 +40,10 @@
 		
 		<mkdir dir="${dist}/plugins"/>
 		<mkdir dir="${dist}/lib"/>
+		
+		<tar tarfile="gridsweeper.tar" basedir="dist"/>
+		<gzip zipfile="gridsweeper.tar.gz" src="gridsweeper.tar"/>
+		<delete file="gridsweeper.tar"/>
 	</target>
 	
 	<target name="jar" depends="compile" description="Build jar">

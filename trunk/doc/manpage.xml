@@ -14,7 +14,7 @@
 
 <refentryinfo>
 	<author>Ed Baskerville</author>
-	<pubdate>27 August 2007</pubdate>
+	<pubdate>31 August 2007</pubdate>
 </refentryinfo>
 
 <refnamediv>
@@ -75,6 +75,14 @@
 	
 	<arg rep="repeat">
 		<replaceable>parameter-setting</replaceable>
+	</arg>
+</cmdsynopsis>
+
+<cmdsynopsis>
+	<command>gsweep</command>
+	
+	<arg>
+		<replaceable>input-file</replaceable>
 	</arg>
 </cmdsynopsis>
 
@@ -763,7 +771,7 @@
 <title>Random Seed Generation</title>
 
 <para>
-	Random seeds are generated using the <classname>RandomSeedGenerator</classname> class from the CERN Colt scientific computing library, whose sole purpose is to decorrelate seeds from any uniform random number generator. Seeds are selected deterministically, in sequence from one of two columns, 0 or 1, in a virtual seed table. The range of rows is 0 to 2^32 - 1. If <varname>firstSeedRow</varname> or <varname>seedCol</varname> are missing, they are chosen at random. Unless you are trying to reproduce a prior experiment, there is no reason to specify these attributes, but they will appear in the experiment file generated in the experiment results directory. You can read more in the <ulink url="http://dsd.lbl.gov/~hoschek/colt/api/index.html">Colt API documentation</ulink>.
+	Random seeds are generated using the <classname>RandomSeedGenerator</classname> class from the CERN Colt scientific computing library, whose sole purpose is to decorrelate seeds from any uniform random number generator. Seeds are selected deterministically, in sequence from one of two columns, 0 or 1, in a virtual seed table. The range of rows is 0 to 2^32 - 1. If <varname>firstSeedRow</varname> or <varname>seedCol</varname> are missing, they are chosen at random. Unless you are trying to reproduce a prior experiment, there is no reason to specify these attributes, but they will appear in the experiment file generated in the experiment results directory. You can read more in the <ulink url="http://dsd.lbl.gov/~hoschek/colt/api/cern/jet/random/engine/RandomSeedGenerator.html">RandomSeedGenerator API documentation</ulink>.
 </para>
 
 </refsect1>

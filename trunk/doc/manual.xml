@@ -288,52 +288,126 @@ $ cat stdout.*
 </chapter>
 
 <chapter id="setup">
-	<title>Setting Up GridSweeper</title>
-	<para>
-		This is how to install GridSweeper.
-	</para>
-	
-	<sect1>
-		<title>What You Need</title>
-		<para> ... </para>
-	</sect1>
-	
-	<sect1>
-		<title>Getting the Pieces</title>
-		<para> ... </para>
-	</sect1>
-	
-	<sect1>
-		<title>Installing GridSweeper</title>
-		<para> ... </para>
-	</sect1>
-	
-	<sect1>
-		<title>Configuring GridSweeper</title>
-		<para> ... </para>
-	</sect1>
+<title>Setting Up GridSweeper</title>
+<para>
+	This section describes how to install and set up GridSweeper for use with your grid. If you are a system administrator for a grid environment, this section is for you. Even if you don’t have administrative access on your system, it is possible to set up GridSweeper for a single user, so you may find this section useful as well—but the best solution is probably to just ask your sysadmin to install it for you!
+</para>
+
+<sect1>
+<title>Getting What You Need</title>
+<para>
+	To get going with GridSweeper, you’ll need just a few things:
+</para>
+
+<itemizedlist>
+
+<listitem><para>
+	a working grid system in an environment with a shared filesystem
+</para></listitem>
+
+<listitem><para>
+	A Java virtual machine with JDK 5 (“1.5”) support.
+</para></listitem>
+
+<listitem><para>
+	the Colt scientific computing library
+</para></listitem>
+
+<listitem><para>
+	the GridSweeper distribution itself
+</para></listitem>
+
+</itemizedlist>
+
+<para>
+	GridSweeper is implemented with the <ulink url="http://drmaa.org/">Distributed Resource Management Application API</ulink> (DRMAA), so in theory it should be able to work with any grid system that supports DRMAA. However, this release has only been tested with the Sun Grid Engine, version 6.1, so your mileage may vary. If you decide to try it with other systems, please let me know if it works, and, if it doesn’t, let me know what problems you are having. If you don’t already have a grid set up, take a look at the Sun Grid Engine. Sun has two websites of relevance: the <ulink url="http://www.sun.com/software/gridware/">product page</ulink> for the commercial version, and the <ulink url="http://gridengine.sunsource.net/">project page</ulink> for the open-source version.
+</para>
+
+<para>
+	Currently, GridSweeper depends on having a shared filesystem across all hosts, both the hosts used to submit jobs and the ones used to execute them. A file-transfer mechanism is under development, but not mature enough for this release. 
+</para>
+
+<para>
+	GridSweeper uses Colt to generate seeds for random number generators. It has been tested with Colt version 1.2.0, available from the Download section of the <ulink url="http://dsd.lbl.gov/~hoschek/colt/">Colt website</ulink>.
+</para>
+
+<para>
+	Once you have the necessary pieces, you can set up the GridSweeper installation.
+</para>
+
+</sect1>
+
+<sect1>
+<title>Installing and Configuring GridSweeper</title>
+
+<para>
+	GridSweeper installation takes a few quick steps:
+</para>
+
+<orderedlist>
+	<listitem><para>putting the GridSweeper installation package in the right place</para></listitem>
+	<listitem><para>restoring execute permissions to GridSweeper scripts</para></listitem>
+	<listitem><para>making Java libraries available to GridSweeper</para></listitem>
+	<listitem><para>adding directories to <envar>PATH</envar> and <envar>MANPATH</envar></para></listitem>
+	<listitem><para>ensuring that Sun Grid Engine is configured properly for all users</para></listitem>
+</orderedlist>
+
+<para>
+	To install GridSweeper, first download the distribution package, and unarchive it to the directory you want, for example <filename>/usr/local</filename>:
+</para>
+
+<screen>
+sudo mv gridsweeper-0.1.tar.gz /usr/local
+cd /usr/local
+sudo tar xzf gridsweeper-0.1.tar.gz
+sudo rm gridsweeper-0.1.tar.gz
+</screen>
+
+<para>
+	Then, you need to restore execute permissions to all the GridSweeper scripts:
+</para>
+
+<screen>
+sudo chmod a+x /path/to/gridsweeper/bin/*
+</screen>
+
+<para>
+	Next, make sure that the appropriate Java libraries are available to GridSweeper: <filename>drmaa.jar</filename>, in <envar>SGE_ROOT</envar><filename>/lib/drmaa.jar</filename>; and <filename>colt.jar</filename>, wherever you have it installed. You can do this one of two ways. You can either add the files to the <envar>CLASSPATH</envar> environment variable, or you can add symbolic links to these files in the <filename>lib</filename> directory in the GridSweeper installation directory, and they will be found there automatically.
+</para>
+
+<para>
+	Similarly, the GridSweeper <filename>bin</filename> and <filename>man</filename> directories must be added to the <envar>PATH</envar> and <envar>MANPATH</envar> environment variables, respectively. You can require each user to do this, or simply add them to system-wide configuration files.
+</para>
+
+<para>
+	In order for GridSweeper to be able to find the Sun Grid Engine DRMAA library, you need to make sure that all your users load the Sun Grid Engine settings script (<envar>SGE_ROOT</envar><filename>/default/common/settings.sh</filename>) at login, for example by sourcing the script in the system-wide shell profile. This can also be done on a per-user basis if desired.
+</para>
+
+</sect1>
+
 </chapter>
 
+
 <chapter id="adapters">
-	<title>Using Adapter Plug-ins</title>
-	<para>
-		...
-	</para>
-	
-	<sect1>
-		<title>Installing Adapter Plug-ins</title>
-		<para> ... </para>
-	</sect1>
-	
-	<sect1>
-		<title>Using Adapter Plug-ins</title>
-		<para> ... </para>
-	</sect1>
-	
-	<sect1>
-		<title>Writing Adapter Plug-ins</title>
-		<para> ... </para>
-	</sect1>
+<title>Using Adapter Plug-ins</title>
+<para>
+...
+</para>
+
+<sect1>
+<title>Installing Adapter Plug-ins</title>
+<para> ... </para>
+</sect1>
+
+<sect1>
+<title>Using Adapter Plug-ins</title>
+<para> ... </para>
+</sect1>
+
+<sect1>
+<title>Writing Adapter Plug-ins</title>
+<para> ... </para>
+</sect1>
 </chapter>
 
 </book>
