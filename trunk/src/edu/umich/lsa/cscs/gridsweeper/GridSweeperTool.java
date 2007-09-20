@@ -287,7 +287,7 @@ public class GridSweeperTool
 		try
 		{
 			StringList dirs = new StringList();
-			dirs.add(appendPathComponent(gs.root, "plugins"));
+			dirs.add(appendPathComponent(System.getenv("GRIDSWEEPER_ROOT"), "plugins"));
 			ClassLoader classLoader = LoaderFactory.create(dirs);
 			AdapterFactory.createAdapter(adapterClassName, classLoader, settings);
 		}
